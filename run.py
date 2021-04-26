@@ -4,10 +4,8 @@ import logging
 
 def main():
 
-    print("Hello World")
 
-
-
+    logging.basicConfig(level = logging.INFO)
 
     cli = c.DoCCLI()
     cli.run()

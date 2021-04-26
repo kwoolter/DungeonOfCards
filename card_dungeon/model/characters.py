@@ -4,10 +4,14 @@ class BaseCharacter():
         self.name = name
         self.type = type
         self.is_player = is_player
-        self.health = 0
+        self.health = 5
+
+    @property
+    def is_dead(self):
+        return self.health <= 0
 
     def print(self):
-        print(f"{self.name} the {self.type} (player={self.is_player})")
+        print(f"{self.name} the {self.type} (player={self.is_player}, health={self.health})")
 
 
 class EnemyCharacter(BaseCharacter):

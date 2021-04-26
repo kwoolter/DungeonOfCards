@@ -34,7 +34,7 @@ class DoCCLI(cmd.Cmd):
     def do_hand(self, arg):
 
         if self.game is not None:
-            print(f'Cards that {self.game.player.name}s Hand:')
+            print(f'Cards that {self.game.player.name} holds:')
             for card in self.game.player_hand:
                 card.print()
         else:
