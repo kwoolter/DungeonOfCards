@@ -34,9 +34,19 @@ class DoCCLI(cmd.Cmd):
     def do_hand(self, arg):
 
         if self.game is not None:
-            print(f'Cards that {self.game.player.name} holds:')
-            for card in self.game.player_hand:
+            print(f'\nCards that {self.game.player.name} holds:')
+            for i,card in enumerate(self.game.player_hand):
+                print(f'{i+1}. ',end="")
+                card.print()
+
+            print(f'\nCards that {self.game.enemy.name} holds:')
+            for i, card in enumerate(self.game.enemy_hand):
+                print(f'{i+1}. ',end="")
                 card.print()
         else:
             print("No battle going on!")
+
+    def do_status(self, arg):
+        self.game.player.print()
+        self.game.enemy.print()
 
