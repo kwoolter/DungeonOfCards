@@ -22,6 +22,7 @@ class Battle():
         self.enemy_hand = []
         self.enemy_discard = []
 
+        self.player_selected_card = None
         self.player_round_card = None
         self.enemy_round_card = None
 
@@ -48,11 +49,20 @@ class Battle():
         self.deal_card(self.player_deck, self.player_hand)
 
     def build_deck(self, card_count: int, deck: list):
-
+        """
+        Add a specified number of randomly generated cards to a deck
+        :param card_count: the number of cards that you want to add to the deck
+        :param deck: the deck that you want to add the cards to
+        """
         for i in range(card_count):
             new_card = BattleCard(f"Card {i}")
             new_card.generate(random.randint(1, 3))
             deck.append(new_card)
+
+    def pick_card(self, choice : BattleCard):
+            self.player_round_card = choice
+            self.player_hand.remove(choice)
+            self.player_discard.append(choice)
 
     def deal_card(self, from_deck: list, to_deck: list):
 
@@ -78,7 +88,7 @@ class Battle():
         turn_full_attack = True
         turn_full_defend = True
 
-        # Attempt all of the attacks in the attackers card
+        # Attempt all of the element attacks in the attackers card
         for element, attack_count in attacker_card.attacks.items():
 
             # For this element, how many blocks does the defender have?
@@ -88,7 +98,10 @@ class Battle():
             # Calculate the damage of the attack which must not be negative
             damage = max(attack_count - block_count, 0)
 
+            # Have we landed ALL attacks?
             turn_full_attack = turn_full_attack and (damage == attack_count)
+
+            # Have all attacks been blocked?
             turn_full_defend = turn_full_defend and (damage == 0)
 
             # Print the results of the defender's block
@@ -100,6 +113,8 @@ class Battle():
                 defender.health -= damage
                 print(f"{attacker.name}'s {element.name} attack does {damage} damage")
 
+        print(f"full attack={turn_full_attack} full defend={turn_full_defend}")
+
     def do_round(self):
 
         if self.is_game_over is True:
@@ -109,8 +124,13 @@ class Battle():
                     print(f"{c.name} the {c.type} is dead!")
             return
 
-        # Get a new card from player and enemy hands
-        self.player_round_card = self.deal_card(self.player_hand, self.player_discard)
+        # Get a new card from player hand
+        if self.player_selected_card is None:
+            self.player_round_card = self.deal_card(self.player_hand, self.player_discard)
+        else:
+            self.pick_card(self.player_selected_card)
+
+        # Get a new card from enemy's hand
         self.enemy_round_card = self.deal_card(self.enemy_hand, self.enemy_discard)
 
         assert self.player_round_card is not None, "The Player has not picked a card for this round"
@@ -162,6 +182,7 @@ class Battle():
         # Reset the cards
         self.player_round_card = None
         self.enemy_round_card = None
+        self.player_selected_card = None
         self.round += 1
 
 

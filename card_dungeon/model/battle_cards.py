@@ -1,6 +1,7 @@
 import random
 from enum import Enum, auto
 
+
 # Types of attack and block elements
 class Element(Enum):
     PHYSICAL = auto()
@@ -9,7 +10,8 @@ class Element(Enum):
     # ICE = 2
     # WATER = 3
 
-# Enum for teh different types of features that can be added to a BattleCard
+
+# Enum for the different types of features that can be added to a BattleCard
 class CardFeature(Enum):
     ATTACK = auto()
     DEFEND = auto()
@@ -21,6 +23,8 @@ class CardFeature(Enum):
 
 class Outcome(Enum):
     HIT = auto()
+
+
 #    BLOCK = auto()
 #    PARTIAL_BLOCK = auto()
 
@@ -57,6 +61,14 @@ class BattleCard(BaseCard):
         self.attacks = {}
         self.blocks = {}
         self.heals = {}
+
+    def __str__(self):
+        text = f"Card '{self.name}': " \
+              f"quick={self.is_quick} " \
+              f"new_cards={self.new_card_count} " \
+              f"unblockable={self.is_attack_unblockable}"
+
+        return text
 
     def print(self):
         print(f"Card '{self.name}' ({self.type.name}) "
@@ -112,8 +124,8 @@ class BattleCard(BaseCard):
                 outcome = random.choice(list(Outcome))
                 self.heals[outcome] = self.heals.get(outcome, 0) + 1
 
-            # If it is a quick feature and we are not already quick...
-            elif feature is CardFeature.QUICK and self.is_quick is False:
+            # If it is a quick feature and we are not already quick and we have some attacks...
+            elif feature is CardFeature.QUICK and self.is_quick is False and len(self.attacks) > 0:
                 self.is_quick = True
 
             # If it is a card dealing feature and we haven't hit the cap for this feature...
