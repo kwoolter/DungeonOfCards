@@ -20,9 +20,9 @@ class CardFeature(Enum):
 
 
 class Outcome(Enum):
-    HIT = 1
-    BLOCK = 2
-    PARTIAL_BLOCK = 3
+    HIT = auto()
+#    BLOCK = auto()
+#    PARTIAL_BLOCK = auto()
 
 
 class CardType(Enum):
@@ -85,7 +85,7 @@ class BattleCard(BaseCard):
         #         HEAL
         #         DEAL
         #         UNBLOCKABLE
-        weights = [10, 10, 5, 3, 1, 3]
+        weights = [10, 10, 4, 3, 1, 3]
 
         # Keep adding features to the Battle Card until we reach the required level...
         while features_added < level:
