@@ -35,14 +35,38 @@ class Battle():
             f"Round {self.round}: Battle between {self.player.name} the {self.player.type} and {self.enemy.name} the {self.enemy.type}")
 
     def initialise(self):
+        """
+        Initialise the battle so that we are ready to start a round
+        :rtype: object
+        """
+
+        # Build random decks for the player and the enemy
         self.build_deck(10, self.player_deck)
         self.build_deck(10, self.enemy_deck)
 
-        self.deal_card(self.player_deck, self.player_hand)
-        self.deal_card(self.player_deck, self.player_hand)
-        self.deal_card(self.player_deck, self.player_hand)
+        # Replenish Player's hand with new cards
+        while len(self.player_hand) < self.player.max_cards_per_hand:
 
-        self.deal_card(self.enemy_deck, self.enemy_hand)
+            # If player's deck is empty then pick up discard pile
+            if len(self.player_deck) == 0:
+                logging.info("Picking up player's discard pile")
+                self.player_deck = self.player_discard
+                self.player_discard = []
+
+            logging.info("Dealing new card to player's hand")
+            self.deal_card(self.player_deck, self.player_hand)
+
+        # Replenish Enemy's hand with new cards
+        while len(self.enemy_hand) < self.enemy.max_cards_per_hand:
+
+            # If enemy's deck is empty then pick up discard pile
+            if len(self.enemy_deck) == 0:
+                logging.info("Picking up enemy's discard pile")
+                self.enemy_deck = self.enemy_discard
+                self.enemy_discard = []
+
+            logging.info("Dealing new card to enemy's hand")
+            self.deal_card(self.enemy_deck, self.enemy_hand)
 
     def start(self):
 
@@ -76,9 +100,15 @@ class Battle():
 
         return new_card
 
-    def do_turn(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
-                defender: BaseCharacter):
-
+    def do_attack(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
+                  defender: BaseCharacter):
+        """
+        Perform an attack on a defender using teh specified attack and defend cards
+        :param attacker_card: The card that the attacker is going to use
+        :param attacker: The attacker
+        :param defender_card: The card that the defender is going to use
+        :param defender: The defender
+        """
         print(f"\n{attacker.name} attacks {defender.name}...")
         attacker.print()
         attacker_card.print()
@@ -116,7 +146,10 @@ class Battle():
         print(f"full attack={turn_full_attack} full defend={turn_full_defend}")
 
     def do_round(self):
-
+        """
+        Do a round in the battle
+        :return:
+        """
         if self.is_game_over is True:
             print("Battle is over!")
             for c in [self.player, self.enemy]:
@@ -138,11 +171,12 @@ class Battle():
 
         # See if the player is going first...
         if self.player_round_card.is_quick is True:
-            self.do_turn(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
-            self.do_turn(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+            self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
+            self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+        # Else the enemy goes first
         else:
-            self.do_turn(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
-            self.do_turn(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
+            self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+            self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
 
         # Add any bonus or penalty to the number of cards a player is allowed in their hand
         self.player.max_cards_per_hand += self.player_round_card.new_card_count
