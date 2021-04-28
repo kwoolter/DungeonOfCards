@@ -38,12 +38,12 @@ class DoCCLI(cmd.Cmd):
 
         if self.game is not None:
             print(f'\nCards that {self.game.player.name} holds:')
-            for i,card in enumerate(self.game.player_hand):
+            for i,card in enumerate(self.game.player_cards.hand):
                 print(f'{i+1}. ',end="")
                 card.print()
 
             print(f'\nCards that {self.game.enemy.name} holds:')
-            for i, card in enumerate(self.game.enemy_hand):
+            for i, card in enumerate(self.game.enemy_cards.hand):
                 print(f'{i+1}. ',end="")
                 card.print()
         else:
@@ -58,11 +58,11 @@ class DoCCLI(cmd.Cmd):
         'Player picks the next card from their hand'
         if self.game is not None:
             print(f'\nCards that {self.game.player.name} holds:')
-            for i,card in enumerate(self.game.player_hand):
+            for i,card in enumerate(self.game.player_cards.hand):
                 print(f'{i+1}. ',end="")
                 card.print()
 
-            choice = pick("Card", self.game.player_hand)
+            choice = pick("Card", self.game.player_cards.hand)
             print(f"You picked {choice}")
 
             self.game.player_selected_card = choice

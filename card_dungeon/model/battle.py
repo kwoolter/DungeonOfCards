@@ -15,16 +15,14 @@ class Battle():
         self.enemy = enemy
 
         self.player_deck = []
-        self.player_hand = []
-        self.player_discard = []
-
         self.enemy_deck = []
-        self.enemy_hand = []
-        self.enemy_discard = []
 
         self.player_selected_card = None
         self.player_round_card = None
         self.enemy_round_card = None
+
+        self.player_cards = CardManager(max_hand_size=3)
+        self.enemy_cards = CardManager(max_hand_size=1)
 
     @property
     def is_game_over(self):
@@ -44,33 +42,15 @@ class Battle():
         self.build_deck(10, self.player_deck)
         self.build_deck(10, self.enemy_deck)
 
-        # Replenish Player's hand with new cards
-        while len(self.player_hand) < self.player.max_cards_per_hand:
+        self.player_cards.deck = self.player_deck
+        self.enemy_cards.deck = self.enemy_deck
 
-            # If player's deck is empty then pick up discard pile
-            if len(self.player_deck) == 0:
-                logging.info("Picking up player's discard pile")
-                self.player_deck = self.player_discard
-                self.player_discard = []
-
-            logging.info("Dealing new card to player's hand")
-            self.deal_card(self.player_deck, self.player_hand)
-
-        # Replenish Enemy's hand with new cards
-        while len(self.enemy_hand) < self.enemy.max_cards_per_hand:
-
-            # If enemy's deck is empty then pick up discard pile
-            if len(self.enemy_deck) == 0:
-                logging.info("Picking up enemy's discard pile")
-                self.enemy_deck = self.enemy_discard
-                self.enemy_discard = []
-
-            logging.info("Dealing new card to enemy's hand")
-            self.deal_card(self.enemy_deck, self.enemy_hand)
+        self.player_cards.replenish()
+        self.enemy_cards.replenish()
 
     def start(self):
+        pass
 
-        self.deal_card(self.player_deck, self.player_hand)
 
     def build_deck(self, card_count: int, deck: list):
         """
@@ -82,23 +62,6 @@ class Battle():
             new_card = BattleCard(f"Card {i}")
             new_card.generate(random.randint(1, 3))
             deck.append(new_card)
-
-    def pick_card(self, choice : BattleCard):
-            self.player_round_card = choice
-            self.player_hand.remove(choice)
-            self.player_discard.append(choice)
-
-    def deal_card(self, from_deck: list, to_deck: list):
-
-        new_card = None
-
-        if len(from_deck) > 0:
-            new_card = from_deck.pop()
-            to_deck.append(new_card)
-        else:
-            print("No cards left in the from deck")
-
-        return new_card
 
     def do_attack(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
                   defender: BaseCharacter):
@@ -157,14 +120,11 @@ class Battle():
                     print(f"{c.name} the {c.type} is dead!")
             return
 
-        # Get a new card from player hand
-        if self.player_selected_card is None:
-            self.player_round_card = self.deal_card(self.player_hand, self.player_discard)
-        else:
-            self.pick_card(self.player_selected_card)
+        # Get a new card from player's hand
+        self.player_round_card = self.player_cards.play_card(self.player_selected_card)
 
         # Get a new card from enemy's hand
-        self.enemy_round_card = self.deal_card(self.enemy_hand, self.enemy_discard)
+        self.enemy_round_card = self.enemy_cards.play_card()
 
         assert self.player_round_card is not None, "The Player has not picked a card for this round"
         assert self.enemy_round_card is not None, "The Enemy has not picked a card for this round"
@@ -183,6 +143,7 @@ class Battle():
         self.player.max_cards_per_hand -= self.enemy_round_card.new_card_count
         self.player.max_cards_per_hand = max(self.player.max_cards_per_hand, 1)
 
+
         # Heal the player if applicable
         self.player.health += self.player_round_card.heals.get(Outcome.HIT,0)
 
@@ -190,28 +151,14 @@ class Battle():
         self.enemy.health += self.enemy_round_card.heals.get(Outcome.HIT,0)
 
         # Replenish Player's hand with new cards
-        while len(self.player_hand) < self.player.max_cards_per_hand:
+        self.player_cards.replenish()
 
-            # If player's deck is empty then pick up discard pile
-            if len(self.player_deck) == 0:
-                logging.info("Picking up player's discard pile")
-                self.player_deck = self.player_discard
-                self.player_discard = []
-
-            logging.info("Dealing new card to player's hand")
-            self.deal_card(self.player_deck, self.player_hand)
+        # Discard cards from the player's hand
+        for i in range(self.enemy_round_card.new_card_count):
+            self.player_cards.play_card()
 
         # Replenish Enemy's hand with new cards
-        while len(self.enemy_hand) < self.enemy.max_cards_per_hand:
-
-            # If enemy's deck is empty then pick up discard pile
-            if len(self.enemy_deck) == 0:
-                logging.info("Picking up enemy's discard pile")
-                self.enemy_deck = self.enemy_discard
-                self.enemy_discard = []
-
-            logging.info("Dealing new card to enemy's hand")
-            self.deal_card(self.enemy_deck, self.enemy_hand)
+        self.enemy_cards.replenish()
 
         # Reset the cards
         self.player_round_card = None

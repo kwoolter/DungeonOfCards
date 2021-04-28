@@ -145,6 +145,57 @@ class LootCard(BaseCard):
         super().__init__(name, CardType.LOOT)
 
 
+class CardManager:
+    def __init__(self, max_hand_size : int = 1):
+        self.deck = []
+        self.hand = []
+        self.discard = []
+        self.max_hand_size = max_hand_size
+
+    def deal_card(self, from_deck: list, to_deck: list):
+
+        new_card = None
+
+        if len(from_deck) > 0:
+            new_card = from_deck.pop()
+            to_deck.append(new_card)
+        else:
+            print("No cards left in the from deck")
+
+        return new_card
+
+    def play_card(self, selected_card : BaseCard = None):
+
+        # If no card specified just pull the top card
+        if selected_card is None and len(self.hand) > 0:
+            selected_card = self.hand[0]
+
+        if selected_card in self.hand:
+            self.hand.remove(selected_card)
+            self.discard.append(selected_card)
+        else:
+            print(f'Cant find card {selected_card} in your hand')
+            selected_card = None
+
+        return selected_card
+
+    def replenish(self):
+        # Replenish hand with new cards
+        while len(self.hand) < self.max_hand_size:
+
+            # If deck is empty then pick up discard pile
+            if len(self.deck) == 0:
+                self.deck = self.discard
+                self.discard = []
+
+            self.deal_card(self.deck, self.hand)
+
+    def reset(self):
+        self.deck = self.deck + self.discard + self.hand
+
+    def shuffle(self):
+        self.deck.shuffle()
+
 def test():
     print(f"\nTesting {__file__}\n")
 
