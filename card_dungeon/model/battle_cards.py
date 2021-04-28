@@ -22,12 +22,11 @@ class CardFeature(Enum):
 
 
 class Outcome(Enum):
+    ALL = auto()
     HIT = auto()
-
-
-#    BLOCK = auto()
-#    PARTIAL_BLOCK = auto()
-
+    HIT_ALL = auto()
+    BLOCK = auto()
+    BLOCK_ALL = auto()
 
 class CardType(Enum):
     BATTLE = 1
@@ -97,7 +96,7 @@ class BattleCard(BaseCard):
         #         HEAL
         #         DEAL
         #         UNBLOCKABLE
-        weights = [10, 10, 4, 3, 1, 3]
+        weights = [10, 10, 4, 10, 1, 3]
 
         # Keep adding features to the Battle Card until we reach the required level...
         while features_added < level:
@@ -121,7 +120,8 @@ class BattleCard(BaseCard):
 
             # If it is a heal feature...
             elif feature is CardFeature.HEAL:
-                outcome = random.choice(list(Outcome))
+                # Store heal value in a dummy placeholder for now
+                outcome = "DUMMY"
                 self.heals[outcome] = self.heals.get(outcome, 0) + 1
 
             # If it is a quick feature and we are not already quick and we have some attacks...
@@ -138,6 +138,25 @@ class BattleCard(BaseCard):
 
             # We think we added a new feature!
             features_added += 1
+
+        # If we added some heal feature(s) the need to replace the placeholder with a real outcome...
+        if len(self.heals) > 0 :
+
+            heal_value = self.heals.get("DUMMY",0)
+            del self.heals["DUMMY"]
+
+            # If there were no blocks or hits...
+            if len(self.blocks) + len(self.attacks) == 0:
+                outcome = Outcome.ALL
+            # If these were mainly blocks...
+            elif len(self.blocks) > len(self.attacks):
+                # select random blocking related outcomes
+                outcome = random.choice([Outcome.ALL, Outcome.BLOCK, Outcome.BLOCK_ALL])
+            # Else select hit related outcomes
+            else:
+                outcome = random.choice([Outcome.ALL, Outcome.HIT, Outcome.HIT_ALL])
+
+            self.heals[outcome] = heal_value
 
 
 class LootCard(BaseCard):

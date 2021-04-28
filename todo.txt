@@ -1,0 +1,1 @@
+1. Need to add checks to only apply attck effects if attack was successful e.g. heal, steal card from player's deck

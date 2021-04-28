@@ -78,11 +78,14 @@ class Battle():
         defender.print()
         defender_card.print()
 
-        turn_full_attack = True
-        turn_full_defend = True
+        attempted_attacks = 0
+        succeeded_attacks = 0
+        suceeded_blocks = 0
 
         # Attempt all of the element attacks in the attackers card
         for element, attack_count in attacker_card.attacks.items():
+
+            attempted_attacks += attack_count
 
             # For this element, how many blocks does the defender have?
             # If attack is unblockable then 0 blocks
@@ -91,11 +94,8 @@ class Battle():
             # Calculate the damage of the attack which must not be negative
             damage = max(attack_count - block_count, 0)
 
-            # Have we landed ALL attacks?
-            turn_full_attack = turn_full_attack and (damage == attack_count)
-
-            # Have all attacks been blocked?
-            turn_full_defend = turn_full_defend and (damage == 0)
+            succeeded_attacks += damage
+            suceeded_blocks += (attack_count * (damage == 0))
 
             # Print the results of the defender's block
             if block_count > 0:
@@ -106,7 +106,9 @@ class Battle():
                 defender.health -= damage
                 print(f"{attacker.name}'s {element.name} attack does {damage} damage")
 
-        print(f"full attack={turn_full_attack} full defend={turn_full_defend}")
+        print(f"attack success={succeeded_attacks}/{attempted_attacks} blocks={suceeded_blocks}")
+
+        return succeeded_attacks, attempted_attacks, suceeded_blocks
 
     def do_round(self):
         """
@@ -120,6 +122,8 @@ class Battle():
                     print(f"{c.name} the {c.type} is dead!")
             return
 
+        results = {}
+
         # Get a new card from player's hand
         self.player_round_card = self.player_cards.play_card(self.player_selected_card)
 
@@ -131,12 +135,12 @@ class Battle():
 
         # See if the player is going first...
         if self.player_round_card.is_quick is True:
-            self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
-            self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+            results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
+            results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
         # Else the enemy goes first
         else:
-            self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
-            self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
+            results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+            results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
 
         # Add any bonus or penalty to the number of cards a player is allowed in their hand
         self.player.max_cards_per_hand += self.player_round_card.new_card_count
@@ -145,25 +149,76 @@ class Battle():
 
 
         # Heal the player if applicable
-        self.player.health += self.player_round_card.heals.get(Outcome.HIT,0)
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Player"]
+        for k, v in self.player_round_card.heals.items():
+
+            logging.info(f"Attempting Player heal {k}={v}...")
+            # Heal in every outcome
+            if k == Outcome.ALL:
+                heal_amount = v
+            # Heal if we landed a hit
+            elif k == Outcome.HIT:
+                heal_amount = v * (succeeded_attacks > 0)
+            # Heal if we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                heal_amount = v * (succeeded_attacks == attempted_attacks)
+            # Heal if we blocked
+            elif k == Outcome.HIT:
+                heal_amount = v * (succeeded_blocks > 0)
+            # Heal if we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                heal_amount = v * (succeeded_blocks == attempted_attacks)
+            # Looks like nothing happened?
+            else:
+                heal_amount = 0
+
+            logging.info(f"Player healed by {heal_amount}")
+            self.player.health += heal_amount
 
         # Heal the enemy if applicable
-        self.enemy.health += self.enemy_round_card.heals.get(Outcome.HIT,0)
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
+        for k, v in self.enemy_round_card.heals.items():
+
+            logging.info(f"Attempting Enemy heal {k}={v}...")
+            # Heal in every outcome
+            if k == Outcome.ALL:
+                heal_amount = v
+                # Heal if we landed a hit
+            elif k == Outcome.HIT:
+                heal_amount = v * (succeeded_attacks > 0)
+            # Heal if we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                heal_amount = v * (succeeded_attacks == attempted_attacks)
+            # Heal if we blocked
+            elif k == Outcome.HIT:
+                heal_amount = v * (succeeded_blocks > 0)
+            # Heal if we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                heal_amount = v * (succeeded_blocks == attempted_attacks)
+            # Looks like nothing happened?
+            else:
+                heal_amount = 0
+
+            logging.info(f"Enemy healed by {heal_amount}")
+            self.enemy.health += heal_amount
+
 
         # Replenish Player's hand with new cards
         self.player_cards.replenish()
 
-        # Discard cards from the player's hand
+        # Discard cards from the player's hand based on enemy hits
         for i in range(self.enemy_round_card.new_card_count):
             self.player_cards.play_card()
 
         # Replenish Enemy's hand with new cards
         self.enemy_cards.replenish()
 
-        # Reset the cards
+        # Reset the round cards
         self.player_round_card = None
         self.enemy_round_card = None
         self.player_selected_card = None
+
+        # Increment the count of completed rounds
         self.round += 1
 
 
