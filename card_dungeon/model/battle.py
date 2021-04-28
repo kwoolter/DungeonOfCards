@@ -163,10 +163,10 @@ class Battle():
             elif k == Outcome.HIT_ALL:
                 heal_amount = v * (succeeded_attacks == attempted_attacks)
             # Heal if we blocked
-            elif k == Outcome.HIT:
+            elif k == Outcome.BLOCK:
                 heal_amount = v * (succeeded_blocks > 0)
             # Heal if we landed ALL hits
-            elif k == Outcome.HIT_ALL:
+            elif k == Outcome.BLOCK_ALL:
                 heal_amount = v * (succeeded_blocks == attempted_attacks)
             # Looks like nothing happened?
             else:
@@ -183,17 +183,17 @@ class Battle():
             # Heal in every outcome
             if k == Outcome.ALL:
                 heal_amount = v
-                # Heal if we landed a hit
+            # Heal if we landed a hit
             elif k == Outcome.HIT:
                 heal_amount = v * (succeeded_attacks > 0)
             # Heal if we landed ALL hits
             elif k == Outcome.HIT_ALL:
                 heal_amount = v * (succeeded_attacks == attempted_attacks)
             # Heal if we blocked
-            elif k == Outcome.HIT:
+            elif k == Outcome.BLOCK:
                 heal_amount = v * (succeeded_blocks > 0)
             # Heal if we landed ALL hits
-            elif k == Outcome.HIT_ALL:
+            elif k == Outcome.BLOCK_ALL:
                 heal_amount = v * (succeeded_blocks == attempted_attacks)
             # Looks like nothing happened?
             else:
