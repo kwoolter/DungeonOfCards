@@ -152,7 +152,7 @@ class Battle():
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Player"]
         for k, v in self.player_round_card.heals.items():
 
-            logging.info(f"Attempting Player heal {k}={v}...")
+            logging.info(f"Attempting Player heal if {k}={v}...")
             # Heal in every outcome
             if k == Outcome.ALL:
                 heal_amount = v
@@ -179,7 +179,7 @@ class Battle():
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
         for k, v in self.enemy_round_card.heals.items():
 
-            logging.info(f"Attempting Enemy heal {k}={v}...")
+            logging.info(f"Attempting Enemy heal if {k}={v}...")
             # Heal in every outcome
             if k == Outcome.ALL:
                 heal_amount = v

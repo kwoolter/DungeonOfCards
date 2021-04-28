@@ -96,6 +96,7 @@ class BattleCard(BaseCard):
         #         HEAL
         #         DEAL
         #         UNBLOCKABLE
+        weights = [10, 10, 4, 3, 1, 3]
         weights = [10, 10, 4, 10, 1, 3]
 
         # Keep adding features to the Battle Card until we reach the required level...
@@ -139,23 +140,24 @@ class BattleCard(BaseCard):
             # We think we added a new feature!
             features_added += 1
 
-        # If we added some heal feature(s) the need to replace the placeholder with a real outcome...
+        # If we added some heal feature(s) the need to replace the placeholder with a real outcome conditions...
         if len(self.heals) > 0 :
 
             heal_value = self.heals.get("DUMMY",0)
             del self.heals["DUMMY"]
 
-            # If there were no blocks or hits...
+            # If there were no blocks or hits always heal...
             if len(self.blocks) + len(self.attacks) == 0:
                 outcome = Outcome.ALL
             # If these were mainly blocks...
             elif len(self.blocks) > len(self.attacks):
-                # select random blocking related outcomes
+                # Select random blocking related outcomes
                 outcome = random.choice([Outcome.ALL, Outcome.BLOCK, Outcome.BLOCK_ALL])
             # Else select hit related outcomes
             else:
                 outcome = random.choice([Outcome.ALL, Outcome.HIT, Outcome.HIT_ALL])
 
+            # Store the new heal, outcome condition and value
             self.heals[outcome] = heal_value
 
 
