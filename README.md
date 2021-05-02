@@ -32,6 +32,15 @@ Battle cards have the following features:-
 
 The `BattleCard.generate(n)` method will generate a random card with `n` features added.
 
+## Player Effects
+* Decay - lose 1 health per round
+* Blessed - gain 1 health per round
+* Burning - lose 1 health per round
+* Invincible - enemy attacks do no damage
+* Sleep - player neither attacks or blocks
+* Confused - you can't see the cards in your own hand
+* Blinded - you can't see the enemy's card
+
 ## Decks
 Both the player and an enemy have the following:-
 * Deck - a deck of hidden Battle Cards

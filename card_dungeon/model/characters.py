@@ -17,7 +17,7 @@ class BaseCharacter():
         return self.health <= 0
 
     def print(self):
-        print(f"{self.name} the {self.type} (player={self.is_player}, health={self.health}, effects={self.effects} max hand={self.max_cards_per_hand})")
+        print(f"{self.name} the {self.type} (player={self.is_player}, health={self.health}, effects={self.effects}, max hand={self.max_cards_per_hand})")
 
     def add_effect(self, effect_name : str, tick_count : int = 3):
         self.effects[effect_name] = tick_count
