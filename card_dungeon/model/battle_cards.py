@@ -51,7 +51,7 @@ class BattleCard(BaseCard):
     MAX_NEW_DEALS = 3
 
     PLAYER_CARD_EFFECTS = [Effect.INVINCIBLE, Effect.BLESSED]
-    ENEMY_CARD_EFFECTS = [Effect.BLIND, Effect.CONFUSED, Effect.DECAY, Effect.BURNING]
+    ENEMY_CARD_EFFECTS = [Effect.BLIND, Effect.CONFUSED, Effect.DECAY, Effect.BURNING, Effect.SLEEP]
 
     def __init__(self, name: str):
         super().__init__(name, CardType.BATTLE)
@@ -105,7 +105,7 @@ class BattleCard(BaseCard):
         # DEAL
         # UNBLOCKABLE
         # EFFECT
-        weights = [10, 10, 4, 3, 1, 3]
+
         weights = [10, 10, 4, 10, 1, 3, 30]
 
         # Keep adding features to the Battle Card until we reach the required level...

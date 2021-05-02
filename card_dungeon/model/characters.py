@@ -34,6 +34,10 @@ class BaseCharacter():
     def is_confused(self):
         return Effect.CONFUSED in self.effects.keys()
 
+    @property
+    def is_sleeping(self):
+        return Effect.SLEEP in self.effects.keys()
+
     def tick(self):
 
         # Process effects

@@ -7,3 +7,4 @@ class Effect(Enum):
     BURNING = auto()
     INVINCIBLE = auto()
     BLESSED = auto()
+    SLEEP = auto()

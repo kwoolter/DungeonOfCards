@@ -78,45 +78,47 @@ class Battle():
         defender.print()
         defender_card.print()
 
-        # Is the defender currently invincible?
-        is_invincible = Effect.INVINCIBLE in defender.effects.keys()
-
         attempted_attacks = 0
         succeeded_attacks = 0
         suceeded_blocks = 0
 
-        # Attempt all of the element attacks in the attackers card
-        for element, attack_count in attacker_card.attacks.items():
+        # If the attacker is awake...
+        if attacker.is_sleeping is False:
 
-            attempted_attacks += attack_count
+            # Attempt all of the element attacks in the attackers card
+            for element, attack_count in attacker_card.attacks.items():
 
-            # For this element, how many blocks does the defender have?
-            # If attack is unblockable then 0 blocks
-            block_count = defender_card.blocks.get(element, 0) * (attacker_card.is_attack_unblockable is False)
+                attempted_attacks += attack_count
 
-            # Calculate the damage of the attack which must not be negative.
-            damage = max(attack_count - block_count, 0)
+                # For this element, how many blocks does the defender have?
+                # If attack is unblockable then 0 blocks
+                # If defender is sleeping then 0 blocks
+                block_count = defender_card.blocks.get(element, 0) * (attacker_card.is_attack_unblockable is False) * (defender.is_sleeping is False)
 
-            # Update attacks and blocks stats
-            succeeded_attacks += damage
-            suceeded_blocks += (attack_count * (damage == 0))
+                # Calculate the damage of the attack which must not be negative.
+                damage = max(attack_count - block_count, 0)
 
-            # Print the results of the defender's block
-            if block_count > 0:
-                print(f"{defender.name} blocks {min(block_count, attack_count)} {element.name} attacks")
+                # Update attacks and blocks stats
+                succeeded_attacks += damage
+                suceeded_blocks += (attack_count * (damage == 0))
 
-            # Print the results of the attacker's attack
-            if damage > 0:
-                # If defender is invincible then damage = 0
-                if defender.is_invincible is True:
-                    damage = 0
-                    print(f"{defender.name} is Invincible!")
-                else:
-                    defender.health -= damage
+                # Print the results of the defender's block
+                if block_count > 0:
+                    print(f"{defender.name} blocks {min(block_count, attack_count)} {element.name} attacks")
 
-                print(f"{attacker.name}'s {element.name} attack does {damage} damage")
+                # Print the results of the attacker's attack
+                if damage > 0:
+                    # If defender is invincible then damage = 0
+                    if defender.is_invincible is True:
+                        damage = 0
+                        print(f"{defender.name} is Invincible!")
+                    else:
+                        defender.health -= damage
 
+                    print(f"{attacker.name}'s {element.name} attack does {damage} damage")
 
+        else:
+            print(f"{attacker.name} is asleep ZZZZzzzzz")
 
         print(f"attack success={succeeded_attacks}/{attempted_attacks} blocks={suceeded_blocks}")
 
