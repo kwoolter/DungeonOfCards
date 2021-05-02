@@ -45,7 +45,10 @@ class DoCCLI(cmd.Cmd):
             print(f'\nCards that {self.game.enemy.name} holds:')
             for i, card in enumerate(self.game.enemy_cards.hand):
                 print(f'{i+1}. ',end="")
-                card.print()
+                if self.game.player.is_blind is False:
+                    card.print()
+                else:
+                    print("??? Blinded ???")
         else:
             print("No battle going on!")
 
@@ -60,7 +63,10 @@ class DoCCLI(cmd.Cmd):
             print(f'\nCards that {self.game.player.name} holds:')
             for i,card in enumerate(self.game.player_cards.hand):
                 print(f'{i+1}. ',end="")
-                card.print()
+                if self.game.player.is_confused is False:
+                    card.print()
+                else:
+                    print("???  Confused ???")
 
             choice = pick("Card", self.game.player_cards.hand)
             print(f"You picked {choice}")

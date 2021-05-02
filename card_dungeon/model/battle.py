@@ -39,8 +39,8 @@ class Battle():
         """
 
         # Build random decks for the player and the enemy
-        self.build_deck(10, self.player_deck)
-        self.build_deck(10, self.enemy_deck)
+        self.build_deck(card_count=10, is_player_deck=True, deck=self.player_deck)
+        self.build_deck(card_count=10, is_player_deck=False, deck=self.enemy_deck)
 
         self.player_cards.deck = self.player_deck
         self.enemy_cards.deck = self.enemy_deck
@@ -52,7 +52,7 @@ class Battle():
         pass
 
 
-    def build_deck(self, card_count: int, deck: list):
+    def build_deck(self, card_count: int, is_player_deck:bool, deck: list):
         """
         Add a specified number of randomly generated cards to a deck
         :param card_count: the number of cards that you want to add to the deck
@@ -60,7 +60,7 @@ class Battle():
         """
         for i in range(card_count):
             new_card = BattleCard(f"Card {i}")
-            new_card.generate(random.randint(1, 3))
+            new_card.generate(random.randint(1, 3), is_player_deck)
             deck.append(new_card)
 
     def do_attack(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
@@ -78,6 +78,9 @@ class Battle():
         defender.print()
         defender_card.print()
 
+        # Is the defender currently invincible?
+        is_invincible = Effect.INVINCIBLE in defender.effects.keys()
+
         attempted_attacks = 0
         succeeded_attacks = 0
         suceeded_blocks = 0
@@ -91,9 +94,10 @@ class Battle():
             # If attack is unblockable then 0 blocks
             block_count = defender_card.blocks.get(element, 0) * (attacker_card.is_attack_unblockable is False)
 
-            # Calculate the damage of the attack which must not be negative
+            # Calculate the damage of the attack which must not be negative.
             damage = max(attack_count - block_count, 0)
 
+            # Update attacks and blocks stats
             succeeded_attacks += damage
             suceeded_blocks += (attack_count * (damage == 0))
 
@@ -103,8 +107,16 @@ class Battle():
 
             # Print the results of the attacker's attack
             if damage > 0:
-                defender.health -= damage
+                # If defender is invincible then damage = 0
+                if defender.is_invincible is True:
+                    damage = 0
+                    print(f"{defender.name} is Invincible!")
+                else:
+                    defender.health -= damage
+
                 print(f"{attacker.name}'s {element.name} attack does {damage} damage")
+
+
 
         print(f"attack success={succeeded_attacks}/{attempted_attacks} blocks={suceeded_blocks}")
 
@@ -146,7 +158,6 @@ class Battle():
         self.player.max_cards_per_hand += self.player_round_card.new_card_count
         self.player.max_cards_per_hand -= self.enemy_round_card.new_card_count
         self.player.max_cards_per_hand = max(self.player.max_cards_per_hand, 1)
-
 
         # Heal the player if applicable
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Player"]
@@ -192,7 +203,7 @@ class Battle():
             # Heal if we blocked
             elif k == Outcome.BLOCK:
                 heal_amount = v * (succeeded_blocks > 0)
-            # Heal if we landed ALL hits
+            # Heal if we blocked ALL hits
             elif k == Outcome.BLOCK_ALL:
                 heal_amount = v * (succeeded_blocks == attempted_attacks)
             # Looks like nothing happened?
@@ -201,6 +212,40 @@ class Battle():
 
             logging.info(f"Enemy healed by {heal_amount}")
             self.enemy.health += heal_amount
+
+        # Apply effects to player if Enemy outcomes match...
+        # Get the results of teh Enemy action
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
+
+        # Loop through teh effects that are on the enemy Battle Card
+        for k, v in self.enemy_round_card.effects.items():
+
+            logging.info(f"Attempting to add effect {v} to Player if outcome = {k}...")
+            # Every outcome
+            if k == Outcome.ALL:
+                success = True
+            # If we landed a hit
+            elif k == Outcome.HIT:
+                success = (succeeded_attacks > 0)
+            # If we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                success = (succeeded_attacks == attempted_attacks)
+            # If we blocked
+            elif k == Outcome.BLOCK:
+                success = (succeeded_blocks > 0)
+            # If we blocked ALL hits
+            elif k == Outcome.BLOCK_ALL:
+                success = (succeeded_blocks == attempted_attacks)
+            # Looks like nothing happened?
+            else:
+                success = False
+
+            # If the Enemy outcome succeeded then add the effect to the player
+            if success is True:
+                logging.info(f"Effect {v} added to Player")
+                self.player.add_effect(v)
+            else:
+                logging.info(f"Failed to add effect {v} to Player")
 
 
         # Replenish Player's hand with new cards
@@ -220,6 +265,8 @@ class Battle():
 
         # Increment the count of completed rounds
         self.round += 1
+        self.player.tick()
+        self.enemy.tick()
 
 
 def test():

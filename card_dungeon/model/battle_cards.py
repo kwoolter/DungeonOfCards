@@ -1,4 +1,6 @@
 import random
+from . doc_enums import *
+
 from enum import Enum, auto
 
 
@@ -10,7 +12,6 @@ class Element(Enum):
     # ICE = 2
     # WATER = 3
 
-
 # Enum for the different types of features that can be added to a BattleCard
 class CardFeature(Enum):
     ATTACK = auto()
@@ -19,7 +20,7 @@ class CardFeature(Enum):
     HEAL = auto()
     DEAL = auto()
     UNBLOCKABLE = auto()
-
+    EFFECT = auto()
 
 class Outcome(Enum):
     ALL = auto()
@@ -60,6 +61,7 @@ class BattleCard(BaseCard):
         self.attacks = {}
         self.blocks = {}
         self.heals = {}
+        self.effects = {}
 
     def __str__(self):
         text = f"Card '{self.name}': " \
@@ -84,20 +86,24 @@ class BattleCard(BaseCard):
         for k, v in self.heals.items():
             print(f"\tHeal {k}={v}")
 
-    def generate(self, level: int = 1):
+        for k, v in self.effects.items():
+            print(f"\tEffect {k}={v}")
+
+    def generate(self, level: int = 1, is_player_card : bool = False):
 
         # How many features have been added to this card so far i.e. 0
         features_added = 0
 
         # Random weightings for features...
-        #         ATTACK
-        #         DEFEND
-        #         QUICK
-        #         HEAL
-        #         DEAL
-        #         UNBLOCKABLE
+        # ATTACK
+        # DEFEND
+        # QUICK
+        # HEAL
+        # DEAL
+        # UNBLOCKABLE
+        # EFFECT
         weights = [10, 10, 4, 3, 1, 3]
-        weights = [10, 10, 4, 10, 1, 3]
+        weights = [10, 10, 4, 10, 1, 3, 30]
 
         # Keep adding features to the Battle Card until we reach the required level...
         while features_added < level:
@@ -133,6 +139,13 @@ class BattleCard(BaseCard):
             elif feature is CardFeature.DEAL and self.new_card_count < BattleCard.MAX_NEW_DEALS:
                 self.new_card_count += 1
 
+            # If it is an NPC card we are building and adding an effect feature and if no effects yet added...
+            elif is_player_card is False and feature is CardFeature.EFFECT and len(self.effects) == 0:
+                # Store random effect against a dummy outcome placeholder for now
+                outcome = "DUMMY"
+                e = random.choice(list(Effect))
+                self.effects[outcome] = e
+
             # Else we failed to add a new feature so off set the increment that is about to happen!!!!
             else:
                 features_added -= 1
@@ -140,7 +153,7 @@ class BattleCard(BaseCard):
             # We think we added a new feature!
             features_added += 1
 
-        # If we added some heal feature(s) the need to replace the placeholder with a real outcome conditions...
+        # If we added some heal feature(s) we need to replace the placeholder with a real outcome condition...
         if len(self.heals) > 0 :
 
             heal_value = self.heals.get("DUMMY",0)
@@ -159,6 +172,27 @@ class BattleCard(BaseCard):
 
             # Store the new heal, outcome condition and value
             self.heals[outcome] = heal_value
+
+        # If we added an effect feature we need to replace the placeholder with a real outcome condition...
+        if len(self.effects) > 0 :
+
+            outcome = "DUMMY"
+            effect = self.effects.get(outcome)
+            del self.effects[outcome]
+
+            # If there were no blocks or hits always apply effect...
+            if len(self.blocks) + len(self.attacks) == 0:
+                outcome = Outcome.ALL
+            # If these were mainly blocks...
+            elif len(self.blocks) > len(self.attacks):
+                # Select random blocking related outcomes
+                outcome = random.choice([Outcome.ALL, Outcome.BLOCK, Outcome.BLOCK_ALL])
+            # Else select hit related outcomes
+            else:
+                outcome = random.choice([Outcome.ALL, Outcome.HIT, Outcome.HIT_ALL])
+
+            # Store the new effect, outcome condition and value
+            self.effects[outcome] = effect
 
 
 class LootCard(BaseCard):

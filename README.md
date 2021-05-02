@@ -25,7 +25,7 @@ Battle cards have the following features:-
 * Block -  physical or magical
 * Unblockable - the attack is unblockable
 * Quick - a quick attack goes ahead of the enemy's turn
-* Healing - The player is healied
+* Healing - The player is healed
 * Dealing - the player receives or loses cards in their hand
 
 The `BattleCard.generate(n)` method will generate a random card with `n` features added.
