@@ -18,14 +18,16 @@ TBC
 
 # The Game
 ## Player and NPCs
+TBC
 
 ## Battle Cards
 Battle cards have the following features:-
 * Attack - physical or magical
 * Block -  physical or magical
 * Unblockable - the attack is unblockable
-* Quick - a quick attack goes ahead of the enemy's turn
-* Healing - The player is healed
+* Quick - a quick attack goes ahead of the opponent's turn
+* Healing - the player is healed dependent on an outcome e.g. successful block
+* Effects - an effect is added to the card that is dependent on an outcome e.g. successful attack
 * Dealing - the player receives or loses cards in their hand
 
 The `BattleCard.generate(n)` method will generate a random card with `n` features added.

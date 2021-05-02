@@ -217,10 +217,40 @@ class Battle():
         # Get the results of teh Enemy action
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
 
-        # Loop through teh effects that are on the enemy Battle Card
+        # Loop through the effects that are on the Player's Battle Card
+        for k, v in self.player_round_card.effects.items():
+
+            logging.info(f"Attempting to add effect {v.name} to Player if outcome = {k}...")
+            # Every outcome
+            if k == Outcome.ALL:
+                success = True
+            # If we landed a hit
+            elif k == Outcome.HIT:
+                success = (succeeded_attacks > 0)
+            # If we landed ALL hits
+            elif k == Outcome.HIT_ALL:
+                success = (succeeded_attacks == attempted_attacks)
+            # If we blocked
+            elif k == Outcome.BLOCK:
+                success = (succeeded_blocks > 0)
+            # If we blocked ALL hits
+            elif k == Outcome.BLOCK_ALL:
+                success = (succeeded_blocks == attempted_attacks)
+            # Looks like nothing happened?
+            else:
+                success = False
+
+            # If the Player outcome succeeded then add the effect to the player
+            if success is True:
+                logging.info(f"Effect {v.name} added to Player")
+                self.player.add_effect(v)
+            else:
+                logging.info(f"Failed to add effect {v.name} to Player")
+
+        # Loop through the effects that are on the Enemy's Battle Card
         for k, v in self.enemy_round_card.effects.items():
 
-            logging.info(f"Attempting to add effect {v} to Player if outcome = {k}...")
+            logging.info(f"Attempting to add effect {v.name} to Player if outcome = {k}...")
             # Every outcome
             if k == Outcome.ALL:
                 success = True
@@ -242,10 +272,10 @@ class Battle():
 
             # If the Enemy outcome succeeded then add the effect to the player
             if success is True:
-                logging.info(f"Effect {v} added to Player")
+                logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
             else:
-                logging.info(f"Failed to add effect {v} to Player")
+                logging.info(f"Failed to add effect {v.name} to Player")
 
 
         # Replenish Player's hand with new cards

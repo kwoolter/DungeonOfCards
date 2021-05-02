@@ -50,6 +50,9 @@ class BattleCard(BaseCard):
     MAX_BLOCKS = 3
     MAX_NEW_DEALS = 3
 
+    PLAYER_CARD_EFFECTS = [Effect.INVINCIBLE, Effect.BLESSED]
+    ENEMY_CARD_EFFECTS = [Effect.BLIND, Effect.CONFUSED, Effect.DECAY, Effect.BURNING]
+
     def __init__(self, name: str):
         super().__init__(name, CardType.BATTLE)
 
@@ -121,8 +124,13 @@ class BattleCard(BaseCard):
                 e = random.choice(list(Element))
                 self.blocks[e] = self.blocks.get(e, 0) + 1
 
-            # If it is an unblockable attack, and we are not already unblockable, and we have at least 1 attack...
-            elif feature is CardFeature.UNBLOCKABLE and self.is_attack_unblockable is False and len(self.attacks) > 0:
+            # If it is an unblockable attack feature
+            # and we are not already unblockable
+            # and we have at least 1 attack...
+            elif feature is CardFeature.UNBLOCKABLE and \
+                    self.is_attack_unblockable is False and\
+                    len(self.attacks) > 0:
+
                 self.is_attack_unblockable = True
 
             # If it is a heal feature...
@@ -131,19 +139,31 @@ class BattleCard(BaseCard):
                 outcome = "DUMMY"
                 self.heals[outcome] = self.heals.get(outcome, 0) + 1
 
-            # If it is a quick feature and we are not already quick and we have some attacks...
-            elif feature is CardFeature.QUICK and self.is_quick is False and len(self.attacks) > 0:
+            # If it is a quick feature
+            # and we are building a player card
+            # and we are not already quick
+            # and we have some attacks to make quick...
+            elif feature is CardFeature.QUICK and \
+                    is_player_card is True and \
+                    self.is_quick is False and \
+                    len(self.attacks) > 0:
                 self.is_quick = True
 
             # If it is a card dealing feature and we haven't hit the cap for this feature...
             elif feature is CardFeature.DEAL and self.new_card_count < BattleCard.MAX_NEW_DEALS:
                 self.new_card_count += 1
 
-            # If it is an NPC card we are building and adding an effect feature and if no effects yet added...
-            elif is_player_card is False and feature is CardFeature.EFFECT and len(self.effects) == 0:
+            # If adding an effect feature and if no effects yet added...
+            elif feature is CardFeature.EFFECT and len(self.effects) == 0:
                 # Store random effect against a dummy outcome placeholder for now
                 outcome = "DUMMY"
-                e = random.choice(list(Effect))
+
+                # Pick a random effect from the applciable list
+                if is_player_card is True:
+                    e = random.choice(BattleCard.PLAYER_CARD_EFFECTS)
+                else:
+                    e = random.choice(BattleCard.ENEMY_CARD_EFFECTS)
+
                 self.effects[outcome] = e
 
             # Else we failed to add a new feature so off set the increment that is about to happen!!!!

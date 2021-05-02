@@ -68,8 +68,12 @@ class DoCCLI(cmd.Cmd):
                 else:
                     print("???  Confused ???")
 
-            choice = pick("Card", self.game.player_cards.hand)
-            print(f"You picked {choice}")
+            # If the Player is not confused then allow them to pick the next card
+            if self.game.player.is_confused is False:
+                choice = pick("Card", self.game.player_cards.hand)
+                print(f"You picked {choice}")
+            else:
+                choice = None
 
             self.game.player_selected_card = choice
 

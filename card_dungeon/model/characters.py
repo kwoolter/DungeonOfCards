@@ -35,6 +35,19 @@ class BaseCharacter():
         return Effect.CONFUSED in self.effects.keys()
 
     def tick(self):
+
+        # Process effects
+        if Effect.DECAY in self.effects.keys():
+            logging.info("You are rotting! Losing Health.")
+            self.health -= 1
+        if Effect.BURNING in self.effects.keys():
+            logging.info("You are burning! Losing Health.")
+            self.health -= 1
+        if Effect.BLESSED in self.effects.keys():
+            logging.info("You are blessed and healing")
+            self.health += 1
+
+        # Decrement effect counters
         keys_to_delete = []
         for k,v in self.effects.items():
             if v == 1:
@@ -43,6 +56,7 @@ class BaseCharacter():
             else:
                 self.effects[k] = v - 1
 
+        # Remove any effects that have expired
         for k in keys_to_delete:
             del self.effects[k]
 
