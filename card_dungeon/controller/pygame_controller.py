@@ -11,6 +11,7 @@ class DoCGUIController:
     def __init__(self):
         self.m = model.Model("Dungeon of Cards")
         self.v = view.MainFrame(self.m)
+        self.events = self.m.events
 
         self._debug = False
 
@@ -54,6 +55,23 @@ class DoCGUIController:
 
         while loop is True:
 
+            # Loop to process game events
+            event =self.events.get_next_event()
+            while event is not None:
+
+                try:
+                    self.m.process_event(event)
+                    self.v.process_event(event)
+
+                except Exception as err:
+                    print("Caught exception {0}".format(str(err)))
+
+                if event.type == model.Event.QUIT:
+                    loop = False
+                    break
+
+                event = self.events.get_next_event()
+
 
             # If we are playing the game then process all of the key controls
             if self.m.state == model.Model.STATE_PLAYING:
@@ -63,6 +81,7 @@ class DoCGUIController:
             # Loop to process pygame events
             for event in pygame.event.get():
 
+                # Process events for when the game is in state PLAYING
                 if self.m.state == model.Model.STATE_PLAYING:
 
                     # Timer events for the model to process
@@ -73,10 +92,11 @@ class DoCGUIController:
                     elif event.type == USEREVENT + 2:
                         self.v.tick()
 
-
                     # Key UP events - less time critical actions
                     elif event.type == KEYUP:
-                        pass
+                        # Space to start the game
+                        if event.key == K_ESCAPE:
+                            self.m.pause()
 
                     # Key DOWN events - less time critical actions
                     elif event.type == KEYDOWN:
@@ -89,14 +109,14 @@ class DoCGUIController:
                     if event.type == KEYUP:
                         # Space to start the game
                         if event.key == K_SPACE:
-                            pass
+                            self.m.start()
                     # Timer events
                     elif event.type == USEREVENT + 2:
                         self.v.tick()
 
                     # Timer for talking
                     elif event.type == USEREVENT + 3:
-                        self.m.talk_to_npc(npc_object=None, npc_name="The Master", world_id=self.m.state)
+                        pass
 
                 # Process events for when the game is in state READY
                 elif self.m.state == model.Model.STATE_READY:
@@ -106,23 +126,26 @@ class DoCGUIController:
                         # Space to start the game
                         if event.key == K_SPACE:
                             self.m.start()
-                        elif event.key == K_F2:
-                            self.audio.change_volume()
-                        elif event.key == K_F3:
-                            self.audio.change_volume(-0.1)
-                        # Debug print game status info
-                        elif event.key == K_F12 and self._debug is True:
-                            self.v.print()
-                            self.m.print()
-                            self.audio.print()
                     # Timer events
                     elif event.type == USEREVENT + 2:
                         self.v.tick()
-
                     # Timer for talking
                     elif event.type == USEREVENT + 3:
                         pass
 
+                # Process events for when the game is in state PAUSED
+                elif self.m.state == model.Model.STATE_PAUSED:
+                    # Key events
+                    if event.type == KEYUP:
+                        # Escape to unpause the game
+                        if event.key == K_ESCAPE:
+                            self.m.pause()
+                        # F4 to quit
+                        elif event.key == K_F4:
+                            loop = False
+                        # F12 to toggle debug
+                        elif event.key == K_F12:
+                            self.m.debug()
 
                 # Quit event
                 if event.type == QUIT:

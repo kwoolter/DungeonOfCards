@@ -19,6 +19,9 @@ class Model():
         self._state = None
         self._debug = False
 
+        # Model Components
+        self.events = EventQueue()
+
     @property
     def state(self):
         return self._state
@@ -28,12 +31,50 @@ class Model():
         if new_state != self._state:
             self._old_state = self._state
             self._state = new_state
+            self.events.add_event(Event(type=Event.STATE,
+                                        name=self.state,
+                                        description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
-        pass
+        self.state = Model.STATE_LOADED
 
     def tick(self):
-        pass
+        if self.state == Model.STATE_PLAYING:
+            pass
+        else:
+            pass
+
+    def start(self):
+        self.state = Model.STATE_PLAYING
+
+    def pause(self, pause_on=None):
+
+        if pause_on is True:
+            self.state = Model.STATE_PAUSED
+        elif pause_on is False and self.state == Model.STATE_PAUSED:
+            self.state = Model.STATE_PLAYING
+        elif pause_on is None:
+            if self.state == Model.STATE_PAUSED:
+                self.state = Model.STATE_PLAYING
+            elif self.state == Model.STATE_PLAYING:
+                self.state = Model.STATE_PAUSED
+
+    def process_event(self, new_event):
+        print("Default Game event process:{0}".format(new_event))
+
+        if new_event.type == Event.DEBUG:
+            self.debug()
+
+    def debug(self, debug_on : bool = None):
+
+        if debug_on is None:
+            self._debug = not self._debug
+        else:
+            self._debug = debug_on
+
+        print(f"Debug={self._debug}")
 
     def end(self):
         print("Ending {0}".format(__class__))
+
+

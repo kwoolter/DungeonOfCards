@@ -14,7 +14,7 @@ Typical flow of the game uses these commands:-
 * Repeat until someone dies
 
 ## Graphics Version
-TBC
+Work in Progress
 
 # The Game
 ## Player and NPCs

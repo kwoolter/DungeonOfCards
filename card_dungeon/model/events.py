@@ -1,5 +1,7 @@
-class Event():
+import collections
 
+
+class Event():
     # Event Types
     DEBUG = "debug"
     QUIT = "quit"
@@ -22,13 +24,11 @@ class Event():
     EFFECT_END = "Effect End"
     HELP = "Help"
 
-
     # Effects
     EFFECT_MELEE_ATTACK = "Melee Attack"
 
-
     EFFECT_DURATION = {
-        EFFECT_MELEE_ATTACK : 20
+        EFFECT_MELEE_ATTACK: 20
     }
 
     def __init__(self, name: str, description: str = None, type: str = DEFAULT):
@@ -38,3 +38,24 @@ class Event():
 
     def __str__(self):
         return "{0}:{1} ({2})".format(self.name, self.description, self.type)
+
+
+class EventQueue():
+    def __init__(self):
+        self.events = collections.deque()
+
+    def add_event(self, new_event: Event):
+        self.events.append(new_event)
+
+    def get_next_event(self):
+        next_event = None
+        if len(self.events) > 0:
+            next_event = self.events.pop()
+        return next_event
+
+    def size(self):
+        return len(self.events)
+
+    def print(self):
+        for event in self.events:
+            print(event)

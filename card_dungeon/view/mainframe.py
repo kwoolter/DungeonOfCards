@@ -1,7 +1,7 @@
 import pygame
 import os
 import card_dungeon.model as model
-from .graphics import Colours
+from .graphics import *
 
 class ImageManager():
 
@@ -102,6 +102,30 @@ class MainFrame(View):
         y = 0
 
         self.surface.fill(Colours.RED)
+
+        msg_box_width = 200
+        msg_box_height = 64
+        msg_rect = pygame.Rect((pane_rect.width - msg_box_width) / 2,
+                               (pane_rect.height - msg_box_height) / 2, msg_box_width, msg_box_height)
+
+        pygame.draw.rect(self.surface,
+                         Colours.DARK_GREY,
+                         msg_rect,
+                         0)
+
+        pygame.draw.rect(self.surface,
+                         Colours.LIGHT_GREY,
+                         msg_rect,
+                         2)
+
+        draw_text(surface=self.surface,
+                  msg="{0}".format(self.model.state),
+                  x=pane_rect.width / 2,
+                  y=pane_rect.height / 2,
+                  size=32,
+                  centre=True,
+                  fg_colour=Colours.LIGHT_GREY,
+                  bg_colour=Colours.DARK_GREY)
 
     def update(self):
         pygame.display.update()
