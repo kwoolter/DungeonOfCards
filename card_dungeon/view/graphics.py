@@ -1,0 +1,16 @@
+class Colours:
+    # set up the colours
+    BLACK = (0, 0, 0)
+    BROWN = (128, 64, 0)
+    WHITE = (255, 255, 255)
+    RED = (237, 28, 36)
+    DARK_RED = (100, 0, 0)
+    GREEN = (34, 177, 76)
+    DARK_GREEN = (0, 100, 0)
+    BLUE = (63, 72, 204)
+    DARK_GREY = (40, 40, 40)
+    GREY = (128, 128, 128)
+    LIGHT_GREY = (200,200,200)
+    GOLD = (255, 201, 14)
+    YELLOW = (255, 255, 0)
+    TRANSPARENT = (255, 1, 1)

@@ -37,7 +37,7 @@ The `BattleCard.generate(n)` method will generate a random card with `n` feature
 * Blessed - gain 1 health per round
 * Burning - lose 1 health per round
 * Invincible - enemy attacks do no damage
-* Sleep - player neither attacks or blocks
+* Sleep - player neither attacks nor blocks
 * Confused - you can't see the cards in your own hand
 * Blinded - you can't see the enemy's card
 
