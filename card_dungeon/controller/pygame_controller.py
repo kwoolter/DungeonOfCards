@@ -2,6 +2,7 @@ import card_dungeon.model as model
 import card_dungeon.view as view
 
 import os
+import random
 import pygame
 from pygame.locals import *
 
@@ -98,7 +99,8 @@ class DoCGUIController:
                         if event.key == K_ESCAPE:
                             self.m.pause()
                         elif event.key == K_F1:
-                            self.v.battle_card_view.model.generate(4)
+                            self.v.battle_card_view_player.model.generate(random.randint(4, 8), is_player_card=True)
+                            self.v.battle_card_view_enemy.model.generate(random.randint(4,8), is_player_card=False)
 
 
                     # Key DOWN events - less time critical actions

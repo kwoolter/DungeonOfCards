@@ -23,7 +23,8 @@ class MainFrame(View):
         self.height = 600
         self._debug = False
 
-        self.battle_card_view = None
+        self.battle_card_view_player = None
+        self.battle_card_view_enemy = None
 
 
     def initialise(self):
@@ -48,16 +49,19 @@ class MainFrame(View):
             print(str(err))
 
 
-        self.battle_card_view = BattleCardView(width=140, height=160)
-        c = model.BattleCard("Card1")
-        c.generate(5)
-        self.battle_card_view.initialise(c)
+        self.battle_card_view_player = BattleCardView(width=200, height=160)
+        c = model.BattleCard("Player Card")
+        c.generate(5, is_player_card=True)
+        self.battle_card_view_player.initialise(c)
+
+        self.battle_card_view_enemy = BattleCardView(width=200, height=160)
+        c = model.BattleCard("Enemy Card")
+        c.generate(5, is_player_card=False)
+        self.battle_card_view_enemy.initialise(c)
 
     def print(self):
 
-        print("Printing Dark Work view...")
-
-
+        print("Printing DoC view...")
 
     def draw(self):
 
@@ -92,8 +96,13 @@ class MainFrame(View):
                   fg_colour=Colours.LIGHT_GREY,
                   bg_colour=Colours.DARK_GREY)
 
-        self.battle_card_view.draw()
-        self.surface.blit(self.battle_card_view.surface, (0,0))
+        self.battle_card_view_player.draw()
+        self.surface.blit(self.battle_card_view_player.surface, (0,0))
+
+        self.battle_card_view_enemy.draw()
+        pane_rect = self.battle_card_view_enemy.surface.get_rect()
+        pane_rect.right = self.surface.get_rect().right
+        self.surface.blit(self.battle_card_view_enemy.surface, pane_rect)
 
     def update(self):
         pygame.display.update()
