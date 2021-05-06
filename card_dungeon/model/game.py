@@ -40,7 +40,7 @@ class Model():
 
     def tick(self):
         if self.state == Model.STATE_PLAYING:
-            pass
+            self.tick_count += 1
         else:
             pass
 

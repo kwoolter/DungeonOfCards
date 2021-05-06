@@ -81,3 +81,6 @@ def drawText(surface, text, color, rect, font, aa=False, bkg=None):
         text = text[i:]
 
     return text
+
+
+

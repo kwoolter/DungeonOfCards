@@ -1,51 +1,9 @@
 import pygame
 import os
 import card_dungeon.model as model
-from .graphics import *
-
-class ImageManager():
-
-    def __init__(self):
-        pass
-
-    def initialise(self):
-        pass
-
-class View():
-    image_manager = ImageManager()
-
-    def __init__(self, width: int = 0, height: int = 0):
-        self._debug = False
-        self.tick_count = 0
-        self.height = height
-        self.width = width
-        self.surface = None
-
-        View.image_manager.initialise()
-
-    def initialise(self):
-        pass
-
-    def tick(self):
-        self.tick_count += 1
-
-    def debug(self, debug_on: bool = None):
-
-        if debug_on is None:
-            self._debug = not self._debug
-        else:
-            self._debug = debug_on
-
-    def process_event(self, new_event: model.Event):
-        print("Default View Class event process:{0}".format(new_event))
-
-
-    def draw(self):
-        pass
-
-    def end(self):
-        print("Ending {0}".format(__class__))
-
+from . view import *
+from . graphics import *
+from . card_views import *
 
 class MainFrame(View):
 
@@ -64,6 +22,8 @@ class MainFrame(View):
         self.width = 600
         self.height = 600
         self._debug = False
+
+        self.battle_card_view = None
 
 
     def initialise(self):
@@ -87,6 +47,11 @@ class MainFrame(View):
         except Exception as err:
             print(str(err))
 
+
+        self.battle_card_view = BattleCardView(width=140, height=160)
+        c = model.BattleCard("Card1")
+        c.generate(5)
+        self.battle_card_view.initialise(c)
 
     def print(self):
 
@@ -126,6 +91,9 @@ class MainFrame(View):
                   centre=True,
                   fg_colour=Colours.LIGHT_GREY,
                   bg_colour=Colours.DARK_GREY)
+
+        self.battle_card_view.draw()
+        self.surface.blit(self.battle_card_view.surface, (0,0))
 
     def update(self):
         pygame.display.update()

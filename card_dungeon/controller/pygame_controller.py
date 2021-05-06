@@ -97,6 +97,9 @@ class DoCGUIController:
                         # Space to start the game
                         if event.key == K_ESCAPE:
                             self.m.pause()
+                        elif event.key == K_F1:
+                            self.v.battle_card_view.model.generate(4)
+
 
                     # Key DOWN events - less time critical actions
                     elif event.type == KEYDOWN:

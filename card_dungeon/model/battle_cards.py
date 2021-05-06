@@ -94,6 +94,16 @@ class BattleCard(BaseCard):
 
     def generate(self, level: int = 1, is_player_card : bool = False):
 
+        # Properties
+        self.is_attack_unblockable = False
+        self.is_quick = False
+        self.new_card_count = 0
+
+        self.attacks = {}
+        self.blocks = {}
+        self.heals = {}
+        self.effects = {}
+
         # How many features have been added to this card so far i.e. 0
         features_added = 0
 
