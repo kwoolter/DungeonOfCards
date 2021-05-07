@@ -4,6 +4,7 @@ import card_dungeon.model as model
 from . view import *
 from . graphics import *
 from . card_views import *
+from . character_view import *
 
 class MainFrame(View):
 
@@ -26,6 +27,9 @@ class MainFrame(View):
         self.battle_card_view_player = None
         self.battle_card_view_enemy = None
 
+        self.player_view = None
+        self.enemy_view = None
+
 
     def initialise(self):
 
@@ -47,6 +51,14 @@ class MainFrame(View):
             pygame.display.set_icon(image)
         except Exception as err:
             print(str(err))
+
+        self.player_view = CharacterView(width=200,height=200)
+        ch = model.PlayerCharacter(name="Keith", type="Warrior")
+        self.player_view.initialise(ch)
+
+        self.enemy_view = CharacterView(width=200, height=200)
+        ch = model.EnemyCharacter(name="Edgar", type="Goblin")
+        self.enemy_view.initialise(ch)
 
 
         self.battle_card_view_player = BattleCardView(width=200, height=160)
@@ -103,6 +115,18 @@ class MainFrame(View):
         pane_rect = self.battle_card_view_enemy.surface.get_rect()
         pane_rect.right = self.surface.get_rect().right
         self.surface.blit(self.battle_card_view_enemy.surface, pane_rect)
+
+        y= 200
+        self.player_view.draw()
+        self.surface.blit(self.player_view.surface, (0,y))
+
+        self.enemy_view.draw()
+        pane_rect = self.enemy_view.surface.get_rect()
+        pane_rect.right = self.surface.get_rect().right
+        pane_rect.y = y
+        self.surface.blit(self.enemy_view.surface, pane_rect)
+
+
 
     def update(self):
         pygame.display.update()
