@@ -55,21 +55,26 @@ class MainFrame(View):
         self.player_view = CharacterView(width=200,height=200)
         ch = model.PlayerCharacter(name="Keith", type="Warrior")
         self.player_view.initialise(ch)
+        self.player_view.bg = Colours.DARK_BLUE
 
         self.enemy_view = CharacterView(width=200, height=200)
         ch = model.EnemyCharacter(name="Edgar", type="Goblin")
         self.enemy_view.initialise(ch)
+        self.enemy_view.bg = Colours.DARK_RED
 
 
         self.battle_card_view_player = BattleCardView(width=200, height=160)
         c = model.BattleCard("Player Card")
         c.generate(5, is_player_card=True)
         self.battle_card_view_player.initialise(c)
+        self.battle_card_view_player.bg = Colours.DARK_BLUE
+
 
         self.battle_card_view_enemy = BattleCardView(width=200, height=160)
         c = model.BattleCard("Enemy Card")
         c.generate(5, is_player_card=False)
         self.battle_card_view_enemy.initialise(c)
+        self.battle_card_view_enemy.bg = Colours.DARK_RED
 
     def print(self):
 
@@ -78,11 +83,29 @@ class MainFrame(View):
     def draw(self):
 
         pane_rect = self.surface.get_rect()
+        self.surface.fill(Colours.WHITE)
+
+        grid_size = 34
+        for x in range(pane_rect.x, pane_rect.width, grid_size):
+            # line(surface, color, start_pos, end_pos, width)
+            pygame.draw.line(self.surface,Colours.CYAN, (x,pane_rect.top),(x,pane_rect.bottom), 2)
+
+        for y in range(pane_rect.top, pane_rect.bottom, grid_size):
+            pygame.draw.line(self.surface, Colours.CYAN, (pane_rect.left, y), (pane_rect.right,y))
 
         x = 0
         y = 0
 
-        self.surface.fill(Colours.RED)
+        self.player_view.draw()
+        self.surface.blit(self.player_view.surface, (0,y))
+
+        self.enemy_view.draw()
+        pane_rect = self.enemy_view.surface.get_rect()
+        pane_rect.right = self.surface.get_rect().right
+        pane_rect.y = y
+        self.surface.blit(self.enemy_view.surface, pane_rect)
+
+        pane_rect = self.surface.get_rect()
 
         msg_box_width = 200
         msg_box_height = 64
@@ -108,23 +131,17 @@ class MainFrame(View):
                   fg_colour=Colours.LIGHT_GREY,
                   bg_colour=Colours.DARK_GREY)
 
+        y= 300
+
         self.battle_card_view_player.draw()
-        self.surface.blit(self.battle_card_view_player.surface, (0,0))
+        self.surface.blit(self.battle_card_view_player.surface, (0,y))
 
         self.battle_card_view_enemy.draw()
         pane_rect = self.battle_card_view_enemy.surface.get_rect()
         pane_rect.right = self.surface.get_rect().right
+        pane_rect.y = y
         self.surface.blit(self.battle_card_view_enemy.surface, pane_rect)
 
-        y= 200
-        self.player_view.draw()
-        self.surface.blit(self.player_view.surface, (0,y))
-
-        self.enemy_view.draw()
-        pane_rect = self.enemy_view.surface.get_rect()
-        pane_rect.right = self.surface.get_rect().right
-        pane_rect.y = y
-        self.surface.blit(self.enemy_view.surface, pane_rect)
 
 
 

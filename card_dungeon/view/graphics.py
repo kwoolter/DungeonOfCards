@@ -16,6 +16,8 @@ class Colours:
     GOLD = (255, 201, 14)
     YELLOW = (255, 255, 0)
     TRANSPARENT = (255, 1, 1)
+    CYAN = (0,255,255)
+    DARK_BLUE = (0,0,55)
 
 
 def draw_text(surface, msg, x, y, size=32, fg_colour=Colours.WHITE, bg_colour=Colours.BLACK, alpha: int = 255,
