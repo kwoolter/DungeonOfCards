@@ -178,6 +178,7 @@ class Battle():
         for k, v in self.player_round_card.heals.items():
 
             logging.info(f"Attempting Player heal if {k}={v}...")
+            logging.info(f"{succeeded_attacks}/{attempted_attacks} attacks; {succeeded_blocks} blocks")
             # Heal in every outcome
             if k == Outcome.ALL:
                 heal_amount = v
@@ -310,7 +311,10 @@ class Battle():
         # Increment the count of completed rounds
         self.round += 1
         self.player.tick()
+        self.player.rounds += 1
+
         self.enemy.tick()
+        self.enemy.rounds +=1
 
 
 def test():

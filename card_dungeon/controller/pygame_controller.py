@@ -98,15 +98,13 @@ class DoCGUIController:
                         # Space to start the game
                         if event.key == K_ESCAPE:
                             self.m.pause()
+                        # Pick a card to play
                         elif event.key >= K_1 and event.key <= K_9:
                             n = event.key - K_1 + 1
                             self.m.select_card(n)
+                        # Do a round of teh  battle
                         elif event.key == K_RETURN:
                             self.m.do_round()
-                        elif event.key == K_F1:
-                            self.v.battle_card_view_player.model.generate(random.randint(4, 8), is_player_card=True)
-                            self.v.battle_card_view_enemy.model.generate(random.randint(4,8), is_player_card=False)
-
 
                     # Key DOWN events - less time critical actions
                     elif event.type == KEYDOWN:
@@ -157,6 +155,15 @@ class DoCGUIController:
                         elif event.key == K_F12:
                             self.m.debug()
 
+                # Process events for when the game is in state PAUSED
+                elif self.m.state == model.Model.STATE_GAME_OVER:
+                    # Key events
+                    if event.type == KEYUP:
+                        # Re-initialise the game
+                        if event.key == K_SPACE:
+                            self.m.initialise()
+                            self.v.initialise()
+
                 # Quit event
                 if event.type == QUIT:
                     loop = False
@@ -164,6 +171,6 @@ class DoCGUIController:
             self.v.draw()
             self.v.update()
 
-            FPSCLOCK.tick(60)
+            FPSCLOCK.tick(20)
 
         self.end()

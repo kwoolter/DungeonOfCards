@@ -25,8 +25,12 @@ class MainFrame(View):
 
         self.model = model
         self.surface = None
-        self.width = 600
+        self.width = 800
         self.height = 600
+
+        self.card_width = 150
+        self.card_height = 180
+
         self._debug = False
 
         self.battle_card_view_player = None
@@ -75,12 +79,13 @@ class MainFrame(View):
         self.surface.fill(Colours.WHITE)
 
         grid_size = 34
+        grid_colour = (190,244,255)
+
         for x in range(pane_rect.x, pane_rect.width, grid_size):
-            # line(surface, color, start_pos, end_pos, width)
-            pygame.draw.line(self.surface,Colours.CYAN, (x,pane_rect.top),(x,pane_rect.bottom), 2)
+            pygame.draw.line(self.surface,grid_colour, (x,pane_rect.top),(x,pane_rect.bottom), 2)
 
         for y in range(pane_rect.top, pane_rect.bottom, grid_size):
-            pygame.draw.line(self.surface, Colours.CYAN, (pane_rect.left, y), (pane_rect.right,y))
+            pygame.draw.line(self.surface, grid_colour, (pane_rect.left, y), (pane_rect.right,y))
 
         padding = 4
         x = padding
@@ -102,9 +107,9 @@ class MainFrame(View):
         x = padding
 
         # Draw all of the cards in the player's hand
-        for card in self.model.battle.player_cards.hand:
+        for i, card in enumerate(self.model.battle.player_cards.hand):
 
-            cv = BattleCardView(width=200, height=160)
+            cv = BattleCardView(width=self.card_width, height=self.card_height)
             cv.initialise(card)
 
             cv.is_highlighted = card == self.model.battle.player_selected_card
@@ -113,14 +118,32 @@ class MainFrame(View):
             cv.fg = Colours.BLUE
             cv.draw()
             self.surface.blit(cv.surface, (x, y))
-            y+= 100
-            x+= 8
+
+
+            # Draw the number below the card
+            fg = Colours.WHITE
+            bg = Colours.BLUE
+
+            if card == self.model.battle.player_selected_card:
+                bg = Colours.GOLD
+
+            draw_text(self.surface,
+                      f" {i+1} ",
+                      x + int(cv.width/2),
+                      y + cv.height,
+                      64,
+                      fg_colour=fg,
+                      bg_colour=bg)
+
+
+            y+= 0
+            x+= cv.width + padding
 
         y = pane_rect.bottom + 20
 
         # Draw all of the cards in the enemy's hand
         for card in self.model.battle.enemy_cards.hand:
-            cv = BattleCardView(width=200, height=160)
+            cv = BattleCardView(width=self.card_width, height=self.card_height)
             cv.initialise(card)
             cv.fg = Colours.RED
 
@@ -138,29 +161,30 @@ class MainFrame(View):
         if self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 
-            msg_box_width = 200
-            msg_box_height = 64
-            msg_rect = pygame.Rect((pane_rect.width - msg_box_width) / 2,
-                                   (pane_rect.height - msg_box_height) / 2, msg_box_width, msg_box_height)
+            msg_box_width = 240
+            msg_box_height = 80
+            msg_rect = pygame.Rect(0,0,msg_box_width, msg_box_height)
+
+            msg_rect.center = pane_rect.center
 
             pygame.draw.rect(self.surface,
-                             Colours.DARK_GREY,
+                             Colours.WHITE,
                              msg_rect,
                              0)
 
             pygame.draw.rect(self.surface,
-                             Colours.LIGHT_GREY,
+                             grid_colour,
                              msg_rect,
-                             2)
+                             4)
 
             draw_text(surface=self.surface,
                       msg="{0}".format(self.model.state),
                       x=pane_rect.width / 2,
                       y=pane_rect.height / 2,
-                      size=32,
+                      size=40,
                       centre=True,
-                      fg_colour=Colours.LIGHT_GREY,
-                      bg_colour=Colours.DARK_GREY)
+                      fg_colour=Colours.GREY,
+                      bg_colour=Colours.WHITE)
 
 
     def update(self):

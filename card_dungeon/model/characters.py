@@ -8,9 +8,14 @@ class BaseCharacter():
         self.name = name
         self.type = type
         self.is_player = is_player
-        self.health = 5
-        self.max_cards_per_hand = 1
+
         self.effects = {}
+
+        # Stats
+        self.max_cards_per_hand = 1
+        self.health = 5
+        self.rounds = 0
+        self.wins = 0
 
     @property
     def is_dead(self):

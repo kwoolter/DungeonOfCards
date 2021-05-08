@@ -20,7 +20,8 @@ class Model():
         self._state = None
         self._debug = False
 
-        # Model Components
+
+        # Components
         self.player = None
         self.battle = None
         self.events = EventQueue()
@@ -41,16 +42,18 @@ class Model():
     def initialise(self):
         self.state = Model.STATE_LOADED
 
-        pn = random.choice(["Keith", "Jack","Rosie"])
-        pt = random.choice(list(PlayerType))
-        p = PlayerCharacter(name=pn, type=pt)
-        self.player = p
+        # If we don't have a living player then create a new one
+        if self.player is None or self.player.is_dead is True:
+            pn = random.choice(["Keith", "Jack", "Rosie"])
+            pt = random.choice(list(PlayerType))
+            self.player = PlayerCharacter(name=pn, type=pt)
 
+        # Generate a random enemy
         en = random.choice(["Edgar", "Vince","Harold"])
         et = random.choice(list(EnemyType))
         e = EnemyCharacter(name=en, type=et)
 
-        self.battle = Battle(p, e)
+        self.battle = Battle(self.player, e)
         self.battle.initialise()
 
     def tick(self):
@@ -90,6 +93,7 @@ class Model():
         self.hacks()
 
         print(f"Debug={self._debug}")
+        print(self)
 
     def hacks(self):
         for e in Effect:
@@ -105,3 +109,6 @@ class Model():
 
     def do_round(self):
         self.battle.do_round()
+        if self.battle.is_game_over:
+            self.player.wins += self.player.is_dead is False
+            self.state = Model.STATE_GAME_OVER
