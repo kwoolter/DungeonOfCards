@@ -45,8 +45,12 @@ class Battle():
         self.player_cards.deck = self.player_deck
         self.enemy_cards.deck = self.enemy_deck
 
+        # Deal cards from the deck to the hand
         self.player_cards.replenish()
         self.enemy_cards.replenish()
+
+        # Select the first card in the player's hand
+        self.player_selected_card = self.player_cards.hand[0]
 
     def start(self):
         pass

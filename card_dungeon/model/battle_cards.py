@@ -1,7 +1,7 @@
 import random
-from . doc_enums import *
-
 from enum import Enum, auto
+
+from .doc_enums import *
 
 
 # Types of attack and block elements
@@ -108,15 +108,14 @@ class BattleCard(BaseCard):
         features_added = 0
 
         # Random weightings for features...
-        # ATTACK
-        # DEFEND
-        # QUICK
-        # HEAL
-        # DEAL
-        # UNBLOCKABLE
-        # EFFECT
-
-        weights = [10, 10, 4, 10, 1, 3, 30]
+        weights = [10,  # ATTACK
+                   10,  # DEFEND
+                   4,  # QUICK
+                   3,  # HEAL
+                   3,  # DEAL
+                   3,  # UNBLOCKABLE
+                   3  # EFFECT
+                   ]
 
         # Keep adding features to the Battle Card until we reach the required level...
         while features_added < level:

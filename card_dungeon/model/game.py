@@ -21,6 +21,7 @@ class Model():
         self._debug = False
 
         # Model Components
+        self.player = None
         self.battle = None
         self.events = EventQueue()
 
@@ -41,6 +42,8 @@ class Model():
         self.state = Model.STATE_LOADED
 
         p = PlayerCharacter(name="Keith", type="Warrior")
+        self.player = p
+
         en = random.choice(["Edgar", "Vince","Harold"])
         et = random.choice(["Rat", "Spider", "Ghost"])
         e = EnemyCharacter(name=en, type=et)
@@ -88,3 +91,10 @@ class Model():
         print("Ending {0}".format(__class__))
 
 
+    def select_card(self, selection : int):
+        print(f"Selecting card {selection}")
+        if selection >0 and selection <= len(self.battle.player_cards.hand):
+            self.battle.player_selected_card = self.battle.player_cards.hand[selection - 1]
+
+    def do_round(self):
+        self.battle.do_round()

@@ -98,6 +98,11 @@ class DoCGUIController:
                         # Space to start the game
                         if event.key == K_ESCAPE:
                             self.m.pause()
+                        elif event.key >= K_1 and event.key <= K_9:
+                            n = event.key - K_1 + 1
+                            self.m.select_card(n)
+                        elif event.key == K_RETURN:
+                            self.m.do_round()
                         elif event.key == K_F1:
                             self.v.battle_card_view_player.model.generate(random.randint(4, 8), is_player_card=True)
                             self.v.battle_card_view_enemy.model.generate(random.randint(4,8), is_player_card=False)

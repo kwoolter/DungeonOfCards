@@ -95,9 +95,11 @@ class MainFrame(View):
         x = padding
         y = padding
 
+        # Draw the player's information
         self.player_view.draw()
         self.surface.blit(self.player_view.surface, (x,y))
 
+        # Draw the enemy's information
         self.enemy_view.draw()
         pane_rect = self.enemy_view.surface.get_rect()
         pane_rect.right = self.surface.get_rect().right - padding
@@ -108,20 +110,31 @@ class MainFrame(View):
         y = pane_rect.bottom + 20
         x = padding
 
+        # Draw all of the cards in the player's hand
         for card in self.model.battle.player_cards.hand:
+
             cv = BattleCardView(width=200, height=160)
             cv.initialise(card)
-            cv.bg = Colours.DARK_BLUE
+
+            cv.is_highlighted = card == self.model.battle.player_selected_card
+            cv.is_concealed = self.model.player.is_confused
+
+            cv.fg = Colours.DARK_BLUE
             cv.draw()
             self.surface.blit(cv.surface, (x, y))
             y+= 60
             x+= 8
 
         y = pane_rect.bottom + 20
+
+        # Draw all of the cards in the enemy's hand
         for card in self.model.battle.enemy_cards.hand:
             cv = BattleCardView(width=200, height=160)
             cv.initialise(card)
-            cv.bg = Colours.DARK_RED
+            cv.fg = Colours.DARK_RED
+
+            cv.is_concealed = self.model.player.is_blind
+
             cv.draw()
             pane_rect = self.battle_card_view_enemy.surface.get_rect()
             pane_rect.right = self.surface.get_rect().right - padding
@@ -130,6 +143,7 @@ class MainFrame(View):
             y+= 60
             x+= 8
 
+        # Draw game state msg box if not playing
         if self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 

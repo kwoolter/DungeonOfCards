@@ -16,6 +16,8 @@ class CharacterView(View):
         self.surface = pygame.Surface((self.width, self.height))
 
     def draw(self):
+
+        # Draw Character name and type
         pane_rect = self.surface.get_rect()
         x,y = pane_rect.midtop
         size = 24
@@ -25,18 +27,34 @@ class CharacterView(View):
                   size = size,
                   fg_colour=self.fg,
                   bg_colour=self.bg)
+
+        # Is the character dead
+        if self.model.is_dead is True:
+            x,y = pane_rect.center
+            size = 40
+            msg = "*** DEAD ***"
+            draw_text(self.surface,
+                      msg,
+                      x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
+            return
+
+        # Draw current health
         y+=32
-        size = 16
-        msg = f"Health:{self.model.health}"
+        size = 18
+        msg = f"Health : {self.model.health}"
         draw_text(self.surface, msg, x,y,
                   size = size,
                   fg_colour=self.fg,
                   bg_colour=self.bg)
 
 
+        # Draw the current active effects
         for k,v in self.model.effects.items():
-            y += 32
-            msg = f"{k} : {v}"
+            y += 16
+            msg = f"{k.name} : {v}"
             draw_text(self.surface, msg, x, y,
                       size=size,
                       fg_colour=self.fg,
