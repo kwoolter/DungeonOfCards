@@ -1,14 +1,14 @@
 # Dungeon Of Cards
 :copyright: :monkey: kwoolter 2021
 Card game based on Guild of Dungeoneering concept.
-Thanks to GAMBRIBNOUS for inspiration and obrrwing graphics.
+Thanks to GAMBRIBNOUS for inspiration and borrowing graphics.
 
 
 ## Graphics Version
-`run_gui.py` `pygame` GUI to play the game.
+`run_gui.py` pygame GUI to play the game.
 Typical flow of the game:-
 * `SPACE` to start a game
-* 1-4 to select a card that you want to play next
+* `1` - `4` to select a card that you want to play next
 * `Enter` to play a round with the selected card
 * Repeat until someone dies
 

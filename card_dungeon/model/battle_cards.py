@@ -8,6 +8,7 @@ class BaseCard():
         # Properties
         self.name = name
         self.type = type
+        self.link_id = 0
 
     def print(self):
         print(f"Card '{self.name}' ({self.type.name})")
@@ -247,6 +248,20 @@ class CardManager:
                 self.discard = []
 
             self.deal_card(self.deck, self.hand)
+
+    def remove_by_id(self, id):
+        """
+        Remove cards from the deck that have been tagged with a specified ID
+        :param id: The id that you want to remove tagged cards
+        """
+        cards_to_delete = []
+        for card in self.deck:
+            if card.link_id == id:
+                cards_to_delete.append(card)
+
+        for card in cards_to_delete:
+            self.deck.remove(card)
+
 
     def reset(self):
         self.deck = self.deck + self.discard + self.hand
