@@ -52,7 +52,7 @@ class CharacterView(View):
         img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type)
         img_rect = img.get_rect()
         img_rect.centerx = pane_rect.centerx
-        img_rect.bottom = pane_rect.bottom - 8
+        img_rect.bottom = pane_rect.bottom - 16
         self.surface.blit(img, img_rect)
 
         # Is the character dead?
@@ -93,7 +93,7 @@ class CharacterView(View):
             img_rect = img.get_rect()
             img_rect.topleft=(x,y)
             self.surface.blit(img, img_rect)
-            msg = f"{v}"
+            msg = f" {v} "
             draw_text(self.surface,
                       msg,
                       img_rect.centerx,

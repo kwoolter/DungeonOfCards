@@ -13,19 +13,15 @@ class BaseCharacter():
 
         # Stats
         self.max_cards_per_hand = 1
-        self.health = 5
+        self.cards_per_hand = self.max_cards_per_hand
+        self.max_health = 5
+        self.health = self.max_health
         self.rounds = 0
         self.wins = 0
 
     @property
     def is_dead(self):
         return self.health <= 0
-
-    def print(self):
-        print(f"{self.name} the {self.type.value} (player={self.is_player}, health={self.health}, effects={self.effects}, max hand={self.max_cards_per_hand})")
-
-    def add_effect(self, effect_name : str, tick_count : int = 3):
-        self.effects[effect_name] = tick_count
 
     @property
     def is_invincible(self):
@@ -42,6 +38,13 @@ class BaseCharacter():
     @property
     def is_sleeping(self):
         return Effect.SLEEP in self.effects.keys()
+
+
+    def print(self):
+        print(f"{self.name} the {self.type.value} (player={self.is_player}, health={self.health}, effects={self.effects}, max hand={self.max_cards_per_hand})")
+
+    def add_effect(self, effect_name : str, tick_count : int = 3):
+        self.effects[effect_name] = tick_count
 
     def tick(self):
 
@@ -69,6 +72,10 @@ class BaseCharacter():
         for k in keys_to_delete:
             del self.effects[k]
 
+    def reset(self):
+        self.effects = {}
+        self.health = self.max_health
+        self.max_cards_per_hand = 1
 
 
 class EnemyCharacter(BaseCharacter):

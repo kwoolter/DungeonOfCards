@@ -50,11 +50,11 @@ class BattleCardView(View):
         if self.is_concealed is True:
             x, y = pane_rect.center
             draw_text(self.surface,
-                      "?",
+                      " ? ",
                       x, y,
                       size=60,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
+                      fg_colour=self.bg,
+                      bg_colour=self.fg)
             return
 
         y += 20
@@ -100,15 +100,16 @@ class BattleCardView(View):
                     self.surface.blit(img, (x, y))
                     x += img_rect.width + padding
 
-                # .. and what conditions need to be met
-                msg = f"...if {k.name}"
-                draw_text(self.surface, msg,
-                          x,
-                          y + img_rect.centery,
-                          size=size,
-                          fg_colour=self.fg,
-                          bg_colour=self.bg,
-                          centre=False)
+                # If there is a condition on the effect other than ALL...
+                if k != model.Outcome.ALL:
+                    msg = f"{k.value}"
+                    draw_text(self.surface, msg,
+                              x,
+                              y + img_rect.centery,
+                              size=size,
+                              fg_colour=self.fg,
+                              bg_colour=self.bg,
+                              centre=False)
 
                 y += img_rect.height + padding
 
@@ -126,11 +127,11 @@ class BattleCardView(View):
                 img_rect.topleft = (x, y)
                 self.surface.blit(img, (x, y))
 
-                # If their is a condition on the effect other than ALL...
+                # If there is a condition on the effect other than ALL...
                 if k != model.Outcome.ALL:
 
                     # Draw what outcome is required for effect to apply
-                    msg = f"if {k.name}"
+                    msg = f"{k.value}"
                     draw_text(self.surface, msg,
                               img_rect.centerx,
                               img_rect.bottom + 10,
@@ -140,7 +141,7 @@ class BattleCardView(View):
 
                 x += img_rect.width + padding
 
-            y += img_rect.height + padding
+            y += img_rect.height + padding + size
 
         # Draw any extra properties of the card
         x = 16

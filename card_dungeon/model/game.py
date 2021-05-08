@@ -1,6 +1,7 @@
 from .events import *
 from .battle import *
 import os
+from . doc_exceptions import *
 
 class Model():
 
@@ -108,7 +109,14 @@ class Model():
             self.battle.player_selected_card = self.battle.player_cards.hand[selection - 1]
 
     def do_round(self):
-        self.battle.do_round()
-        if self.battle.is_game_over:
-            self.player.wins += self.player.is_dead is False
-            self.state = Model.STATE_GAME_OVER
+
+        if self.battle.player_selected_card is None:
+            self.events.add_event(Event(type=Event.GAME,
+                                        name=Event.ACTION_FAILED,
+                                        description="No player card selected"))
+        else:
+            self.battle.do_round()
+            if self.battle.is_game_over:
+                self.player.wins += self.player.is_dead is False
+                self.player.reset()
+                self.state = Model.STATE_GAME_OVER

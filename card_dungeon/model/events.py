@@ -22,6 +22,8 @@ class Event():
     TICK = "Tick"
     EFFECT_START = "Effect Start"
     EFFECT_END = "Effect End"
+    ACTION_FAILED = "action failed"
+    ACTION_SUCCEEDED = "action succeeded"
     HELP = "Help"
 
     # Effects

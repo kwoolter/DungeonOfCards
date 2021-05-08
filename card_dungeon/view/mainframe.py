@@ -25,7 +25,7 @@ class MainFrame(View):
 
         self.model = model
         self.surface = None
-        self.width = 800
+        self.width = 1000
         self.height = 600
 
         self.card_width = 150
@@ -61,11 +61,11 @@ class MainFrame(View):
         except Exception as err:
             print(str(err))
 
-        self.player_view = CharacterView(width=200,height=200)
+        self.player_view = CharacterView(width=200,height=240)
         self.player_view.initialise(self.model.battle.player)
         self.player_view.fg = Colours.BLUE
 
-        self.enemy_view = CharacterView(width=200, height=200)
+        self.enemy_view = CharacterView(width=200, height=240)
         self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.fg = Colours.RED
 
@@ -85,7 +85,7 @@ class MainFrame(View):
             pygame.draw.line(self.surface,grid_colour, (x,pane_rect.top),(x,pane_rect.bottom), 2)
 
         for y in range(pane_rect.top, pane_rect.bottom, grid_size):
-            pygame.draw.line(self.surface, grid_colour, (pane_rect.left, y), (pane_rect.right,y))
+            pygame.draw.line(self.surface, grid_colour, (pane_rect.left, y), (pane_rect.right,y), 2)
 
         padding = 4
         x = padding

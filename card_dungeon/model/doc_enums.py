@@ -43,11 +43,11 @@ class Element(Enum):
     # WATER = 3
 
 class Outcome(Enum):
-    ALL = auto()
-    HIT = auto()
-    HIT_ALL = auto()
-    BLOCK = auto()
-    BLOCK_ALL = auto()
+    ALL = "always"
+    HIT = "a hit"
+    HIT_ALL = "all hits"
+    BLOCK = "a block"
+    BLOCK_ALL = "all blocks"
 
 class CardType(Enum):
     BATTLE = 1
