@@ -1,4 +1,5 @@
 from .events import *
+from .battle import *
 import os
 
 class Model():
@@ -20,6 +21,7 @@ class Model():
         self._debug = False
 
         # Model Components
+        self.battle = None
         self.events = EventQueue()
 
     @property
@@ -37,6 +39,14 @@ class Model():
 
     def initialise(self):
         self.state = Model.STATE_LOADED
+
+        p = PlayerCharacter(name="Keith", type="Warrior")
+        en = random.choice(["Edgar", "Vince","Harold"])
+        et = random.choice(["Rat", "Spider", "Ghost"])
+        e = EnemyCharacter(name=en, type=et)
+
+        self.battle = Battle(p, e)
+        self.battle.initialise()
 
     def tick(self):
         if self.state == Model.STATE_PLAYING:

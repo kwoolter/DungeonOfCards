@@ -25,3 +25,19 @@ class CharacterView(View):
                   size = size,
                   fg_colour=self.fg,
                   bg_colour=self.bg)
+        y+=32
+        size = 16
+        msg = f"Health:{self.model.health}"
+        draw_text(self.surface, msg, x,y,
+                  size = size,
+                  fg_colour=self.fg,
+                  bg_colour=self.bg)
+
+
+        for k,v in self.model.effects.items():
+            y += 32
+            msg = f"{k} : {v}"
+            draw_text(self.surface, msg, x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)

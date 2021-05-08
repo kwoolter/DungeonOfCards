@@ -53,13 +53,11 @@ class MainFrame(View):
             print(str(err))
 
         self.player_view = CharacterView(width=200,height=200)
-        ch = model.PlayerCharacter(name="Keith", type="Warrior")
-        self.player_view.initialise(ch)
+        self.player_view.initialise(self.model.battle.player)
         self.player_view.bg = Colours.DARK_BLUE
 
         self.enemy_view = CharacterView(width=200, height=200)
-        ch = model.EnemyCharacter(name="Edgar", type="Goblin")
-        self.enemy_view.initialise(ch)
+        self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.bg = Colours.DARK_RED
 
 
@@ -93,56 +91,71 @@ class MainFrame(View):
         for y in range(pane_rect.top, pane_rect.bottom, grid_size):
             pygame.draw.line(self.surface, Colours.CYAN, (pane_rect.left, y), (pane_rect.right,y))
 
-        x = 0
-        y = 0
+        padding = 4
+        x = padding
+        y = padding
 
         self.player_view.draw()
-        self.surface.blit(self.player_view.surface, (0,y))
+        self.surface.blit(self.player_view.surface, (x,y))
 
         self.enemy_view.draw()
         pane_rect = self.enemy_view.surface.get_rect()
-        pane_rect.right = self.surface.get_rect().right
-        pane_rect.y = y
+        pane_rect.right = self.surface.get_rect().right - padding
+        pane_rect.y = padding
         self.surface.blit(self.enemy_view.surface, pane_rect)
 
-        pane_rect = self.surface.get_rect()
 
-        msg_box_width = 200
-        msg_box_height = 64
-        msg_rect = pygame.Rect((pane_rect.width - msg_box_width) / 2,
-                               (pane_rect.height - msg_box_height) / 2, msg_box_width, msg_box_height)
+        y = pane_rect.bottom + 20
+        x = padding
 
-        pygame.draw.rect(self.surface,
-                         Colours.DARK_GREY,
-                         msg_rect,
-                         0)
+        for card in self.model.battle.player_cards.hand:
+            cv = BattleCardView(width=200, height=160)
+            cv.initialise(card)
+            cv.bg = Colours.DARK_BLUE
+            cv.draw()
+            self.surface.blit(cv.surface, (x, y))
+            y+= 60
+            x+= 8
 
-        pygame.draw.rect(self.surface,
-                         Colours.LIGHT_GREY,
-                         msg_rect,
-                         2)
+        y = pane_rect.bottom + 20
+        for card in self.model.battle.enemy_cards.hand:
+            cv = BattleCardView(width=200, height=160)
+            cv.initialise(card)
+            cv.bg = Colours.DARK_RED
+            cv.draw()
+            pane_rect = self.battle_card_view_enemy.surface.get_rect()
+            pane_rect.right = self.surface.get_rect().right - padding
+            pane_rect.y = y
+            self.surface.blit(cv.surface, pane_rect)
+            y+= 60
+            x+= 8
 
-        draw_text(surface=self.surface,
-                  msg="{0}".format(self.model.state),
-                  x=pane_rect.width / 2,
-                  y=pane_rect.height / 2,
-                  size=32,
-                  centre=True,
-                  fg_colour=Colours.LIGHT_GREY,
-                  bg_colour=Colours.DARK_GREY)
+        if self.model.state != model.Model.STATE_PLAYING:
+            pane_rect = self.surface.get_rect()
 
-        y= 300
+            msg_box_width = 200
+            msg_box_height = 64
+            msg_rect = pygame.Rect((pane_rect.width - msg_box_width) / 2,
+                                   (pane_rect.height - msg_box_height) / 2, msg_box_width, msg_box_height)
 
-        self.battle_card_view_player.draw()
-        self.surface.blit(self.battle_card_view_player.surface, (0,y))
+            pygame.draw.rect(self.surface,
+                             Colours.DARK_GREY,
+                             msg_rect,
+                             0)
 
-        self.battle_card_view_enemy.draw()
-        pane_rect = self.battle_card_view_enemy.surface.get_rect()
-        pane_rect.right = self.surface.get_rect().right
-        pane_rect.y = y
-        self.surface.blit(self.battle_card_view_enemy.surface, pane_rect)
+            pygame.draw.rect(self.surface,
+                             Colours.LIGHT_GREY,
+                             msg_rect,
+                             2)
 
-
+            draw_text(surface=self.surface,
+                      msg="{0}".format(self.model.state),
+                      x=pane_rect.width / 2,
+                      y=pane_rect.height / 2,
+                      size=32,
+                      centre=True,
+                      fg_colour=Colours.LIGHT_GREY,
+                      bg_colour=Colours.DARK_GREY)
 
 
     def update(self):
