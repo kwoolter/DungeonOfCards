@@ -1,38 +1,6 @@
 import random
-from enum import Enum, auto
 
 from .doc_enums import *
-
-
-# Types of attack and block elements
-class Element(Enum):
-    PHYSICAL = auto()
-    MAGICAL = auto()
-    # FIRE = 1
-    # ICE = 2
-    # WATER = 3
-
-# Enum for the different types of features that can be added to a BattleCard
-class CardFeature(Enum):
-    ATTACK = auto()
-    DEFEND = auto()
-    QUICK = auto()
-    HEAL = auto()
-    DEAL = auto()
-    UNBLOCKABLE = auto()
-    EFFECT = auto()
-
-class Outcome(Enum):
-    ALL = auto()
-    HIT = auto()
-    HIT_ALL = auto()
-    BLOCK = auto()
-    BLOCK_ALL = auto()
-
-class CardType(Enum):
-    BATTLE = 1
-    LOOT = 2
-    MAP = 3
 
 
 class BaseCard():
@@ -68,9 +36,9 @@ class BattleCard(BaseCard):
 
     def __str__(self):
         text = f"Card '{self.name}': " \
-              f"quick={self.is_quick} " \
-              f"new_cards={self.new_card_count} " \
-              f"unblockable={self.is_attack_unblockable}"
+               f"quick={self.is_quick} " \
+               f"new_cards={self.new_card_count} " \
+               f"unblockable={self.is_attack_unblockable}"
 
         return text
 
@@ -92,7 +60,7 @@ class BattleCard(BaseCard):
         for k, v in self.effects.items():
             print(f"\tEffect {k}={v}")
 
-    def generate(self, level: int = 1, is_player_card : bool = False):
+    def generate(self, level: int = 1, is_player_card: bool = False):
 
         # Properties
         self.is_attack_unblockable = False
@@ -108,14 +76,17 @@ class BattleCard(BaseCard):
         features_added = 0
 
         # Random weightings for features...
-        weights = [10,  # ATTACK
-                   10,  # DEFEND
-                   4,  # QUICK
-                   3,  # HEAL
-                   3,  # DEAL
-                   3,  # UNBLOCKABLE
-                   3  # EFFECT
-                   ]
+        weights = [
+            10,  # ATTACK MAGIC
+            10,  # ATTACK MELEE
+            10,  # DEFEND MAGIC
+            10,  # DEFEND MELEE
+            4,  # QUICK
+            3,  # HEAL
+            3,  # DEAL
+            3,  # UNBLOCKABLE
+            3  # EFFECT
+        ]
 
         # Keep adding features to the Battle Card until we reach the required level...
         while features_added < level:
@@ -124,20 +95,18 @@ class BattleCard(BaseCard):
             feature = random.choices(list(CardFeature), weights=weights, k=1)[0]
 
             # If it is an attack and we haven't hit the max number of attacks..
-            if feature is CardFeature.ATTACK and len(self.attacks) < BattleCard.MAX_ATTACKS:
-                e = random.choice(list(Element))
-                self.attacks[e] = self.attacks.get(e, 0) + 1
+            if feature in (CardFeature.ATTACK_MAGIC, CardFeature.ATTACK_MELEE) and len(self.attacks) < BattleCard.MAX_ATTACKS:
+                self.attacks[feature] = self.attacks.get(feature, 0) + 1
 
             # If it is a block and we haven't hit the max number of block..
-            elif feature is CardFeature.DEFEND and len(self.blocks) < BattleCard.MAX_BLOCKS:
-                e = random.choice(list(Element))
-                self.blocks[e] = self.blocks.get(e, 0) + 1
+            elif feature in (CardFeature.BLOCK_MAGIC, CardFeature.BLOCK_MELEE) and len(self.blocks) < BattleCard.MAX_BLOCKS:
+                self.blocks[feature] = self.blocks.get(feature, 0) + 1
 
             # If it is an unblockable attack feature
             # and we are not already unblockable
             # and we have at least 1 attack...
             elif feature is CardFeature.UNBLOCKABLE and \
-                    self.is_attack_unblockable is False and\
+                    self.is_attack_unblockable is False and \
                     len(self.attacks) > 0:
 
                 self.is_attack_unblockable = True
@@ -167,7 +136,7 @@ class BattleCard(BaseCard):
                 # Store random effect against a dummy outcome placeholder for now
                 outcome = "DUMMY"
 
-                # Pick a random effect from the applciable list
+                # Pick a random effect from the applicable list
                 if is_player_card is True:
                     e = random.choice(BattleCard.PLAYER_CARD_EFFECTS)
                 else:
@@ -183,9 +152,9 @@ class BattleCard(BaseCard):
             features_added += 1
 
         # If we added some heal feature(s) we need to replace the placeholder with a real outcome condition...
-        if len(self.heals) > 0 :
+        if len(self.heals) > 0:
 
-            heal_value = self.heals.get("DUMMY",0)
+            heal_value = self.heals.get("DUMMY", 0)
             del self.heals["DUMMY"]
 
             # If there were no blocks or hits always heal...
@@ -203,7 +172,7 @@ class BattleCard(BaseCard):
             self.heals[outcome] = heal_value
 
         # If we added an effect feature we need to replace the placeholder with a real outcome condition...
-        if len(self.effects) > 0 :
+        if len(self.effects) > 0:
 
             outcome = "DUMMY"
             effect = self.effects.get(outcome)
@@ -230,7 +199,7 @@ class LootCard(BaseCard):
 
 
 class CardManager:
-    def __init__(self, max_hand_size : int = 1):
+    def __init__(self, max_hand_size: int = 1):
         self.deck = []
         self.hand = []
         self.discard = []
@@ -248,7 +217,7 @@ class CardManager:
 
         return new_card
 
-    def play_card(self, selected_card : BaseCard = None):
+    def play_card(self, selected_card: BaseCard = None):
 
         # If no card specified just pull the top card
         if selected_card is None and len(self.hand) > 0:
@@ -263,9 +232,14 @@ class CardManager:
 
         return selected_card
 
-    def replenish(self):
+    def replenish(self, max_hand_size: int = None):
+
+        # What is the maximum number of cards that we can hold?
+        if max_hand_size is None:
+            max_hand_size = self.max_hand_size
+
         # Replenish hand with new cards
-        while len(self.hand) < self.max_hand_size:
+        while len(self.hand) < max_hand_size:
 
             # If deck is empty then pick up discard pile
             if len(self.deck) == 0:
@@ -279,6 +253,7 @@ class CardManager:
 
     def shuffle(self):
         self.deck.shuffle()
+
 
 def test():
     print(f"\nTesting {__file__}\n")

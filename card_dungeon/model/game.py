@@ -41,11 +41,13 @@ class Model():
     def initialise(self):
         self.state = Model.STATE_LOADED
 
-        p = PlayerCharacter(name="Keith", type="Warrior")
+        pn = random.choice(["Keith", "Jack","Rosie"])
+        pt = random.choice(list(PlayerType))
+        p = PlayerCharacter(name=pn, type=pt)
         self.player = p
 
         en = random.choice(["Edgar", "Vince","Harold"])
-        et = random.choice(["Rat", "Spider", "Ghost"])
+        et = random.choice(list(EnemyType))
         e = EnemyCharacter(name=en, type=et)
 
         self.battle = Battle(p, e)
@@ -85,11 +87,16 @@ class Model():
         else:
             self._debug = debug_on
 
+        self.hacks()
+
         print(f"Debug={self._debug}")
+
+    def hacks(self):
+        for e in Effect:
+            self.player.add_effect(e)
 
     def end(self):
         print("Ending {0}".format(__class__))
-
 
     def select_card(self, selection : int):
         print(f"Selecting card {selection}")

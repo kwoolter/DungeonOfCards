@@ -5,6 +5,13 @@ from .characters import *
 
 
 class Battle():
+
+    ATTACK_BLOCKS = {
+        CardFeature.ATTACK_MAGIC : CardFeature.BLOCK_MAGIC,
+        CardFeature.ATTACK_MELEE : CardFeature.BLOCK_MELEE
+    }
+
+
     def __init__(self, player: PlayerCharacter, enemy: EnemyCharacter):
 
         # Properties
@@ -90,14 +97,15 @@ class Battle():
         if attacker.is_sleeping is False:
 
             # Attempt all of the element attacks in the attackers card
-            for element, attack_count in attacker_card.attacks.items():
+            for attack, attack_count in attacker_card.attacks.items():
 
                 attempted_attacks += attack_count
 
-                # For this element, how many blocks does the defender have?
+                # For this attack, how many blocks does the defender have?
                 # If attack is unblockable then 0 blocks
                 # If defender is sleeping then 0 blocks
-                block_count = defender_card.blocks.get(element, 0) * (attacker_card.is_attack_unblockable is False) * (defender.is_sleeping is False)
+                block = Battle.ATTACK_BLOCKS[attack]
+                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable is False) * (defender.is_sleeping is False)
 
                 # Calculate the damage of the attack which must not be negative.
                 damage = max(attack_count - block_count, 0)
@@ -108,7 +116,7 @@ class Battle():
 
                 # Print the results of the defender's block
                 if block_count > 0:
-                    print(f"{defender.name} blocks {min(block_count, attack_count)} {element.name} attacks")
+                    print(f"{defender.name} blocks {min(block_count, attack_count)} {attack.value}(s)")
 
                 # Print the results of the attacker's attack
                 if damage > 0:
@@ -119,7 +127,7 @@ class Battle():
                     else:
                         defender.health -= damage
 
-                    print(f"{attacker.name}'s {element.name} attack does {damage} damage")
+                    print(f"{attacker.name}'s {attack.value} does {damage} damage")
 
         else:
             print(f"{attacker.name} is asleep ZZZZzzzzz")
@@ -220,7 +228,7 @@ class Battle():
             self.enemy.health += heal_amount
 
         # Apply effects to player if Enemy outcomes match...
-        # Get the results of teh Enemy action
+        # Get the results of the Enemy action
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
 
         # Loop through the effects that are on the Player's Battle Card
@@ -284,15 +292,15 @@ class Battle():
                 logging.info(f"Failed to add effect {v.name} to Player")
 
 
-        # Replenish Player's hand with new cards
-        self.player_cards.replenish()
-
         # Discard cards from the player's hand based on enemy hits
         for i in range(self.enemy_round_card.new_card_count):
             self.player_cards.play_card()
 
+        # Replenish Player's hand with new cards
+        self.player_cards.replenish(self.player.max_cards_per_hand)
+
         # Replenish Enemy's hand with new cards
-        self.enemy_cards.replenish()
+        self.enemy_cards.replenish(self.enemy.max_cards_per_hand)
 
         # Reset the round cards
         self.player_round_card = None

@@ -5,6 +5,7 @@ from . view import *
 from . graphics import *
 from . card_views import *
 from . character_view import *
+from .game_image_manager import *
 
 class MainFrame(View):
 
@@ -17,6 +18,10 @@ class MainFrame(View):
         super().__init__()
 
         self._debug = False
+
+        im = DoCImageManager()
+        im.initialise()
+        View.IMAGE_MANAGER = im
 
         self.model = model
         self.surface = None
@@ -54,25 +59,11 @@ class MainFrame(View):
 
         self.player_view = CharacterView(width=200,height=200)
         self.player_view.initialise(self.model.battle.player)
-        self.player_view.bg = Colours.DARK_BLUE
+        self.player_view.fg = Colours.BLUE
 
         self.enemy_view = CharacterView(width=200, height=200)
         self.enemy_view.initialise(self.model.battle.enemy)
-        self.enemy_view.bg = Colours.DARK_RED
-
-
-        self.battle_card_view_player = BattleCardView(width=200, height=160)
-        c = model.BattleCard("Player Card")
-        c.generate(5, is_player_card=True)
-        self.battle_card_view_player.initialise(c)
-        self.battle_card_view_player.bg = Colours.DARK_BLUE
-
-
-        self.battle_card_view_enemy = BattleCardView(width=200, height=160)
-        c = model.BattleCard("Enemy Card")
-        c.generate(5, is_player_card=False)
-        self.battle_card_view_enemy.initialise(c)
-        self.battle_card_view_enemy.bg = Colours.DARK_RED
+        self.enemy_view.fg = Colours.RED
 
     def print(self):
 
@@ -119,10 +110,10 @@ class MainFrame(View):
             cv.is_highlighted = card == self.model.battle.player_selected_card
             cv.is_concealed = self.model.player.is_confused
 
-            cv.fg = Colours.DARK_BLUE
+            cv.fg = Colours.BLUE
             cv.draw()
             self.surface.blit(cv.surface, (x, y))
-            y+= 60
+            y+= 100
             x+= 8
 
         y = pane_rect.bottom + 20
@@ -131,12 +122,12 @@ class MainFrame(View):
         for card in self.model.battle.enemy_cards.hand:
             cv = BattleCardView(width=200, height=160)
             cv.initialise(card)
-            cv.fg = Colours.DARK_RED
+            cv.fg = Colours.RED
 
             cv.is_concealed = self.model.player.is_blind
 
             cv.draw()
-            pane_rect = self.battle_card_view_enemy.surface.get_rect()
+            pane_rect = cv.surface.get_rect()
             pane_rect.right = self.surface.get_rect().right - padding
             pane_rect.y = y
             self.surface.blit(cv.surface, pane_rect)

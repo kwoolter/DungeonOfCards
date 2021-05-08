@@ -9,7 +9,7 @@ class BattleCardView(View):
         self.model = model
         self.surface = None
         self.fg = Colours.DARK_GREEN
-        self.bg = Colours.LIGHT_GREY
+        self.bg = Colours.WHITE
         self.is_highlighted = False
         self.is_concealed = False
 
@@ -59,59 +59,104 @@ class BattleCardView(View):
 
         # Draw any extra properties of the card
         size=16
-        y+= 24
+        y += 20
         dy = 16
+        padding = 4
 
-        extras = ""
-        if self.model.is_attack_unblockable is True:
-            extras += "X"
-            self.is_attack_unblockable = False
-        if self.model.is_quick is True:
-            extras += "!"
-        if self.model.new_card_count != 0:
-            extras += f" {self.model.new_card_count:+d} cards"
+        if len(self.model.attacks) > 0:
+            # Draw the card attacks
+            for k,v in self.model.attacks.items():
+                x = 10
+                img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
+                img_rect = img.get_rect()
+                for i in range(v):
+                    self.surface.blit(img, (x, y))
+                    x += img_rect.width + padding
+                y+=img_rect.height + padding
 
-        if extras != "":
-            draw_text(self.surface, extras, x, y + int(size / 2),
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y+=dy
-
-        # Draw the card attacks
-        for k,v in self.model.attacks.items():
-            msg = f"Attack {k.name}:{v}"
-            draw_text(self.surface, msg, x, y + int(size / 2),
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y+=dy
-
-        # Draw the card blocks
-        for k,v in self.model.blocks.items():
-            msg = f"Block {k.name}:{v}"
-            draw_text(self.surface, msg, x, y + int(size / 2),
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y+=dy
+        if len(self.model.blocks) > 0:
+            # Draw the card blocks
+            for k,v in self.model.blocks.items():
+                x = 10
+                img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
+                img_rect = img.get_rect()
+                for i in range(v):
+                    self.surface.blit(img, (x, y))
+                    x += img_rect.width + padding
+                y+=img_rect.height + padding
 
         # Draw the card heals
-        for k,v in self.model.heals.items():
-            msg = f"Heal by {v} if {k.name}"
-            draw_text(self.surface, msg, x, y + int(size / 2),
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y+=dy
+        if len(self.model.heals) > 0:
+
+            # Get the heal image
+            img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
+            img_rect = img.get_rect()
+
+            # For each type of heal
+            for k,v in self.model.heals.items():
+                x = 10
+
+                # Draw the number of hearts that you will heal by
+                for i in range(v):
+                    self.surface.blit(img, (x, y))
+                    x += img_rect.width + padding
+
+                # .. and what conditions need to be met
+                msg = f"...if {k.name}"
+                draw_text(self.surface, msg,
+                          x,
+                          y + img_rect.centery,
+                          size=size,
+                          fg_colour=self.fg,
+                          bg_colour=self.bg,
+                          centre = False)
+
+                y += img_rect.height + padding
 
         # Draw the card effects
-        for k,v in self.model.effects.items():
-            msg = f"Effect {v.name} if {k.name}"
-            draw_text(self.surface, msg, x, y + int(size / 2),
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y+=dy
+        if len(self.model.effects) > 0:
+
+            x = 8
+
+            # For each type of effect
+            for k,v in self.model.effects.items():
+
+                # Get the effect image
+                img = View.IMAGE_MANAGER.get_skin_image(tile_name=v)
+                img_rect = img.get_rect()
+                img_rect.topleft = (x,y)
+                self.surface.blit(img, (x, y))
+
+                # Draw what outcome is required for effect to apply
+                msg = f"if {k.name}"
+                draw_text(self.surface, msg,
+                          img_rect.centerx,
+                          img_rect.bottom + 10,
+                          size=size,
+                          fg_colour=self.fg,
+                          bg_colour=self.bg)
+
+                x+=img_rect.width + padding
+
+        # Draw any extra properties of the card
+        x = 8
+        y = 8
+        padding = 4
+
+        if self.model.is_attack_unblockable is True:
+            property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.UNBLOCKABLE)
+            self.surface.blit(property_img, (x, y))
+            x += property_img.get_rect().width + padding
+
+        if self.model.is_quick is True:
+            property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.QUICK)
+            self.surface.blit(property_img, (x, y))
+            x += property_img.get_rect().width + padding
+
+        if self.model.new_card_count != 0:
+            property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.DEAL)
+            self.surface.blit(property_img, (x, y))
+            x += property_img.get_rect().width + padding
+
 
 
