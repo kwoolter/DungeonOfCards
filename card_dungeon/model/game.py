@@ -65,6 +65,7 @@ class Model():
 
     def start(self):
         self.state = Model.STATE_PLAYING
+        self.player.reset()
 
     def pause(self, pause_on=None):
 
@@ -118,5 +119,4 @@ class Model():
             self.battle.do_round()
             if self.battle.is_game_over:
                 self.player.wins += self.player.is_dead is False
-                self.player.reset()
                 self.state = Model.STATE_GAME_OVER

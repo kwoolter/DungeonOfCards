@@ -18,6 +18,13 @@ class EnemyType(Enum):
     RAT = "Rat"
     GOBLIN = "Goblin"
     GHOST = "Ghost"
+    MIMIC = "Mimic"
+    SCORPION = "Scorpion"
+    PIGGY = "Wild Piggy"
+    RATMAN = "Rat Man"
+    SNAKE = "Snake"
+    BUNNY = "Angry Bunny"
+
 
 class CardFeature(Enum):
     ATTACK_MELEE = "Melee Attack"

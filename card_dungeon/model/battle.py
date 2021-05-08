@@ -16,6 +16,7 @@ class Battle():
 
         # Properties
         self.round = 0
+        self.player_max_cards_per_hand = 4
 
         # Components
         self.player = player
@@ -167,9 +168,12 @@ class Battle():
             results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
 
         # Add any bonus or penalty to the number of cards a player is allowed in their hand
-        self.player.max_cards_per_hand += self.player_round_card.new_card_count
-        self.player.max_cards_per_hand -= self.enemy_round_card.new_card_count
-        self.player.max_cards_per_hand = max(self.player.max_cards_per_hand, 1)
+        self.player.cards_per_hand += self.player_round_card.new_card_count
+        self.player.cards_per_hand -= self.enemy_round_card.new_card_count
+
+        # Cap and floor the number of cards that a player is allowed to hold
+        self.player.cards_per_hand = max(self.player.cards_per_hand, 1)
+        self.player.cards_per_hand = min(self.player.cards_per_hand, self.player_max_cards_per_hand)
 
         # Heal the player if applicable
         succeeded_attacks, attempted_attacks, succeeded_blocks = results["Player"]
@@ -296,10 +300,10 @@ class Battle():
             self.player_cards.play_card()
 
         # Replenish Player's hand with new cards
-        self.player_cards.replenish(self.player.max_cards_per_hand)
+        self.player_cards.replenish(self.player.cards_per_hand)
 
         # Replenish Enemy's hand with new cards
-        self.enemy_cards.replenish(self.enemy.max_cards_per_hand)
+        self.enemy_cards.replenish(self.enemy.cards_per_hand)
 
         # Reset the round cards
         self.player_round_card = None

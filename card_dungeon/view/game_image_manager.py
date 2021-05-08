@@ -27,6 +27,12 @@ class DoCImageManager(ImageManager):
             EnemyType.RAT: "Rat.png",
             EnemyType.GHOST: "Ghost.png",
             EnemyType.GOBLIN: "Goblin.png",
+            EnemyType.MIMIC: "Mimic.png",
+            EnemyType.SCORPION: "Scorpion.png",
+            EnemyType.PIGGY: "Wild_Piggy.png",
+            EnemyType.RATMAN: "Ratman.png",
+            EnemyType.SNAKE: "Snake.png",
+            EnemyType.BUNNY: "Angry_Bunny.png",
 
             CardFeature.ATTACK_MAGIC: "attack_magic.png",
             CardFeature.ATTACK_MELEE: "attack_melee.png",

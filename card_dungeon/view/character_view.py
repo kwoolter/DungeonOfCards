@@ -20,10 +20,12 @@ class CharacterView(View):
 
         self.surface.fill(self.bg)
 
+        margin = 8
+
         # Draw the border of the card
         pane_rect = self.surface.get_rect()
         border = pane_rect
-        border.inflate_ip(-8, -8)
+        border.inflate_ip(-margin, -margin)
         if self.is_highlighted is True:
             fg = Colours.YELLOW
             border_width = 5
@@ -41,12 +43,16 @@ class CharacterView(View):
         x, y = pane_rect.midtop
         size = 24
         y += int(size / 2) + 4
+        header_rect=pygame.Rect(border.x,border.y,border.width, size)
+        pygame.draw.rect(self.surface,
+                         fg,
+                         header_rect)
 
         msg = f"{self.model.name} the {self.model.type.value}"
         draw_text(self.surface, msg, x, y,
                   size=size,
-                  fg_colour=self.fg,
-                  bg_colour=self.bg)
+                  fg_colour=self.bg,
+                  bg_colour=self.fg)
 
         # Draw the image of the character
         img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type)
@@ -64,12 +70,12 @@ class CharacterView(View):
                       msg,
                       x, y,
                       size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
+                      fg_colour=self.bg,
+                      bg_colour=self.fg)
             return
 
         # Draw current health
-        y += 10
+        y += 16
         padding = 4
         heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
         img_rect = heart_img.get_rect()

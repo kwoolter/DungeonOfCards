@@ -75,7 +75,7 @@ class BaseCharacter():
     def reset(self):
         self.effects = {}
         self.health = self.max_health
-        self.max_cards_per_hand = 1
+        self.cards_per_hand = self.max_cards_per_hand
 
 
 class EnemyCharacter(BaseCharacter):
@@ -86,6 +86,9 @@ class PlayerCharacter(BaseCharacter):
     def __init__(self, name: str, type: str):
         super().__init__(name=name, type=type, is_player=True)
         self.max_cards_per_hand = 3
+        self.cards_per_hand = self.max_cards_per_hand
+
+
 
 
 
