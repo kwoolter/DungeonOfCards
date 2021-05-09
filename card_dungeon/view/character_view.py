@@ -51,7 +51,7 @@ class CharacterView(View):
         if self.model is None:
             return
 
-        msg = f"{self.model.name} the {self.model.type.value}"
+        msg = f"{self.model.name} the level {self.model.level} {self.model.type.value}"
         draw_text(self.surface, msg, x, y,
                   size=size,
                   fg_colour=self.bg,

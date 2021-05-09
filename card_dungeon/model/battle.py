@@ -362,8 +362,6 @@ class Battle():
                                         name=Event.ENEMY_INFO,
                                         description=f"{self.enemy.name} the {self.enemy.type.value} is dead!"))
 
-
-
         # Discard cards from the player's hand based on enemy hits
         for i in range(self.enemy_round_card.new_card_count):
             self.player_cards.play_card()

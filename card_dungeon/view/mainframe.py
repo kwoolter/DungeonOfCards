@@ -119,7 +119,7 @@ class MainFrame(View):
             cv.initialise(card)
 
             cv.is_highlighted = card == self.model.battle.player_selected_card
-            cv.is_concealed = self.model.player.is_confused
+            cv.is_concealed = self.model.player.is_confused and self.model.state == model.Model.STATE_PLAYING
 
             cv.fg = Colours.BLUE
             cv.draw()
@@ -157,7 +157,7 @@ class MainFrame(View):
             view_rect = cv.surface.get_rect()
             view_rect.right = self.surface.get_rect().right - padding
             view_rect.y = y
-            self.surface.blit(cv.surface, view_rect)
+            #self.surface.blit(cv.surface, view_rect)
             y += 60
             x += 8
 

@@ -18,6 +18,7 @@ class BaseCharacter():
         self.health = self.max_health
         self.rounds = 0
         self.wins = 0
+        self.level = 1
 
     @property
     def is_dead(self):

@@ -119,8 +119,17 @@ class Model():
         else:
             self.battle.do_round()
             if self.battle.is_game_over:
-                self.battle.reset_round()
-                self.player.wins += self.player.is_dead is False
+                #self.battle.reset_round()
+
+                # Log event if player levelled up
+                if self.player.is_dead is False:
+                    self.player.wins += self.player.is_dead is False
+                    if self.battle.player.level <= self.battle.enemy.level:
+                        self.player.level += 1
+                        self.events.add_event(Event(type=Event.BATTLE,
+                                                    name=Event.PLAYER_INFO,
+                                                    description=f"{self.player.name} the {self.player.type.value} has gained a level!"))
+
                 self.state = Model.STATE_GAME_OVER
             else:
                 self.state = Model.STATE_ROUND_OVER
