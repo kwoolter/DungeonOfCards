@@ -118,14 +118,19 @@ class Model():
                                         description="No player card selected"))
         else:
             self.battle.do_round()
+
+            # If game over...
             if self.battle.is_game_over:
                 #self.battle.reset_round()
 
-                # Log event if player levelled up
+                # If player survived
                 if self.player.is_dead is False:
-                    self.player.wins += self.player.is_dead is False
+
+                    self.player.wins += 1
+
+                    # Log event if player levelled up
                     if self.battle.player.level <= self.battle.enemy.level:
-                        self.player.level += 1
+                        self.player.level_up()
                         self.events.add_event(Event(type=Event.BATTLE,
                                                     name=Event.PLAYER_INFO,
                                                     description=f"{self.player.name} the {self.player.type.value} has gained a level!"))

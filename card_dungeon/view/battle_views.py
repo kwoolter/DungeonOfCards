@@ -90,9 +90,9 @@ class BattleRoundView(View):
         size = self.text_size
         padding = 8
 
-        msg_rect = pygame.Rect(0,0,200,size)
+        msg_rect = pygame.Rect(0,0,260,size)
         msg_rect.centerx = border.centerx
-        msg_rect.y += size
+        msg_rect.y += size + padding
 
         # Loop through each recorded event...
         for event in self.model.events.events:
@@ -100,10 +100,10 @@ class BattleRoundView(View):
             # Pick the colour scheme for the event
             if event.name == model.Event.PLAYER_INFO:
                 fg=Colours.BLUE
-                bg=Colours.LIGHT_GREY
+                bg=Colours.WHITE
             elif event.name == model.Event.ENEMY_INFO:
                 fg=Colours.RED
-                bg=Colours.LIGHT_GREY
+                bg=Colours.WHITE
             else:
                 fg=Colours.DARK_GREEN
                 bg=self.bg
