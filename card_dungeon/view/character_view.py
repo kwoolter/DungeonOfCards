@@ -48,6 +48,9 @@ class CharacterView(View):
                          fg,
                          header_rect)
 
+        if self.model is None:
+            return
+
         msg = f"{self.model.name} the {self.model.type.value}"
         draw_text(self.surface, msg, x, y,
                   size=size,

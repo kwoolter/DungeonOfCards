@@ -104,6 +104,7 @@ class DoCGUIController:
                             self.m.select_card(n)
                         # Do a round of teh  battle
                         elif event.key == K_RETURN:
+                            self.v.batte_round_view.initialise(self.m.battle)
                             self.m.do_round()
 
                     # Key DOWN events - less time critical actions
