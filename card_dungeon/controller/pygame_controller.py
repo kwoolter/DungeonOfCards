@@ -111,6 +111,14 @@ class DoCGUIController:
                     elif event.type == KEYDOWN:
                         pass
 
+                # Process events for when the game is in state PLAYING
+                if self.m.state == model.Model.STATE_ROUND_OVER:
+                    # Key events
+                    if event.type == KEYUP:
+                        # Space to start the game
+                        if event.key == K_SPACE:
+                            self.m.new_round()
+
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
 

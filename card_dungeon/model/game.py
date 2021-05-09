@@ -11,6 +11,7 @@ class Model():
     STATE_LOADED = Event.STATE_LOADED
     STATE_READY = Event.STATE_READY
     STATE_PLAYING = Event.STATE_PLAYING
+    STATE_ROUND_OVER = Event.STATE_ROUND_OVER
     STATE_PAUSED = Event.STATE_PAUSED
     STATE_GAME_OVER = Event.STATE_GAME_OVER
 
@@ -118,5 +119,16 @@ class Model():
         else:
             self.battle.do_round()
             if self.battle.is_game_over:
+                self.battle.reset_round()
                 self.player.wins += self.player.is_dead is False
                 self.state = Model.STATE_GAME_OVER
+            else:
+                self.state = Model.STATE_ROUND_OVER
+
+    def new_round(self):
+
+        if self.state == Model.STATE_ROUND_OVER:
+            self.state = Model.STATE_PLAYING
+            self.battle.reset_round()
+        else:
+            print(f"Can't start a new roubnd right now!")

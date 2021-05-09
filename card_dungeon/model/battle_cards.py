@@ -218,6 +218,18 @@ class CardManager:
 
         return new_card
 
+    @property
+    def default_hand_card(self):
+
+        card = None
+
+        # If no card specified just pull the top card
+        if len(self.hand) > 0:
+            card = self.hand[0]
+
+        return card
+
+
     def play_card(self, selected_card: BaseCard = None):
 
         # If no card specified just pull the top card

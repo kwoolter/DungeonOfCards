@@ -109,7 +109,7 @@ class MainFrame(View):
         pane_rect.y = padding
         self.surface.blit(self.enemy_view.surface, pane_rect)
 
-        y = pane_rect.bottom + 20
+        y = pane_rect.bottom + 10
         x = padding
 
         # Draw all of the cards in the player's hand
@@ -143,7 +143,7 @@ class MainFrame(View):
             y += 0
             x += cv.width + padding
 
-        y = pane_rect.bottom + 20
+        y = pane_rect.bottom + 10
 
         # Draw all of the cards in the enemy's hand
         for card in self.model.battle.enemy_cards.hand:
@@ -174,19 +174,20 @@ class MainFrame(View):
         if self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 
-            msg_box_width = 240
-            msg_box_height = 80
+            msg_box_width = 350
+            msg_box_height = 100
             msg_rect = pygame.Rect(0, 0, msg_box_width, msg_box_height)
+            bg = grid_colour
 
             msg_rect.center = pane_rect.center
 
             pygame.draw.rect(self.surface,
-                             Colours.WHITE,
+                             bg,
                              msg_rect,
                              0)
 
             pygame.draw.rect(self.surface,
-                             grid_colour,
+                             Colours.GREY,
                              msg_rect,
                              4)
 
@@ -197,7 +198,7 @@ class MainFrame(View):
                       size=40,
                       centre=True,
                       fg_colour=Colours.GREY,
-                      bg_colour=Colours.WHITE)
+                      bg_colour=bg)
 
     def update(self):
         pygame.display.update()

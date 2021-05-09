@@ -13,6 +13,8 @@ class BattleRoundView(View):
         self.surface = None
         self.fg = Colours.DARK_GREEN
         self.bg = Colours.WHITE
+        self.text_size = 20
+        self.font = pygame.font.SysFont(pygame.font.get_default_font(), self.text_size)
 
         self.player_card_view = None
         self.enemy_card_view = None
@@ -26,8 +28,11 @@ class BattleRoundView(View):
 
         self.player_card_view = BattleCardView(width=self.card_width, height=self.card_height)
         self.player_card_view.initialise(self.model.player_selected_card)
+        self.player_card_view.fg = Colours.BLUE
+
         self.enemy_card_view = BattleCardView(width=self.card_width, height=self.card_height)
-        self.enemy_card_view.initialise(self.model.enemy_cards.hand[0])
+        self.enemy_card_view.initialise(self.model.enemy_cards.default_hand_card )
+        self.enemy_card_view.fg = Colours.RED
 
     def draw(self):
         self.surface.fill(self.bg)
@@ -64,7 +69,10 @@ class BattleRoundView(View):
                   bg_colour=self.bg)
 
         self.player_card_view.initialise(self.model.player_selected_card)
-        # self.enemy_card_view.initialise(self.model.enemy_round_card)
+        self.enemy_card_view.initialise(self.model.enemy_selected_card)
+
+        self.player_card_view.is_concealed = self.model.player.is_confused
+        self.enemy_card_view.is_concealed = self.model.player.is_blind
 
         self.player_card_view.draw()
         card_rect = self.player_card_view.surface.get_rect()
@@ -79,22 +87,53 @@ class BattleRoundView(View):
         self.surface.blit(self.enemy_card_view.surface, card_rect)
 
         # Draw the battle events
-        x, y = pane_rect.midtop
-        size = 20
-        y+= size
+        size = self.text_size
+        padding = 8
 
+        msg_rect = pygame.Rect(0,0,200,size)
+        msg_rect.centerx = border.centerx
+        msg_rect.y += size
+
+        # Loop through each recorded event...
         for event in self.model.events.events:
-            y+= size
+
+            # Pick the colour scheme for the event
+            if event.name == model.Event.PLAYER_INFO:
+                fg=Colours.BLUE
+                bg=Colours.LIGHT_GREY
+            elif event.name == model.Event.ENEMY_INFO:
+                fg=Colours.RED
+                bg=Colours.LIGHT_GREY
+            else:
+                fg=Colours.DARK_GREEN
+                bg=self.bg
+
+            msg_rect.y += padding
 
             msg = f"{event.description}"
 
-            draw_text(self.surface,
-                      msg,
-                      x,
-                      y,
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
+            # draw_text(self.surface,
+            #           msg,
+            #           x,
+            #           y,
+            #           size=size,
+            #           fg_colour=self.fg,
+            #           bg_colour=self.bg)
+
+            while len(msg) > 0:
+                pygame.draw.rect(self.surface,
+                                 bg,
+                                 msg_rect)
+
+                msg = drawText(self.surface,
+                         msg,
+                         color = fg,
+                         rect = msg_rect,
+                         font = self.font,
+                         bkg = bg)
+                msg_rect.y += size
+
+
 
 
 
