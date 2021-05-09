@@ -8,6 +8,7 @@ class Event():
     DEFAULT = "default"
     STATE = "state"
     GAME = "game"
+    BATTLE = "Battle"
     WORLD = "world"
     EFFECT = "effect"
 
@@ -22,6 +23,7 @@ class Event():
     TICK = "Tick"
     EFFECT_START = "Effect Start"
     EFFECT_END = "Effect End"
+    ACTION_INFO = "Action Info"
     ACTION_FAILED = "action failed"
     ACTION_SUCCEEDED = "action succeeded"
     HELP = "Help"
@@ -54,6 +56,9 @@ class EventQueue():
         if len(self.events) > 0:
             next_event = self.events.pop()
         return next_event
+
+    def clear(self):
+        self.events.clear()
 
     def size(self):
         return len(self.events)

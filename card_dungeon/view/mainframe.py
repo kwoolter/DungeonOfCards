@@ -64,7 +64,7 @@ class MainFrame(View):
             print(str(err))
 
 
-        self.batte_round_view = BattleRoundView(width=500, height=240)
+        self.batte_round_view = BattleRoundView(width=600, height=240)
         self.batte_round_view.initialise(self.model.battle)
 
         self.player_view = CharacterView(width=200, height=240)

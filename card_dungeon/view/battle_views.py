@@ -2,6 +2,7 @@ from .view import *
 from .graphics import *
 import card_dungeon.model as model
 from .card_views import BattleCardView
+import time
 
 
 class BattleRoundView(View):
@@ -76,3 +77,24 @@ class BattleRoundView(View):
         card_rect.right = pane_rect.right - padding
         card_rect.centery = pane_rect.centery
         self.surface.blit(self.enemy_card_view.surface, card_rect)
+
+        # Draw the battle events
+        x, y = pane_rect.midtop
+        size = 20
+        y+= size
+
+        for event in self.model.events.events:
+            y+= size
+
+            msg = f"{event.description}"
+
+            draw_text(self.surface,
+                      msg,
+                      x,
+                      y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
+
+
+

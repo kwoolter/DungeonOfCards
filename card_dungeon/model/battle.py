@@ -2,6 +2,7 @@ import logging
 
 from .battle_cards import *
 from .characters import *
+from .events import *
 
 
 class Battle():
@@ -19,6 +20,7 @@ class Battle():
         self.player_max_cards_per_hand = 4
 
         # Components
+        self.events = EventQueue()
         self.player = player
         self.enemy = enemy
 
@@ -98,6 +100,11 @@ class Battle():
             # Attempt all of the element attacks in the attackers card
             for attack, attack_count in attacker_card.attacks.items():
 
+                # Log event
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.ACTION_INFO,
+                                            description=f"{attacker.name} attacks {defender.name} with {attack.value}"))
+
                 attempted_attacks += attack_count
 
                 # For this attack, how many blocks does the defender have?
@@ -117,6 +124,11 @@ class Battle():
                 if block_count > 0:
                     print(f"{defender.name} blocks {min(block_count, attack_count)} {attack.value}(s)")
 
+                    # Log event
+                    self.events.add_event(Event(type=Event.BATTLE,
+                                                name=Event.ACTION_INFO,
+                                                description=f"{defender.name} blocks {min(block_count, attack_count)} {attack.value}(s)"))
+
                 # Print the results of the attacker's attack
                 if damage > 0:
                     # If defender is invincible then damage = 0
@@ -127,6 +139,10 @@ class Battle():
                         defender.health -= damage
 
                     print(f"{attacker.name}'s {attack.value} does {damage} damage")
+                    # Log event
+                    self.events.add_event(Event(type=Event.BATTLE,
+                                                name=Event.ACTION_INFO,
+                                                description=f"{attacker.name}'s {attack.value} does {damage} damage"))
 
         else:
             print(f"{attacker.name} is asleep ZZZZzzzzz")
@@ -148,6 +164,7 @@ class Battle():
             return
 
         results = {}
+        self.events.clear()
 
         # Get a new card from player's hand
         self.player_round_card = self.player_cards.play_card(self.player_selected_card)
