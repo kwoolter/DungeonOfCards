@@ -43,7 +43,7 @@ class CharacterView(View):
         x, y = pane_rect.midtop
         size = 24
         y += int(size / 2) + 4
-        header_rect=pygame.Rect(border.x,border.y,border.width, size)
+        header_rect = pygame.Rect(border.x, border.y, border.width, size)
         pygame.draw.rect(self.surface,
                          fg,
                          header_rect)
@@ -51,7 +51,7 @@ class CharacterView(View):
         if self.model is None:
             return
 
-        msg = f"{self.model.name} the level {self.model.level} {self.model.type.value}"
+        msg = f"{self.model.name} the {self.model.type.value}"
         draw_text(self.surface, msg, x, y,
                   size=size,
                   fg_colour=self.bg,
@@ -84,10 +84,11 @@ class CharacterView(View):
         img_rect = heart_img.get_rect()
 
         x = int(pane_rect.width - ((img_rect.width + padding) * self.model.health)) / 2
-        x=16
+        x = 16
         for i in range(self.model.health):
-            if i == 5:
-                y+=img_rect.height + padding
+            # 5 hearts per row.
+            if i % 5 == 0:
+                y += img_rect.height + padding
                 x = 16
             self.surface.blit(heart_img, (x, y))
             x += heart_img.get_rect().width + 4
@@ -100,7 +101,7 @@ class CharacterView(View):
         for k, v in self.model.effects.items():
             img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
             img_rect = img.get_rect()
-            img_rect.topleft=(x,y)
+            img_rect.topleft = (x, y)
             self.surface.blit(img, img_rect)
             msg = f" {v} "
             draw_text(self.surface,
@@ -112,5 +113,3 @@ class CharacterView(View):
                       bg_colour=self.fg)
 
             x += img_rect.width + padding
-
-

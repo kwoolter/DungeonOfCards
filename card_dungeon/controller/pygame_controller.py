@@ -170,7 +170,7 @@ class DoCGUIController:
                     if event.type == KEYUP:
                         # Re-initialise the game
                         if event.key == K_SPACE:
-                            self.m.initialise()
+                            self.m.new_battle()
                             self.v.initialise()
 
                 # Quit event

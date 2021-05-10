@@ -42,21 +42,8 @@ class Model():
                                         description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
-        self.state = Model.STATE_LOADED
 
-        # If we don't have a living player then create a new one
-        if self.player is None or self.player.is_dead is True:
-            pn = random.choice(["Keith", "Jack", "Rosie"])
-            pt = random.choice(list(PlayerType))
-            self.player = PlayerCharacter(name=pn, type=pt)
-
-        # Generate a random enemy
-        en = random.choice(["Edgar", "Vince","Harold"])
-        et = random.choice(list(EnemyType))
-        e = EnemyCharacter(name=en, type=et)
-
-        self.battle = Battle(self.player, e)
-        self.battle.initialise()
+        self.new_battle()
 
     def tick(self):
         if self.state == Model.STATE_PLAYING:
@@ -121,8 +108,6 @@ class Model():
 
             # If game over...
             if self.battle.is_game_over:
-                #self.battle.reset_round()
-
                 # If player survived
                 if self.player.is_dead is False:
 
@@ -145,4 +130,27 @@ class Model():
             self.state = Model.STATE_PLAYING
             self.battle.reset_round()
         else:
-            print(f"Can't start a new roubnd right now!")
+            print(f"Can't start a new round right now!")
+
+    def new_battle(self):
+
+        self.state = Model.STATE_LOADED
+
+        # If we don't have a living player then create a new one
+        if self.player is None or self.player.is_dead is True:
+            pn = random.choice(["Keith", "Jack", "Rosie"])
+            pt = random.choice(list(PlayerType))
+            self.player = PlayerCharacter(name=pn, type=pt)
+
+        # Reset the player ready for a new battle
+        self.player.reset()
+
+        # Generate a random enemy
+        en = random.choice(["Edgar", "Vince","Harold"])
+        et = random.choice(list(EnemyType))
+        e = EnemyCharacter(name=en, type=et)
+
+        # Create a new battle - player vs. enemy
+        self.battle = Battle(self.player, e)
+        self.battle.initialise()
+
