@@ -87,7 +87,7 @@ class CharacterView(View):
         x = 16
         for i in range(self.model.health):
             # 5 hearts per row.
-            if i % 5 == 0:
+            if i>0 and i % 5 == 0:
                 y += img_rect.height + padding
                 x = 16
             self.surface.blit(heart_img, (x, y))

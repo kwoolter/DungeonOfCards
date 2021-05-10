@@ -42,6 +42,9 @@ class MainFrame(View):
 
         self.batte_round_view = None
 
+        self.player_card_rects =[]
+        self.msg_box_rect = None
+
     def initialise(self):
 
         super().initialise()
@@ -113,6 +116,7 @@ class MainFrame(View):
         x = padding
 
         # Draw all of the cards in the player's hand
+        self.player_card_rects = []
         for i, card in enumerate(self.model.battle.player_cards.hand):
 
             cv = BattleCardView(width=self.card_width, height=self.card_height)
@@ -124,6 +128,9 @@ class MainFrame(View):
             cv.fg = Colours.BLUE
             cv.draw()
             self.surface.blit(cv.surface, (x, y))
+
+            # Store the card's rect in a list to evaluate click events for card selection
+            self.player_card_rects.append(pygame.Rect(x,y, cv.width,cv.height))
 
             # Draw the number below the card
             fg = Colours.WHITE
@@ -177,6 +184,7 @@ class MainFrame(View):
             msg_box_width = 350
             msg_box_height = 100
             msg_rect = pygame.Rect(0, 0, msg_box_width, msg_box_height)
+            self.msg_box_rect = msg_rect
             bg = grid_colour
 
             msg_rect.center = pane_rect.center
@@ -202,6 +210,22 @@ class MainFrame(View):
 
     def update(self):
         pygame.display.update()
+
+    def click_card(self, pos):
+        """
+        See if the user click on a player card.
+        :param pos: Where the user clicked
+        :return: match
+        """
+        match = 0
+        # Loop through the list of player card rects to see if the specified pos collides
+        for i, card_rect in enumerate(self.player_card_rects):
+            if card_rect.collidepoint(pos) == True:
+                match = i + 1
+                break
+
+        return match
+
 
     def end(self):
         pygame.quit()

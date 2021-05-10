@@ -102,10 +102,16 @@ class DoCGUIController:
                         elif event.key >= K_1 and event.key <= K_9:
                             n = event.key - K_1 + 1
                             self.m.select_card(n)
-                        # Do a round of teh  battle
+                        # Do a round of the  battle
                         elif event.key == K_RETURN:
                             self.v.batte_round_view.initialise(self.m.battle)
                             self.m.do_round()
+
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        pos = pygame.mouse.get_pos()
+                        n = self.v.click_card(pos)
+                        self.m.select_card(n)
 
                     # Key DOWN events - less time critical actions
                     elif event.type == KEYDOWN:

@@ -38,7 +38,7 @@ class BattleRoundView(View):
         self.surface.fill(self.bg)
 
         pane_rect = self.surface.get_rect()
-        padding = 10
+        padding = 4
 
         # Draw the border of the card
         border = pane_rect
@@ -55,7 +55,7 @@ class BattleRoundView(View):
             return
 
 
-        # Draw the batle contestants
+        # Draw the battle contestants
         x, y = pane_rect.midtop
         size = 24
         msg = f"{self.model.player.name} vs. {self.model.enemy.name} Round {self.model.round}"
@@ -68,6 +68,7 @@ class BattleRoundView(View):
                   fg_colour=self.fg,
                   bg_colour=self.bg)
 
+        # Draw the card that each contestant is going to play in this round
         self.player_card_view.initialise(self.model.player_selected_card)
         self.enemy_card_view.initialise(self.model.enemy_selected_card)
 
@@ -88,9 +89,10 @@ class BattleRoundView(View):
 
         # Draw the battle events
         size = self.text_size
-        padding = 8
+        padding = 4
 
-        msg_rect = pygame.Rect(0,0,260,size)
+        # Create a rect that will contain each event line of text
+        msg_rect = pygame.Rect(0,0,280,size)
         msg_rect.centerx = border.centerx
         msg_rect.y += size + padding
 
@@ -110,16 +112,10 @@ class BattleRoundView(View):
 
             msg_rect.y += padding
 
+
             msg = f"{event.description}"
 
-            # draw_text(self.surface,
-            #           msg,
-            #           x,
-            #           y,
-            #           size=size,
-            #           fg_colour=self.fg,
-            #           bg_colour=self.bg)
-
+            # Print each event description in chunks until we run out of msg to display
             while len(msg) > 0:
                 pygame.draw.rect(self.surface,
                                  bg,
@@ -131,7 +127,7 @@ class BattleRoundView(View):
                          rect = msg_rect,
                          font = self.font,
                          bkg = bg)
-                msg_rect.y += size
+                msg_rect.y += size - 2
 
 
 
