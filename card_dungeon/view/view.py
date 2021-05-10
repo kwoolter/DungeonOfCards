@@ -2,8 +2,8 @@ import os
 import pygame
 import logging
 
-class ImageManager():
 
+class ImageManager():
     image_cache = {}
     skins = {}
     sprite_sheets = {}
@@ -44,7 +44,7 @@ class ImageManager():
                 print(f'{image_file_name}:{original_image.get_rect()} smallest={smallest_size}')
                 cropped_image = pygame.Surface((smallest_size.width, smallest_size.height))
                 cropped_image.fill(transparent)
-                cropped_image.blit(original_image, dest=(0,0), area= smallest_size)
+                cropped_image.blit(original_image, dest=(0, 0), area=smallest_size)
                 cropped_image.set_colorkey(transparent)
 
                 # Scale the image if requested
@@ -93,8 +93,8 @@ class ImageManager():
 
         return image
 
-class View():
 
+class View():
     IMAGE_MANAGER = None
 
     def __init__(self, width: int = 0, height: int = 0):
@@ -109,22 +109,48 @@ class View():
         # Dictionary of clickable areas in the view
         self.click_zones = {}
 
+        # Dictionary of child views Key=View Name, Value = (View, pos)
+        self.child_views = {}
+
+    @property
+    def rect(self):
+        if self.surface is not None:
+            return self.surface.get_rect()
+        else:
+            return pygame.Rect(0, 0, self.width, self.height)
+
     def initialise(self):
+        self.clear_child_views()
         self.clear_click_zones()
+
+    def add_child_view(self, new_view, name: str = None, pos=(0, 0)) -> str:
+        if name is None:
+            name = f"{new_view.id}"
+        self.child_views[name] = (new_view, pos)
+        return name
+
+    def clear_child_views(self):
+        self.child_views = {}
 
     def clear_click_zones(self):
         self.click_zones = {}
 
-    def add_click_zone(self, zone_name : str, zone_rect):
+    def add_click_zone(self, zone_name: str, zone_rect):
         self.click_zones[zone_name] = zone_rect
 
     # See if a click landed in a known zone in the view
     def is_zone_clicked(self, pos):
         zone = None
-        for k,v in self.click_zones.items():
+        for k, v in self.click_zones.items():
             if v.collidepoint(pos) == True:
                 zone = k
                 break
+
+        if zone is None:
+            for k, v in self.child_views.items():
+                zone = v.is_zone_click(pos)
+                if zone != None:
+                    break
         return zone
 
     def tick(self):
@@ -143,10 +169,8 @@ class View():
     def process_event(self, args):
         print(f"{__class__}: Procssing event {args}")
 
-
     def end(self):
         print(f"Ending {__class__}")
-
 
 
 class spritesheet(object):
