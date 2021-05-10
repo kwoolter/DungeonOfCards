@@ -118,12 +118,15 @@ class DoCGUIController:
                         pass
 
                 # Process events for when the game is in state PLAYING
-                if self.m.state == model.Model.STATE_ROUND_OVER:
+                elif self.m.state == model.Model.STATE_ROUND_OVER:
                     # Key events
                     if event.type == KEYUP:
                         # Space to start the game
                         if event.key == K_SPACE:
                             self.m.new_round()
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.m.new_round()
 
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
@@ -141,6 +144,10 @@ class DoCGUIController:
                     elif event.type == USEREVENT + 3:
                         pass
 
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.m.start()
+
                 # Process events for when the game is in state READY
                 elif self.m.state == model.Model.STATE_READY:
 
@@ -155,6 +162,10 @@ class DoCGUIController:
                     # Timer for talking
                     elif event.type == USEREVENT + 3:
                         pass
+
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.m.start()
 
                 # Process events for when the game is in state PAUSED
                 elif self.m.state == model.Model.STATE_PAUSED:
@@ -178,6 +189,10 @@ class DoCGUIController:
                         if event.key == K_SPACE:
                             self.m.new_battle()
                             self.v.initialise()
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.m.new_battle()
+                        self.v.initialise()
 
                 # Quit event
                 if event.type == QUIT:
