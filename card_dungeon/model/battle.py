@@ -15,6 +15,7 @@ class Battle():
 
         # Properties
         self.round = 1
+        self.is_round_complete = False
         self.player_max_cards_per_hand = 4
 
         # Components
@@ -368,6 +369,8 @@ class Battle():
                                     name=Event.BATTLE_ROUND_OVER,
                                     description=f"End of round {self.round}"))
 
+        self.is_round_complete = True
+
     def reset_round(self):
 
         # Replenish Player's hand with new cards
@@ -394,6 +397,9 @@ class Battle():
 
         self.enemy.tick()
         self.enemy.rounds += 1
+
+        # Flag that indicated if a round has finished or not
+        self.is_round_complete = False
 
 
 def test():

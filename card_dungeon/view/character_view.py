@@ -78,20 +78,19 @@ class CharacterView(View):
             return
 
         # Draw current health
-        y += 16
+        y += 14
         padding = 4
-        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
+        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CharacterFeature.HEALTH,width=20, height=20)
         img_rect = heart_img.get_rect()
 
-        x = int(pane_rect.width - ((img_rect.width + padding) * self.model.health)) / 2
-        x = 16
+        start_x = x = 12
         for i in range(self.model.health):
             # 5 hearts per row.
-            if i>0 and i % 5 == 0:
+            if i>0 and i % 8 == 0:
                 y += img_rect.height + padding
-                x = 16
+                x = start_x
             self.surface.blit(heart_img, (x, y))
-            x += heart_img.get_rect().width + 4
+            x += heart_img.get_rect().width + 2
 
         # Draw the current active effects
         y += img_rect.height + padding

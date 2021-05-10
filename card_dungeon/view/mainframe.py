@@ -69,6 +69,7 @@ class MainFrame(View):
 
         self.batte_round_view = BattleRoundView(width=600, height=240)
         self.batte_round_view.initialise(self.model.battle)
+        self.battle_view_rect = None
 
         self.player_view = CharacterView(width=200, height=240)
         self.player_view.initialise(self.model.battle.player)
@@ -131,6 +132,7 @@ class MainFrame(View):
 
             # Store the card's rect in a list to evaluate click events for card selection
             self.player_card_rects.append(pygame.Rect(x,y, cv.width,cv.height))
+            self.add_click_zone(f"Player Card {i+1}",pygame.Rect(x,y, cv.width,cv.height) )
 
             # Draw the number below the card
             fg = Colours.WHITE
@@ -174,6 +176,7 @@ class MainFrame(View):
         view_rect = self.batte_round_view.surface.get_rect()
         view_rect.centerx = pane_rect.centerx
         view_rect.y = padding
+        self.battle_view_rect = view_rect
         self.surface.blit(self.batte_round_view.surface, view_rect)
 
 
@@ -223,6 +226,15 @@ class MainFrame(View):
             if card_rect.collidepoint(pos) == True:
                 match = i + 1
                 break
+
+        zone = self.is_zone_clicked(pos)
+        if zone is None:
+            cx,cy=pos
+            view_rect = self.battle_view_rect
+            zone = self.batte_round_view.is_zone_clicked((cx-view_rect.x,cy-view_rect.y))
+
+        if zone is not None:
+            print(f"You clicked on zone {zone}")
 
         return match
 

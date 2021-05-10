@@ -95,7 +95,12 @@ class Model():
     def select_card(self, selection : int):
         print(f"Selecting card {selection}")
         if selection >0 and selection <= len(self.battle.player_cards.hand):
-            self.battle.player_selected_card = self.battle.player_cards.hand[selection - 1]
+            selected_card = self.battle.player_cards.hand[selection - 1]
+            if self.battle.player_selected_card != selected_card:
+                self.battle.player_selected_card = selected_card
+            else:
+                self.battle.player_selected_card = None
+
 
     def do_round(self):
 

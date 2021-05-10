@@ -13,8 +13,13 @@ class BattleRoundView(View):
         self.surface = None
         self.fg = Colours.DARK_GREEN
         self.bg = Colours.WHITE
+
         self.text_size = 20
         self.font = pygame.font.SysFont(pygame.font.get_default_font(), self.text_size)
+
+        self.button_text_size = 48
+        self.button_font = pygame.font.SysFont(pygame.font.get_default_font(), self.button_text_size)
+        self.play_button_rect = None
 
         self.player_card_view = None
         self.enemy_card_view = None
@@ -53,7 +58,6 @@ class BattleRoundView(View):
 
         if self.model is None:
             return
-
 
         # Draw the battle contestants
         x, y = pane_rect.midtop
@@ -112,7 +116,6 @@ class BattleRoundView(View):
 
             msg_rect.y += padding
 
-
             msg = f"{event.description}"
 
             # Print each event description in chunks until we run out of msg to display
@@ -128,6 +131,43 @@ class BattleRoundView(View):
                          font = self.font,
                          bkg = bg)
                 msg_rect.y += size - 2
+
+        # Draw the 'Play' button
+        if self.model.player_selected_card is not None and self.model.is_round_complete is False:
+
+            fg = Colours.WHITE
+            bg=Colours.GREEN
+            border_fg = Colours.DARK_GREEN
+            button_rect = pygame.Rect(0,0, 150,100)
+            button_rect.center = pane_rect.center
+            self.play_button_rect = button_rect
+            self.add_click_zone("Play Button", button_rect)
+
+            pygame.draw.rect(self.surface,
+                             bg,
+                             button_rect)
+
+            pygame.draw.rect(self.surface,
+                             border_fg,
+                             button_rect,
+                             4)
+
+            text_size = self.button_text_size
+            text_rect = pygame.Rect(0,0, 150,text_size)
+            text_rect.center = button_rect.center
+
+            msg = f"Play"
+
+            msg = drawText(self.surface,
+                           msg,
+                           color=fg,
+                           rect=text_rect,
+                           font=self.button_font,
+                           bkg=bg,
+                           )
+        else:
+
+            self.play_button_rect = None
 
 
 

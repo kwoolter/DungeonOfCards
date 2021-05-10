@@ -100,12 +100,32 @@ class View():
     def __init__(self, width: int = 0, height: int = 0):
         self._debug = False
         self.tick_count = 0
+
         self.height = height
         self.width = width
+
         self.surface = None
 
+        # Dictionary of clickable areas in the view
+        self.click_zones = {}
+
     def initialise(self):
-        pass
+        self.clear_click_zones()
+
+    def clear_click_zones(self):
+        self.click_zones = {}
+
+    def add_click_zone(self, zone_name : str, zone_rect):
+        self.click_zones[zone_name] = zone_rect
+
+    # See if a click landed in a known zone in the view
+    def is_zone_clicked(self, pos):
+        zone = None
+        for k,v in self.click_zones.items():
+            if v.collidepoint(pos) == True:
+                zone = k
+                break
+        return zone
 
     def tick(self):
         self.tick_count += 1
