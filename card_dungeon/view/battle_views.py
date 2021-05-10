@@ -41,6 +41,7 @@ class BattleRoundView(View):
 
     def draw(self):
         self.surface.fill(self.bg)
+        self.clear_click_zones()
 
         pane_rect = self.surface.get_rect()
         padding = 4

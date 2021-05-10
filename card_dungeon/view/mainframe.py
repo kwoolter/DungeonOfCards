@@ -88,7 +88,9 @@ class MainFrame(View):
 
         pane_rect = self.surface.get_rect()
         self.surface.fill(Colours.WHITE)
+        self.clear_click_zones()
 
+        # Fill the view with graph paper-like grid of squares
         grid_size = 34
         grid_colour = (190, 244, 255)
 
@@ -106,12 +108,20 @@ class MainFrame(View):
         self.player_view.draw()
         self.surface.blit(self.player_view.surface, (x, y))
 
+        # Add a click zone for the player
+        self.add_click_zone("Player View",
+                            pygame.Rect(x,y,self.player_view.width,self.player_view.height))
+
         # Draw the enemy's information
         self.enemy_view.draw()
         pane_rect = self.enemy_view.surface.get_rect()
         pane_rect.right = self.surface.get_rect().right - padding
         pane_rect.y = padding
         self.surface.blit(self.enemy_view.surface, pane_rect)
+
+        # Add a click zone for the enemy
+        self.add_click_zone("Enemy View",
+                            pygame.Rect(pane_rect.x,pane_rect.y,self.player_view.width,self.player_view.height))
 
         y = pane_rect.bottom + 10
         x = padding
@@ -132,6 +142,7 @@ class MainFrame(View):
 
             # Store the card's rect in a list to evaluate click events for card selection
             self.player_card_rects.append(pygame.Rect(x,y, cv.width,cv.height))
+            # add a click zone for each player card
             self.add_click_zone(f"Player Card {i+1}",pygame.Rect(x,y, cv.width,cv.height) )
 
             # Draw the number below the card
@@ -176,8 +187,10 @@ class MainFrame(View):
         view_rect = self.batte_round_view.surface.get_rect()
         view_rect.centerx = pane_rect.centerx
         view_rect.y = padding
-        self.battle_view_rect = view_rect
         self.surface.blit(self.batte_round_view.surface, view_rect)
+
+        # Remember where this view was placed
+        self.battle_view_rect = view_rect
 
 
         # Draw game state msg box if not playing
