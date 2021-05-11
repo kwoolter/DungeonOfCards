@@ -73,7 +73,7 @@ class CharacterView(View):
                       size=size,
                       fg_colour=self.bg,
                       bg_colour=self.fg)
-            return
+            # return
 
         # Draw current health
         y += 14

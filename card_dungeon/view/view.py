@@ -99,13 +99,18 @@ class View():
     IMAGE_MANAGER = None
 
     def __init__(self, name: str = None, width: int = 0, height: int = 0):
+
+        # Properties
         self._debug = False
         self.tick_count = 0
-
         self.height = height
         self.width = width
+        self.is_visible = True
+
+        # If no view name specific then generate one
         if name is None:
             name = f"View:{id(self)}"
+
         self.name = name
 
         self.surface = None
@@ -134,6 +139,10 @@ class View():
         :return: zone if we found a clickable zone either in this view or in a child view
         """
         zone = None
+
+        # If this view is not visible then do not proceed
+        if self.is_visible is False:
+            return zone
 
         # Loop through the clickable zones in this view..
         for k, v in self.click_zones.items():

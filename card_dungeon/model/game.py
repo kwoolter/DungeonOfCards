@@ -1,10 +1,9 @@
-from .events import *
-from .battle import *
 import os
-from . doc_exceptions import *
+
+from .battle import *
+
 
 class Model():
-
     DATA_FILES_DIR = os.path.dirname(__file__) + "\\data\\"
 
     # Define states to synch up with corresponding event names
@@ -15,18 +14,18 @@ class Model():
     STATE_PAUSED = Event.STATE_PAUSED
     STATE_GAME_OVER = Event.STATE_GAME_OVER
 
-    def __init__(self, name : str):
+    def __init__(self, name: str):
         # Properties
         self.name = name
         self.tick_count = 0
         self._state = None
         self._debug = False
 
-
         # Components
         self.player = None
         self.battle = None
         self.events = EventQueue()
+        self.loot_deck = CardManager(max_hand_size=5)
 
     @property
     def state(self):
@@ -44,6 +43,7 @@ class Model():
     def initialise(self):
 
         self.new_battle()
+        self.new_loot()
 
     def tick(self):
         if self.state == Model.STATE_PLAYING:
@@ -73,7 +73,7 @@ class Model():
         if new_event.type == Event.DEBUG:
             self.debug()
 
-    def debug(self, debug_on : bool = None):
+    def debug(self, debug_on: bool = None):
 
         if debug_on is None:
             self._debug = not self._debug
@@ -92,15 +92,14 @@ class Model():
     def end(self):
         print("Ending {0}".format(__class__))
 
-    def select_card(self, selection : int):
+    def select_card(self, selection: int):
         print(f"Selecting card {selection}")
-        if selection >0 and selection <= len(self.battle.player_cards.hand):
+        if selection > 0 and selection <= len(self.battle.player_cards.hand):
             selected_card = self.battle.player_cards.hand[selection - 1]
             if self.battle.player_selected_card != selected_card:
                 self.battle.player_selected_card = selected_card
             else:
                 self.battle.player_selected_card = None
-
 
     def do_round(self):
 
@@ -137,6 +136,17 @@ class Model():
         else:
             print(f"Can't start a new round right now!")
 
+    def new_loot(self):
+        """
+        Create a new deck of Loot Cards
+        """
+        for i in range(10):
+            loot_name = random.choice(["Gold", "Silver", "Diamond", "Ruby", "Sapphire", "Emerald"])
+            new_card = LootCard(loot_name)
+            self.loot_deck.deck.append(new_card)
+        self.loot_deck.shuffle()
+        self.loot_deck.replenish()
+
     def new_battle(self):
 
         self.state = Model.STATE_LOADED
@@ -151,7 +161,7 @@ class Model():
         self.player.reset()
 
         # Generate a random enemy and make the same level as the player
-        en = random.choice(["Edgar", "Vince","Harold", "Fred", "George", "Monty"])
+        en = random.choice(["Edgar", "Vince", "Harold", "Fred", "George", "Monty"])
         et = random.choice(list(EnemyType))
         e = EnemyCharacter(name=en, type=et)
         for i in range(self.player.level):
@@ -160,4 +170,3 @@ class Model():
         # Create a new battle - player vs. enemy
         self.battle = Battle(self.player, e)
         self.battle.initialise()
-

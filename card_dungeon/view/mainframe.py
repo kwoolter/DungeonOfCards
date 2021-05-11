@@ -6,6 +6,7 @@ from .graphics import *
 from .card_views import BattleCardView
 from .character_view import CharacterView
 from . battle_views import BattleRoundView
+from .loot_view import LootView
 from .game_image_manager import *
 
 
@@ -41,6 +42,7 @@ class MainFrame(View):
         self.player_view = None
         self.enemy_view = None
         self.batte_round_view = None
+        self.loot_view = None
 
         self.msg_box_rect = None
 
@@ -76,6 +78,9 @@ class MainFrame(View):
         self.enemy_view = CharacterView(name="Enemy Character View", width=200, height=240)
         self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.fg = Colours.RED
+
+        self.loot_view = LootView(name="Loot View", width=self.card_width*5+30,height=self.card_height+20)
+        self.loot_view.initialise(self.model.loot_deck)
 
 
     def print(self):
@@ -206,6 +211,18 @@ class MainFrame(View):
                       centre=True,
                       fg_colour=Colours.GREY,
                       bg_colour=bg)
+
+
+        if self.loot_view.is_visible is True:
+            # Draw the loot card deck
+            self.loot_view.draw()
+            view_rect = self.loot_view.rect
+            view_rect.centerx = pane_rect.centerx
+            view_rect.bottom = pane_rect.bottom - 10
+            self.surface.blit(self.loot_view.surface, view_rect)
+
+            # Register battle view as a child view
+            self.add_child_view(self.loot_view, pos=view_rect.topleft)
 
     def update(self):
         pygame.display.update()
