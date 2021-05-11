@@ -171,10 +171,10 @@ class View():
 
                 zone = v.is_zone_clicked((pos_x - vpos_x, pos_y - vpos_y))
                 if zone != None:
-                    print(f"You clicked on Child:{k}:{v.name} Zone:{zone}")
+                    print(f"You clicked on Child View '{k}' Zone:'{zone}'")
                     break
         else:
-            print(f"You click on Parent:{self.name} Zone:{zone}")
+            print(f"You click on Parent View '{self.name}' Zone:'{zone}'")
 
         return zone
 

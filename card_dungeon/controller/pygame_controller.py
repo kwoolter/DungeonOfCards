@@ -81,6 +81,9 @@ class DoCGUIController:
             # Loop to process pygame events
             for event in pygame.event.get():
 
+                # See what actions have been performed...
+                actions = self.handle_state_events(event)
+
                 # Process events for when the game is in state PLAYING
                 if self.m.state == model.Model.STATE_PLAYING:
 
@@ -92,18 +95,7 @@ class DoCGUIController:
                     elif event.type == USEREVENT + 2:
                         self.v.tick()
 
-                    # handle MOUSEBUTTONUP
-                    elif event.type == pygame.MOUSEBUTTONUP:
-                        pos = pygame.mouse.get_pos()
-                        n = self.v.click_card(pos)
-
-                        # New debug
-                        self.v.is_zone_clicked(pos)
-
-                        self.m.select_card(n)
-
                     else:
-                        actions = self.handle_state_events(event)
                         if actions.get("PAUSE"):
                             self.m.pause()
                         elif actions.get("GO"):
@@ -117,13 +109,11 @@ class DoCGUIController:
 
                 # Process events for when the game is in state PLAYING
                 elif self.m.state == model.Model.STATE_ROUND_OVER:
-                    actions = self.handle_state_events(event)
                     if actions.get("CONTINUE"):
                         self.m.new_round()
 
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
-                    actions = self.handle_state_events(event)
                     if actions.get("CONTINUE"):
                         self.m.start()
 
@@ -137,7 +127,6 @@ class DoCGUIController:
 
                 # Process events for when the game is in state READY
                 elif self.m.state == model.Model.STATE_READY:
-                    actions = self.handle_state_events(event)
                     if actions.get("CONTINUE"):
                         self.m.start()
 
@@ -148,13 +137,8 @@ class DoCGUIController:
                     elif event.type == USEREVENT + 3:
                         pass
 
-                    # handle MOUSEBUTTONUP
-                    elif event.type == pygame.MOUSEBUTTONUP:
-                        self.m.start()
-
                 # Process events for when the game is in state PAUSED
                 elif self.m.state == model.Model.STATE_PAUSED:
-                    actions = self.handle_state_events(event)
                     if actions.get("PAUSE"):
                         self.m.pause()
                     elif actions.get("DEBUG"):
@@ -165,7 +149,6 @@ class DoCGUIController:
 
                 # Process events for when the game is in state GAME OVER
                 elif self.m.state == model.Model.STATE_GAME_OVER:
-                    actions = self.handle_state_events(event)
                     if actions.get("CONTINUE"):
                         self.m.new_battle()
                         self.v.initialise()
@@ -276,5 +259,22 @@ class DoCGUIController:
             # Go and play!
             elif event.key == K_RETURN:
                 actions["GO"] = True
+
+        # handle MOUSEBUTTONUP
+        elif event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
+
+            # Get the name of the zone that the user clicked on
+            zone = self.v.is_zone_clicked(pos)
+
+            # If it was a recognisable zone...
+            if zone is not None:
+                if zone == "Play Button":
+                    actions["GO"] = True
+                elif zone.startswith("Player Card"):
+                    n = int(zone.split(":")[1])
+                    actions["SELECT"] = n
+                else:
+                    print(f"Nothing happened when you clicked on zone '{zone}' in state {self.m.state}")
 
         return actions

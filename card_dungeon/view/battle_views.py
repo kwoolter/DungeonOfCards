@@ -77,15 +77,20 @@ class BattleRoundView(View):
         self.player_card_view.initialise(self.model.player_selected_card)
         self.enemy_card_view.initialise(self.model.enemy_selected_card)
 
-        self.player_card_view.is_concealed = self.model.player.is_confused
-        self.enemy_card_view.is_concealed = self.model.player.is_blind
+        # if the round is still in progress...
+        if self.model.is_round_complete is False:
+            # Chnage card visibility flags based on effects on the player
+            self.player_card_view.is_concealed = self.model.player.is_confused
+            self.enemy_card_view.is_concealed = self.model.player.is_blind
 
+        # Draw the card that the player has selected
         self.player_card_view.draw()
         card_rect = self.player_card_view.surface.get_rect()
         card_rect.x = pane_rect.x + padding
         card_rect.centery = pane_rect.centery
         self.surface.blit(self.player_card_view.surface, card_rect)
 
+        # Draw the card that the enemy has selected
         self.enemy_card_view.draw()
         card_rect = self.enemy_card_view.surface.get_rect()
         card_rect.right = pane_rect.right - padding
