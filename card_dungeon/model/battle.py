@@ -14,7 +14,7 @@ class Battle():
     def __init__(self, player: PlayerCharacter, enemy: EnemyCharacter):
 
         # Properties
-        self.round = 1
+        self.round = 0
         self.is_round_complete = False
         self.player_max_cards_per_hand = 4
 
@@ -56,11 +56,7 @@ class Battle():
         self.player_cards.deck = self.player_deck
         self.enemy_cards.deck = self.enemy_deck
 
-
         self.reset_round()
-
-    def start(self):
-        pass
 
     def build_deck(self, card_count: int, is_player_deck: bool, deck: list):
         """

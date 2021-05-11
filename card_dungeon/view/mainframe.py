@@ -18,21 +18,22 @@ class MainFrame(View):
 
         super().__init__(name="MainFrame")
 
-        self._debug = False
-
-        im = DoCImageManager()
-        im.initialise()
-        View.IMAGE_MANAGER = im
-
+        # Properties
         self.model = model
         self.surface = None
+
         self.width = 1000
-        self.height = 600
+        self.height = 470
 
         self.card_width = 150
         self.card_height = 180
 
         self._debug = False
+
+        # Components
+        im = DoCImageManager()
+        im.initialise()
+        View.IMAGE_MANAGER = im
 
         self.battle_card_view_player = None
         self.battle_card_view_enemy = None
@@ -64,6 +65,7 @@ class MainFrame(View):
         except Exception as err:
             print(str(err))
 
+        # Create and initialise component Views
         self.batte_round_view = BattleRoundView(name="Battle View", width=600, height=240)
         self.batte_round_view.initialise(self.model.battle)
 
@@ -83,12 +85,12 @@ class MainFrame(View):
     def draw(self):
 
         pane_rect = self.surface.get_rect()
-        self.surface.fill(Colours.WHITE)
 
         self.clear_child_views()
         self.clear_click_zones()
 
         # Fill the view with graph paper-like grid of squares
+        self.surface.fill(Colours.WHITE)
         grid_size = 34
         grid_colour = (190, 244, 255)
 
@@ -102,7 +104,7 @@ class MainFrame(View):
         x = padding
         y = padding
 
-        # Draw the player's information
+        # Draw the player's information view
         self.player_view.draw()
         view_rect = self.player_view.rect
         view_rect.topleft = (x,y)
@@ -110,9 +112,8 @@ class MainFrame(View):
 
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.player_view, pos = view_rect.topleft)
-        self.add_click_zone("Player View",view_rect)
 
-        # Draw the enemy's information
+        # Draw the enemy's information view
         self.enemy_view.draw()
         view_rect = self.enemy_view.rect
         view_rect.right = pane_rect.right - padding
@@ -121,7 +122,6 @@ class MainFrame(View):
 
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.enemy_view, pos = view_rect.topleft)
-        self.add_click_zone("Enemy View",view_rect)
 
         y = view_rect.bottom + 10
         x = padding
@@ -149,8 +149,11 @@ class MainFrame(View):
             fg = Colours.WHITE
             bg = Colours.BLUE
 
+            # Change colours if this is THE selected card
             if card == self.model.battle.player_selected_card:
                 bg = Colours.GOLD
+            else:
+                bg = Colours.GREY
 
             draw_text(self.surface,
                       f" {i + 1} ",

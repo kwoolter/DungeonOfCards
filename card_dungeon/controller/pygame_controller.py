@@ -265,7 +265,7 @@ class DoCGUIController:
             pos = pygame.mouse.get_pos()
 
             # Get the name of the zone that the user clicked on
-            zone = self.v.is_zone_clicked(pos)
+            zone = self.v.on_click(pos)
 
             # If it was a recognisable zone...
             if zone is not None:

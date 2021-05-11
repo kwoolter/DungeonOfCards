@@ -4,10 +4,15 @@ from .view import *
 
 
 class CharacterView(View):
-    def __init__(self, name:str, width: int, height: int):
+    MODE_PORTRAIT = "Portrait Mode"
+    MODE_STATS = "Stats Mode"
+
+    def __init__(self, name: str, width: int, height: int):
         super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
+
+        self.mode = CharacterView.MODE_PORTRAIT
         self.is_highlighted = False
         self.bg = Colours.WHITE
         self.fg = Colours.DARK_GREEN
@@ -57,13 +62,6 @@ class CharacterView(View):
                   fg_colour=self.bg,
                   bg_colour=self.fg)
 
-        # Draw the image of the character
-        img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type)
-        img_rect = img.get_rect()
-        img_rect.centerx = pane_rect.centerx
-        img_rect.bottom = pane_rect.bottom - 16
-        self.surface.blit(img, img_rect)
-
         # Is the character dead?
         if self.model.is_dead is True:
             x, y = pane_rect.center
@@ -80,20 +78,53 @@ class CharacterView(View):
         # Draw current health
         y += 14
         padding = 4
-        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CharacterFeature.HEALTH,width=20, height=20)
+        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CharacterFeature.HEALTH, width=20, height=20)
         img_rect = heart_img.get_rect()
 
         start_x = x = 12
         for i in range(self.model.health):
-            # 5 hearts per row.
-            if i>0 and i % 8 == 0:
+            # 8 hearts per row.
+            if i > 0 and i % 8 == 0:
                 y += img_rect.height + padding
                 x = start_x
             self.surface.blit(heart_img, (x, y))
-            x += heart_img.get_rect().width + 2
+            x += img_rect.width + 2
+
+        temp_y = y + img_rect.height + padding
+
+        if self.mode == CharacterView.MODE_PORTRAIT:
+            # Draw the image of the character
+            img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type)
+            img_rect = img.get_rect()
+            img_rect.centerx = pane_rect.centerx
+            img_rect.bottom = pane_rect.bottom - 16
+            self.surface.blit(img, img_rect)
+
+        elif self.mode == CharacterView.MODE_STATS:
+            # Draw character stats
+            x = pane_rect.centerx
+            y += heart_img.get_rect().height + 20
+            size = 16
+            msg = f"Level:{self.model.level}"
+            draw_text(self.surface, msg, x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
+            y += size
+            msg = f"Rounds:{self.model.rounds}"
+            draw_text(self.surface, msg, x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
+            y += size
+            msg = f"Wins:{self.model.wins}"
+            draw_text(self.surface, msg, x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
 
         # Draw the current active effects
-        y += img_rect.height + padding
+        y = temp_y
         x = 10
         size = 18
 
@@ -105,10 +136,18 @@ class CharacterView(View):
             msg = f" {v} "
             draw_text(self.surface,
                       msg,
-                      img_rect.centerx,
+                      img_rect.left + 4,
                       img_rect.bottom,
                       size=size,
                       fg_colour=self.bg,
                       bg_colour=self.fg)
 
             x += img_rect.width + padding
+
+    def on_click_zone(self, zone_name:str):
+        # Don't care where the user clicked.
+        # Toggle the View mode between character's portrait and character's stats
+        if self.mode == CharacterView.MODE_PORTRAIT:
+            self.mode = CharacterView.MODE_STATS
+        elif self.mode == CharacterView.MODE_STATS:
+            self.mode = CharacterView.MODE_PORTRAIT
