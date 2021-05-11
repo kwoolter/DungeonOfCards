@@ -150,10 +150,12 @@ class Model():
         # Reset the player ready for a new battle
         self.player.reset()
 
-        # Generate a random enemy
-        en = random.choice(["Edgar", "Vince","Harold"])
+        # Generate a random enemy and make the same level as the player
+        en = random.choice(["Edgar", "Vince","Harold", "Fred", "George", "Monty"])
         et = random.choice(list(EnemyType))
         e = EnemyCharacter(name=en, type=et)
+        for i in range(self.player.level):
+            e.level_up()
 
         # Create a new battle - player vs. enemy
         self.battle = Battle(self.player, e)

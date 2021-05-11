@@ -18,31 +18,30 @@ class MainFrame(View):
 
         super().__init__(name="MainFrame")
 
-        self._debug = False
-
-        im = DoCImageManager()
-        im.initialise()
-        View.IMAGE_MANAGER = im
-
+        # Properties
         self.model = model
         self.surface = None
+
         self.width = 1000
-        self.height = 600
+        self.height = 470
 
         self.card_width = 150
         self.card_height = 180
 
         self._debug = False
 
+        # Components
+        im = DoCImageManager()
+        im.initialise()
+        View.IMAGE_MANAGER = im
+
         self.battle_card_view_player = None
         self.battle_card_view_enemy = None
 
         self.player_view = None
         self.enemy_view = None
-
         self.batte_round_view = None
 
-        self.player_card_rects =[]
         self.msg_box_rect = None
 
     def initialise(self):
@@ -66,10 +65,9 @@ class MainFrame(View):
         except Exception as err:
             print(str(err))
 
-
+        # Create and initialise component Views
         self.batte_round_view = BattleRoundView(name="Battle View", width=600, height=240)
         self.batte_round_view.initialise(self.model.battle)
-        self.battle_view_rect = None
 
         self.player_view = CharacterView(name="Player Character View", width=200, height=240)
         self.player_view.initialise(self.model.battle.player)
@@ -87,12 +85,12 @@ class MainFrame(View):
     def draw(self):
 
         pane_rect = self.surface.get_rect()
-        self.surface.fill(Colours.WHITE)
 
         self.clear_child_views()
         self.clear_click_zones()
 
         # Fill the view with graph paper-like grid of squares
+        self.surface.fill(Colours.WHITE)
         grid_size = 34
         grid_colour = (190, 244, 255)
 
@@ -106,7 +104,7 @@ class MainFrame(View):
         x = padding
         y = padding
 
-        # Draw the player's information
+        # Draw the player's information view
         self.player_view.draw()
         view_rect = self.player_view.rect
         view_rect.topleft = (x,y)
@@ -114,9 +112,8 @@ class MainFrame(View):
 
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.player_view, pos = view_rect.topleft)
-        self.add_click_zone("Player View",view_rect)
 
-        # Draw the enemy's information
+        # Draw the enemy's information view
         self.enemy_view.draw()
         view_rect = self.enemy_view.rect
         view_rect.right = pane_rect.right - padding
@@ -125,13 +122,11 @@ class MainFrame(View):
 
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.enemy_view, pos = view_rect.topleft)
-        self.add_click_zone("Enemy View",view_rect)
 
         y = view_rect.bottom + 10
         x = padding
 
         # Draw all of the cards in the player's hand
-        self.player_card_rects = []
         for i, card in enumerate(self.model.battle.player_cards.hand):
 
             cv = BattleCardView(name=f"Battle Card View {i}",width=self.card_width, height=self.card_height)
@@ -146,19 +141,19 @@ class MainFrame(View):
             cv.draw()
             self.surface.blit(cv.surface, view_rect)
 
-            # Store the card's rect in a list to evaluate click events for card selection
-            self.player_card_rects.append(view_rect)
-
             # Register card view as a child and add a click zone
             self.add_child_view(cv, pos=view_rect.topleft)
-            self.add_click_zone(f"Player Card {i+1}",view_rect )
+            self.add_click_zone(f"Player Card:{i+1}",view_rect )
 
             # Draw the number below the card
             fg = Colours.WHITE
             bg = Colours.BLUE
 
+            # Change colours if this is THE selected card
             if card == self.model.battle.player_selected_card:
                 bg = Colours.GOLD
+            else:
+                bg = Colours.GREY
 
             draw_text(self.surface,
                       f" {i + 1} ",
@@ -170,10 +165,7 @@ class MainFrame(View):
 
             x += cv.width + padding
 
-        y = pane_rect.bottom + 10
-
-
-        # Draw the battle
+        # Draw the battle view
         pane_rect = self.surface.get_rect()
         self.batte_round_view.draw()
         view_rect = self.batte_round_view.surface.get_rect()
@@ -183,10 +175,6 @@ class MainFrame(View):
 
         # Register battle view as a child view
         self.add_child_view(self.batte_round_view, pos=view_rect.topleft)
-
-        # Remember where this view was placed
-        self.battle_view_rect = view_rect
-
 
         # Draw game state msg box if not playing
         if self.model.state != model.Model.STATE_PLAYING:
@@ -222,39 +210,12 @@ class MainFrame(View):
     def update(self):
         pygame.display.update()
 
-    def click_card(self, pos):
-        """
-        See if the user click on a player card.
-        :param pos: Where the user clicked
-        :return: match
-        """
-        match = 0
-        # Loop through the list of player card rects to see if the specified pos collides
-        for i, card_rect in enumerate(self.player_card_rects):
-            if card_rect.collidepoint(pos) == True:
-                match = i + 1
-                break
-
-        zone = self.is_zone_clicked(pos)
-        if zone is None:
-            cx,cy=pos
-            view_rect = self.battle_view_rect
-            zone = self.batte_round_view.is_zone_clicked((cx-view_rect.x,cy-view_rect.y))
-
-        if zone is not None:
-            print(f"You clicked on zone {zone}")
-
-        return match
-
-
     def end(self):
         pygame.quit()
         print("Ending {0}".format(__class__))
 
     def tick(self):
-
         super().tick()
 
     def process_event(self, new_event: model.Event):
-
         super().process_event(new_event)

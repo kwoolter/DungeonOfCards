@@ -127,6 +127,55 @@ class View():
         self.clear_child_views()
         self.clear_click_zones()
 
+    def on_click(self, pos):
+        """
+        This method is called when a user clicks on a position that is within this view
+        :param pos: where the used click inside this view
+        :return: zone if we found a clickable zone either in this view or in a child view
+        """
+        zone = None
+
+        # Loop through the clickable zones in this view..
+        for k, v in self.click_zones.items():
+
+            # See if the specified position is within this zone
+            # If it is then stop looking for a match
+            if v.collidepoint(pos) == True:
+                zone = k
+                break
+
+        # Override this method if you want to react to a user clicking on a zone in this view
+        self.on_click_zone(zone)
+
+        # If we didn't find a matching zone in this view then try all of the child views...
+        if zone is None:
+            for k, (v, vpos) in self.child_views.items():
+
+                # Did we click somewhere on the child window?
+                view_rect = v.rect
+                view_rect.topleft = vpos
+
+                # If child window contains the click point...
+                if view_rect.collidepoint(pos):
+
+                    # Adjust the specified pos to be relative to child window top left
+                    vpos_x, vpos_y = vpos
+                    pos_x, pos_y = pos
+                    adj_pos = (pos_x - vpos_x, pos_y - vpos_y)
+
+                    # Call on-click method for child window with an adjusted click position
+                    zone = v.on_click(adj_pos)
+                    if zone != None:
+                        break
+
+        return zone
+
+    def on_click_zone(self, zone_name:str):
+        if zone_name is None:
+            print(f"Default on_click_zone(): View '{self.name}' general click")
+        else:
+            print(f"Default on_click_zone(): '{self.name}' Zone '{zone_name}' click")
+
     # Add a view that is a child of this view
     def add_child_view(self, new_view, name: str = None, pos=(0, 0)) -> str:
         if name is None:
@@ -148,35 +197,6 @@ class View():
     # Add a clickable zone to the view
     def add_click_zone(self, zone_name: str, zone_rect):
         self.click_zones[zone_name] = zone_rect
-
-    # See if a click landed in a known zone in this view
-    def is_zone_clicked(self, pos):
-        zone = None
-
-        # Loop through the clickable zones in this view..
-        for k, v in self.click_zones.items():
-
-            # See if the specified position is within this zone
-            # If it is then stop looking for a match
-            if v.collidepoint(pos) == True:
-                zone = k
-                break
-
-        # If we didn't find a matching zone in this view then try all of the child views...
-        if zone is None:
-            for k, (v, vpos) in self.child_views.items():
-                # Adjust the specified pos to be relative to child window top left
-                vpos_x, vpos_y = vpos
-                pos_x, pos_y = pos
-
-                zone = v.is_zone_clicked((pos_x - vpos_x, pos_y - vpos_y))
-                if zone != None:
-                    print(f"You clicked on Child:{k}:{v.name} Zone:{zone}")
-                    break
-        else:
-            print(f"You click on Parent:{self.name} Zone:{zone}")
-
-        return zone
 
     def tick(self):
         self.tick_count += 1

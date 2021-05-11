@@ -43,11 +43,15 @@ class BattleCardView(View):
         # Draw the name of the card
         x, y = pane_rect.midtop
         size = 24
+        header = pygame.Rect(border.x,border.y,border.width, size)
+        pygame.draw.rect(self.surface,
+                         self.fg,
+                         header)
 
         draw_text(self.surface, self.model.name, x, y + int(size / 2),
                   size=size,
-                  fg_colour=self.fg,
-                  bg_colour=self.bg)
+                  fg_colour=self.bg,
+                  bg_colour=self.fg)
 
         # If the card is concealed then we don't need to show any more details
         if self.is_concealed is True:
@@ -60,8 +64,8 @@ class BattleCardView(View):
                       bg_colour=self.fg)
             return
 
-        y += 20
         padding = 4
+        y += 24 + padding
 
         # Draw the card attacks
         if len(self.model.attacks) > 0:

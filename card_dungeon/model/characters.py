@@ -2,11 +2,18 @@ import logging
 import random
 from . doc_enums import *
 
+class Gender(Enum):
+    MALE = "Male"
+    FEMALE = "Female"
+
 class BaseCharacter():
 
-    def __init__(self, name: str, type: str, is_player: bool):
+    def __init__(self, name: str, type: str, gender: str = Gender.MALE, is_player: bool = False):
+
+        # Properties
         self.name = name
         self.type = type
+        self.gender = gender
         self.is_player = is_player
 
         self.effects = {}
