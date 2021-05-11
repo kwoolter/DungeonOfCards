@@ -4,8 +4,8 @@ from .view import *
 
 
 class CharacterView(View):
-    def __init__(self, width: int, height: int):
-        super().__init__(width=width, height=height)
+    def __init__(self, name:str, width: int, height: int):
+        super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
         self.is_highlighted = False

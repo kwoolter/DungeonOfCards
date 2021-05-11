@@ -1,6 +1,7 @@
-import os
-import pygame
 import logging
+import os
+
+import pygame
 
 
 class ImageManager():
@@ -97,12 +98,15 @@ class ImageManager():
 class View():
     IMAGE_MANAGER = None
 
-    def __init__(self, width: int = 0, height: int = 0):
+    def __init__(self, name: str = None, width: int = 0, height: int = 0):
         self._debug = False
         self.tick_count = 0
 
         self.height = height
         self.width = width
+        if name is None:
+            name = f"View:{id(self)}"
+        self.name = name
 
         self.surface = None
 
@@ -123,34 +127,55 @@ class View():
         self.clear_child_views()
         self.clear_click_zones()
 
+    # Add a view that is a child of this view
     def add_child_view(self, new_view, name: str = None, pos=(0, 0)) -> str:
         if name is None:
-            name = f"{new_view.id}"
+            name = new_view.name
         self.child_views[name] = (new_view, pos)
+
+        # logging.info(f"Added Child View {name} at {pos}")
+
         return name
 
+    # Clear all child views from this view
     def clear_child_views(self):
         self.child_views = {}
 
+    # Remove all clickable zones
     def clear_click_zones(self):
         self.click_zones = {}
 
+    # Add a clickable zone to the view
     def add_click_zone(self, zone_name: str, zone_rect):
         self.click_zones[zone_name] = zone_rect
 
-    # See if a click landed in a known zone in the view
+    # See if a click landed in a known zone in this view
     def is_zone_clicked(self, pos):
         zone = None
+
+        # Loop through the clickable zones in this view..
         for k, v in self.click_zones.items():
+
+            # See if the specified position is within this zone
+            # If it is then stop looking for a match
             if v.collidepoint(pos) == True:
                 zone = k
                 break
 
+        # If we didn't find a matching zone in this view then try all of the child views...
         if zone is None:
-            for k, v in self.child_views.items():
-                zone = v.is_zone_click(pos)
+            for k, (v, vpos) in self.child_views.items():
+                # Adjust the specified pos to be relative to child window top left
+                vpos_x, vpos_y = vpos
+                pos_x, pos_y = pos
+
+                zone = v.is_zone_clicked((pos_x - vpos_x, pos_y - vpos_y))
                 if zone != None:
+                    print(f"You clicked on Child:{k}:{v.name} Zone:{zone}")
                     break
+        else:
+            print(f"You click on Parent:{self.name} Zone:{zone}")
+
         return zone
 
     def tick(self):
@@ -163,11 +188,22 @@ class View():
         else:
             self._debug = debug_on
 
+    def print(self):
+        print(f"View {self.name} (tick:{self.tick_count}")
+
+        print("Click Zones:")
+        for k, v in self.click_zones.items():
+            print(f"{k}:{v}")
+
+        print("Child Views:")
+        for k, v in self.child_views.items():
+            print(f"{k}:{v}")
+
     def draw(self):
         pass
 
     def process_event(self, args):
-        print(f"{__class__}: Procssing event {args}")
+        print(f"{__class__}: Processing event {args}")
 
     def end(self):
         print(f"Ending {__class__}")

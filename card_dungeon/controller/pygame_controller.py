@@ -96,6 +96,10 @@ class DoCGUIController:
                     elif event.type == pygame.MOUSEBUTTONUP:
                         pos = pygame.mouse.get_pos()
                         n = self.v.click_card(pos)
+
+                        # New debug
+                        self.v.is_zone_clicked(pos)
+
                         self.m.select_card(n)
 
                     else:
@@ -155,6 +159,7 @@ class DoCGUIController:
                         self.m.pause()
                     elif actions.get("DEBUG"):
                         self.m.debug()
+                        self.v.print()
                     elif actions.get("QUIT"):
                         loop = False
 

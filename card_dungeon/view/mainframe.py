@@ -16,7 +16,7 @@ class MainFrame(View):
 
     def __init__(self, model: model.Model):
 
-        super().__init__()
+        super().__init__(name="MainFrame")
 
         self._debug = False
 
@@ -67,27 +67,29 @@ class MainFrame(View):
             print(str(err))
 
 
-        self.batte_round_view = BattleRoundView(width=600, height=240)
+        self.batte_round_view = BattleRoundView(name="Battle View", width=600, height=240)
         self.batte_round_view.initialise(self.model.battle)
         self.battle_view_rect = None
 
-        self.player_view = CharacterView(width=200, height=240)
+        self.player_view = CharacterView(name="Player Character View", width=200, height=240)
         self.player_view.initialise(self.model.battle.player)
         self.player_view.fg = Colours.BLUE
 
-        self.enemy_view = CharacterView(width=200, height=240)
+        self.enemy_view = CharacterView(name="Enemy Character View", width=200, height=240)
         self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.fg = Colours.RED
 
 
     def print(self):
-
         print("Printing DoC view...")
+        super().print()
 
     def draw(self):
 
         pane_rect = self.surface.get_rect()
         self.surface.fill(Colours.WHITE)
+
+        self.clear_child_views()
         self.clear_click_zones()
 
         # Fill the view with graph paper-like grid of squares
@@ -106,44 +108,50 @@ class MainFrame(View):
 
         # Draw the player's information
         self.player_view.draw()
-        self.surface.blit(self.player_view.surface, (x, y))
+        view_rect = self.player_view.rect
+        view_rect.topleft = (x,y)
+        self.surface.blit(self.player_view.surface, view_rect)
 
-        # Add a click zone for the player
-        self.add_click_zone("Player View",
-                            pygame.Rect(x,y,self.player_view.width,self.player_view.height))
+        # Register this view as a child view and a clickable zone
+        self.add_child_view(self.player_view, pos = view_rect.topleft)
+        self.add_click_zone("Player View",view_rect)
 
         # Draw the enemy's information
         self.enemy_view.draw()
-        pane_rect = self.enemy_view.surface.get_rect()
-        pane_rect.right = self.surface.get_rect().right - padding
-        pane_rect.y = padding
-        self.surface.blit(self.enemy_view.surface, pane_rect)
+        view_rect = self.enemy_view.rect
+        view_rect.right = pane_rect.right - padding
+        view_rect.y = padding
+        self.surface.blit(self.enemy_view.surface, view_rect)
 
-        # Add a click zone for the enemy
-        self.add_click_zone("Enemy View",
-                            pygame.Rect(pane_rect.x,pane_rect.y,self.player_view.width,self.player_view.height))
+        # Register this view as a child view and a clickable zone
+        self.add_child_view(self.enemy_view, pos = view_rect.topleft)
+        self.add_click_zone("Enemy View",view_rect)
 
-        y = pane_rect.bottom + 10
+        y = view_rect.bottom + 10
         x = padding
 
         # Draw all of the cards in the player's hand
         self.player_card_rects = []
         for i, card in enumerate(self.model.battle.player_cards.hand):
 
-            cv = BattleCardView(width=self.card_width, height=self.card_height)
+            cv = BattleCardView(name=f"Battle Card View {i}",width=self.card_width, height=self.card_height)
+            view_rect = cv.rect
+            view_rect.topleft = (x,y)
+
             cv.initialise(card)
-
             cv.is_highlighted = card == self.model.battle.player_selected_card
-            cv.is_concealed = self.model.player.is_confused and self.model.state == model.Model.STATE_PLAYING
-
+            cv.is_concealed = self.model.player.is_confused and self.model.state in (model.Model.STATE_PLAYING,model.Model.STATE_ROUND_OVER)
             cv.fg = Colours.BLUE
+
             cv.draw()
-            self.surface.blit(cv.surface, (x, y))
+            self.surface.blit(cv.surface, view_rect)
 
             # Store the card's rect in a list to evaluate click events for card selection
-            self.player_card_rects.append(pygame.Rect(x,y, cv.width,cv.height))
-            # add a click zone for each player card
-            self.add_click_zone(f"Player Card {i+1}",pygame.Rect(x,y, cv.width,cv.height) )
+            self.player_card_rects.append(view_rect)
+
+            # Register card view as a child and add a click zone
+            self.add_child_view(cv, pos=view_rect.topleft)
+            self.add_click_zone(f"Player Card {i+1}",view_rect )
 
             # Draw the number below the card
             fg = Colours.WHITE
@@ -160,26 +168,10 @@ class MainFrame(View):
                       fg_colour=fg,
                       bg_colour=bg)
 
-            y += 0
             x += cv.width + padding
 
         y = pane_rect.bottom + 10
 
-        # Draw all of the cards in the enemy's hand
-        for card in self.model.battle.enemy_cards.hand:
-            cv = BattleCardView(width=self.card_width, height=self.card_height)
-            cv.initialise(card)
-            cv.fg = Colours.RED
-
-            cv.is_concealed = self.model.player.is_blind
-
-            cv.draw()
-            view_rect = cv.surface.get_rect()
-            view_rect.right = self.surface.get_rect().right - padding
-            view_rect.y = y
-            #self.surface.blit(cv.surface, view_rect)
-            y += 60
-            x += 8
 
         # Draw the battle
         pane_rect = self.surface.get_rect()
@@ -188,6 +180,9 @@ class MainFrame(View):
         view_rect.centerx = pane_rect.centerx
         view_rect.y = padding
         self.surface.blit(self.batte_round_view.surface, view_rect)
+
+        # Register battle view as a child view
+        self.add_child_view(self.batte_round_view, pos=view_rect.topleft)
 
         # Remember where this view was placed
         self.battle_view_rect = view_rect

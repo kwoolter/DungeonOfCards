@@ -7,8 +7,8 @@ import time
 
 class BattleRoundView(View):
 
-    def __init__(self, width: int, height: int):
-        super().__init__(width=width, height=height)
+    def __init__(self, name:str, width: int, height: int):
+        super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
         self.fg = Colours.DARK_GREEN
@@ -31,11 +31,11 @@ class BattleRoundView(View):
         self.model = model
         self.surface = pygame.Surface((self.width, self.height))
 
-        self.player_card_view = BattleCardView(width=self.card_width, height=self.card_height)
+        self.player_card_view = BattleCardView(name="Player Battle Card View", width=self.card_width, height=self.card_height)
         self.player_card_view.initialise(self.model.player_selected_card)
         self.player_card_view.fg = Colours.BLUE
 
-        self.enemy_card_view = BattleCardView(width=self.card_width, height=self.card_height)
+        self.enemy_card_view = BattleCardView(name="Enemy Battle Card View", width=self.card_width, height=self.card_height)
         self.enemy_card_view.initialise(self.model.enemy_cards.default_hand_card )
         self.enemy_card_view.fg = Colours.RED
 
