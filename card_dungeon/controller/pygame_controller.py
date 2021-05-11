@@ -26,8 +26,8 @@ class DoCGUIController:
     def debug(self):
         self._debug = not self._debug
         self.m.events.add_event(model.Event(type=model.Event.DEBUG,
-                                    name="Debug={0}".format(self._debug),
-                                    description="Debug mode = {0}".format(self._debug)))
+                                            name="Debug={0}".format(self._debug),
+                                            description="Debug mode = {0}".format(self._debug)))
         if self._debug is True:
             print("\n\nDEBUG MODE\n\n")
 
@@ -50,14 +50,14 @@ class DoCGUIController:
         # Sound effects tick timer
         pygame.time.set_timer(USEREVENT + 3, 8000)
 
-        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP, USEREVENT])
+        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP, MOUSEBUTTONUP,USEREVENT])
 
         loop = True
 
         while loop is True:
 
             # Loop to process game events
-            event =self.events.get_next_event()
+            event = self.events.get_next_event()
             while event is not None:
 
                 try:
@@ -72,7 +72,6 @@ class DoCGUIController:
                     break
 
                 event = self.events.get_next_event()
-
 
             # If we are playing the game then process all of the key controls
             if self.m.state == model.Model.STATE_PLAYING:
@@ -93,33 +92,43 @@ class DoCGUIController:
                     elif event.type == USEREVENT + 2:
                         self.v.tick()
 
-                    # Key UP events - less time critical actions
-                    elif event.type == KEYUP:
-                        # Space to start the game
-                        if event.key == K_ESCAPE:
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        pos = pygame.mouse.get_pos()
+                        n = self.v.click_card(pos)
+
+                        # New debug
+                        self.v.is_zone_clicked(pos)
+
+                        self.m.select_card(n)
+
+                    else:
+                        actions = self.handle_state_events(event)
+                        if actions.get("PAUSE"):
                             self.m.pause()
-                        # Pick a card to play
-                        elif event.key >= K_1 and event.key <= K_9:
-                            n = event.key - K_1 + 1
-                            self.m.select_card(n)
-                        # Do a round of teh  battle
-                        elif event.key == K_RETURN:
+                        elif actions.get("GO"):
+                            self.v.batte_round_view.initialise(self.m.battle)
                             self.m.do_round()
 
-                    # Key DOWN events - less time critical actions
-                    elif event.type == KEYDOWN:
-                        pass
+                        n = actions.get("SELECT", 0)
+                        if n > 0:
+                            self.m.select_card(n)
+
+
+                # Process events for when the game is in state PLAYING
+                elif self.m.state == model.Model.STATE_ROUND_OVER:
+                    actions = self.handle_state_events(event)
+                    if actions.get("CONTINUE"):
+                        self.m.new_round()
 
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
+                    actions = self.handle_state_events(event)
+                    if actions.get("CONTINUE"):
+                        self.m.start()
 
-                    # Key events
-                    if event.type == KEYUP:
-                        # Space to start the game
-                        if event.key == K_SPACE:
-                            self.m.start()
                     # Timer events
-                    elif event.type == USEREVENT + 2:
+                    if event.type == USEREVENT + 2:
                         self.v.tick()
 
                     # Timer for talking
@@ -128,41 +137,38 @@ class DoCGUIController:
 
                 # Process events for when the game is in state READY
                 elif self.m.state == model.Model.STATE_READY:
+                    actions = self.handle_state_events(event)
+                    if actions.get("CONTINUE"):
+                        self.m.start()
 
-                    # Key events
-                    if event.type == KEYUP:
-                        # Space to start the game
-                        if event.key == K_SPACE:
-                            self.m.start()
                     # Timer events
-                    elif event.type == USEREVENT + 2:
+                    if event.type == USEREVENT + 2:
                         self.v.tick()
                     # Timer for talking
                     elif event.type == USEREVENT + 3:
                         pass
 
-                # Process events for when the game is in state PAUSED
-                elif self.m.state == model.Model.STATE_PAUSED:
-                    # Key events
-                    if event.type == KEYUP:
-                        # Escape to unpause the game
-                        if event.key == K_ESCAPE:
-                            self.m.pause()
-                        # F4 to quit
-                        elif event.key == K_F4:
-                            loop = False
-                        # F12 to toggle debug
-                        elif event.key == K_F12:
-                            self.m.debug()
+                    # handle MOUSEBUTTONUP
+                    elif event.type == pygame.MOUSEBUTTONUP:
+                        self.m.start()
 
                 # Process events for when the game is in state PAUSED
+                elif self.m.state == model.Model.STATE_PAUSED:
+                    actions = self.handle_state_events(event)
+                    if actions.get("PAUSE"):
+                        self.m.pause()
+                    elif actions.get("DEBUG"):
+                        self.m.debug()
+                        self.v.print()
+                    elif actions.get("QUIT"):
+                        loop = False
+
+                # Process events for when the game is in state GAME OVER
                 elif self.m.state == model.Model.STATE_GAME_OVER:
-                    # Key events
-                    if event.type == KEYUP:
-                        # Re-initialise the game
-                        if event.key == K_SPACE:
-                            self.m.initialise()
-                            self.v.initialise()
+                    actions = self.handle_state_events(event)
+                    if actions.get("CONTINUE"):
+                        self.m.new_battle()
+                        self.v.initialise()
 
                 # Quit event
                 if event.type == QUIT:
@@ -174,3 +180,101 @@ class DoCGUIController:
             FPSCLOCK.tick(20)
 
         self.end()
+
+    def handle_state_events(self, event):
+        actions = {}
+
+        # Generic Key events
+        if event.type == KEYUP:
+            # SPACE = Continue
+            if event.key == K_SPACE:
+                actions["CONTINUE"] = True
+        # Generic Mouse events - MOUSEBUTTONUP
+        elif event.type == pygame.MOUSEBUTTONUP:
+            actions["CONTINUE"] = True
+
+        if self.m.state == model.Model.STATE_PLAYING:
+            actions.update(self.handle_state_events_PLAYING(event))
+        elif self.m.state == model.Model.STATE_LOADED:
+            actions.update(self.handle_state_events_LOADED(event))
+        elif self.m.state == model.Model.STATE_GAME_OVER:
+            actions.update(self.handle_state_events_GAME_OVER(event))
+        elif self.m.state == model.Model.STATE_ROUND_OVER:
+            actions.update(self.handle_state_events_ROUND_OVER(event))
+        elif self.m.state == model.Model.STATE_PAUSED:
+            actions.update(self.handle_state_events_PAUSED(event))
+
+        return actions
+
+    def handle_state_events_GAME_OVER(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Re-initialise the game
+            if event.key == K_F5:
+                actions["TEST"] = True
+
+        return actions
+
+    def handle_state_events_LOADED(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Re-initialise the game
+            if event.key == K_F5:
+                actions["TEST"] = True
+
+        return actions
+
+    def handle_state_events_ROUND_OVER(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Re-initialise the game
+            if event.key == K_F5:
+                actions["TEST"] = True
+
+        return actions
+
+    def handle_state_events_PAUSED(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Escape to Un-pause
+            if event.key == K_ESCAPE:
+                actions["PAUSE"] = True
+            # F4 to quit
+            elif event.key == K_F4:
+                actions["QUIT"] = True
+            # F12 to toggle debug
+            elif event.key == K_F12:
+                actions["DEBUG"] = True
+        # Mouse events - MOUSEBUTTONUP to unpause
+        elif event.type == pygame.MOUSEBUTTONUP:
+            actions["PAUSE"] = True
+
+        return actions
+
+    def handle_state_events_PLAYING(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Re-initialise the game
+            if event.key == K_F5:
+                actions["TEST"] = True
+            elif event.key == K_ESCAPE:
+                actions["PAUSE"] = True
+            # Pick a card to play
+            elif event.key >= K_1 and event.key <= K_9:
+                n = event.key - K_1 + 1
+                actions["SELECT"] = n
+            # Go and play!
+            elif event.key == K_RETURN:
+                actions["GO"] = True
+
+        return actions

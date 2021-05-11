@@ -1,21 +1,22 @@
 import pygame
 import os
 import card_dungeon.model as model
-from . view import *
-from . graphics import *
-from . card_views import *
-from . character_view import *
+from .view import *
+from .graphics import *
+from .card_views import BattleCardView
+from .character_view import CharacterView
+from . battle_views import BattleRoundView
 from .game_image_manager import *
 
-class MainFrame(View):
 
+class MainFrame(View):
     RESOURCES_DIR = os.path.dirname(__file__) + "\\resources\\"
 
     TRANSPARENT = (0, 255, 0)
 
     def __init__(self, model: model.Model):
 
-        super().__init__()
+        super().__init__(name="MainFrame")
 
         self._debug = False
 
@@ -39,6 +40,10 @@ class MainFrame(View):
         self.player_view = None
         self.enemy_view = None
 
+        self.batte_round_view = None
+
+        self.player_card_rects =[]
+        self.msg_box_rect = None
 
     def initialise(self):
 
@@ -61,31 +66,41 @@ class MainFrame(View):
         except Exception as err:
             print(str(err))
 
-        self.player_view = CharacterView(width=200,height=240)
+
+        self.batte_round_view = BattleRoundView(name="Battle View", width=600, height=240)
+        self.batte_round_view.initialise(self.model.battle)
+        self.battle_view_rect = None
+
+        self.player_view = CharacterView(name="Player Character View", width=200, height=240)
         self.player_view.initialise(self.model.battle.player)
         self.player_view.fg = Colours.BLUE
 
-        self.enemy_view = CharacterView(width=200, height=240)
+        self.enemy_view = CharacterView(name="Enemy Character View", width=200, height=240)
         self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.fg = Colours.RED
 
-    def print(self):
 
+    def print(self):
         print("Printing DoC view...")
+        super().print()
 
     def draw(self):
 
         pane_rect = self.surface.get_rect()
         self.surface.fill(Colours.WHITE)
 
+        self.clear_child_views()
+        self.clear_click_zones()
+
+        # Fill the view with graph paper-like grid of squares
         grid_size = 34
-        grid_colour = (190,244,255)
+        grid_colour = (190, 244, 255)
 
         for x in range(pane_rect.x, pane_rect.width, grid_size):
-            pygame.draw.line(self.surface,grid_colour, (x,pane_rect.top),(x,pane_rect.bottom), 2)
+            pygame.draw.line(self.surface, grid_colour, (x, pane_rect.top), (x, pane_rect.bottom), 2)
 
         for y in range(pane_rect.top, pane_rect.bottom, grid_size):
-            pygame.draw.line(self.surface, grid_colour, (pane_rect.left, y), (pane_rect.right,y), 2)
+            pygame.draw.line(self.surface, grid_colour, (pane_rect.left, y), (pane_rect.right, y), 2)
 
         padding = 4
         x = padding
@@ -93,32 +108,50 @@ class MainFrame(View):
 
         # Draw the player's information
         self.player_view.draw()
-        self.surface.blit(self.player_view.surface, (x,y))
+        view_rect = self.player_view.rect
+        view_rect.topleft = (x,y)
+        self.surface.blit(self.player_view.surface, view_rect)
+
+        # Register this view as a child view and a clickable zone
+        self.add_child_view(self.player_view, pos = view_rect.topleft)
+        self.add_click_zone("Player View",view_rect)
 
         # Draw the enemy's information
         self.enemy_view.draw()
-        pane_rect = self.enemy_view.surface.get_rect()
-        pane_rect.right = self.surface.get_rect().right - padding
-        pane_rect.y = padding
-        self.surface.blit(self.enemy_view.surface, pane_rect)
+        view_rect = self.enemy_view.rect
+        view_rect.right = pane_rect.right - padding
+        view_rect.y = padding
+        self.surface.blit(self.enemy_view.surface, view_rect)
 
+        # Register this view as a child view and a clickable zone
+        self.add_child_view(self.enemy_view, pos = view_rect.topleft)
+        self.add_click_zone("Enemy View",view_rect)
 
-        y = pane_rect.bottom + 20
+        y = view_rect.bottom + 10
         x = padding
 
         # Draw all of the cards in the player's hand
+        self.player_card_rects = []
         for i, card in enumerate(self.model.battle.player_cards.hand):
 
-            cv = BattleCardView(width=self.card_width, height=self.card_height)
+            cv = BattleCardView(name=f"Battle Card View {i}",width=self.card_width, height=self.card_height)
+            view_rect = cv.rect
+            view_rect.topleft = (x,y)
+
             cv.initialise(card)
-
             cv.is_highlighted = card == self.model.battle.player_selected_card
-            cv.is_concealed = self.model.player.is_confused
-
+            cv.is_concealed = self.model.player.is_confused and self.model.state in (model.Model.STATE_PLAYING,model.Model.STATE_ROUND_OVER)
             cv.fg = Colours.BLUE
-            cv.draw()
-            self.surface.blit(cv.surface, (x, y))
 
+            cv.draw()
+            self.surface.blit(cv.surface, view_rect)
+
+            # Store the card's rect in a list to evaluate click events for card selection
+            self.player_card_rects.append(view_rect)
+
+            # Register card view as a child and add a click zone
+            self.add_child_view(cv, pos=view_rect.topleft)
+            self.add_click_zone(f"Player Card {i+1}",view_rect )
 
             # Draw the number below the card
             fg = Colours.WHITE
@@ -128,52 +161,52 @@ class MainFrame(View):
                 bg = Colours.GOLD
 
             draw_text(self.surface,
-                      f" {i+1} ",
-                      x + int(cv.width/2),
+                      f" {i + 1} ",
+                      x + int(cv.width / 2),
                       y + cv.height,
                       64,
                       fg_colour=fg,
                       bg_colour=bg)
 
+            x += cv.width + padding
 
-            y+= 0
-            x+= cv.width + padding
+        y = pane_rect.bottom + 10
 
-        y = pane_rect.bottom + 20
 
-        # Draw all of the cards in the enemy's hand
-        for card in self.model.battle.enemy_cards.hand:
-            cv = BattleCardView(width=self.card_width, height=self.card_height)
-            cv.initialise(card)
-            cv.fg = Colours.RED
+        # Draw the battle
+        pane_rect = self.surface.get_rect()
+        self.batte_round_view.draw()
+        view_rect = self.batte_round_view.surface.get_rect()
+        view_rect.centerx = pane_rect.centerx
+        view_rect.y = padding
+        self.surface.blit(self.batte_round_view.surface, view_rect)
 
-            cv.is_concealed = self.model.player.is_blind
+        # Register battle view as a child view
+        self.add_child_view(self.batte_round_view, pos=view_rect.topleft)
 
-            cv.draw()
-            pane_rect = cv.surface.get_rect()
-            pane_rect.right = self.surface.get_rect().right - padding
-            pane_rect.y = y
-            self.surface.blit(cv.surface, pane_rect)
-            y+= 60
-            x+= 8
+        # Remember where this view was placed
+        self.battle_view_rect = view_rect
+
 
         # Draw game state msg box if not playing
         if self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 
-            msg_box_width = 240
-            msg_box_height = 80
-            msg_rect = pygame.Rect(0,0,msg_box_width, msg_box_height)
+            msg_box_width = 350
+            msg_box_height = 100
+            msg_rect = pygame.Rect(0, 0, msg_box_width, msg_box_height)
+            self.msg_box_rect = msg_rect
+            bg = grid_colour
 
             msg_rect.center = pane_rect.center
 
             pygame.draw.rect(self.surface,
-                             Colours.WHITE,
+                             bg,
                              msg_rect,
                              0)
 
             pygame.draw.rect(self.surface,
-                             grid_colour,
+                             Colours.GREY,
                              msg_rect,
                              4)
 
@@ -184,11 +217,35 @@ class MainFrame(View):
                       size=40,
                       centre=True,
                       fg_colour=Colours.GREY,
-                      bg_colour=Colours.WHITE)
-
+                      bg_colour=bg)
 
     def update(self):
         pygame.display.update()
+
+    def click_card(self, pos):
+        """
+        See if the user click on a player card.
+        :param pos: Where the user clicked
+        :return: match
+        """
+        match = 0
+        # Loop through the list of player card rects to see if the specified pos collides
+        for i, card_rect in enumerate(self.player_card_rects):
+            if card_rect.collidepoint(pos) == True:
+                match = i + 1
+                break
+
+        zone = self.is_zone_clicked(pos)
+        if zone is None:
+            cx,cy=pos
+            view_rect = self.battle_view_rect
+            zone = self.batte_round_view.is_zone_clicked((cx-view_rect.x,cy-view_rect.y))
+
+        if zone is not None:
+            print(f"You clicked on zone {zone}")
+
+        return match
+
 
     def end(self):
         pygame.quit()
@@ -198,8 +255,6 @@ class MainFrame(View):
 
         super().tick()
 
-
     def process_event(self, new_event: model.Event):
 
         super().process_event(new_event)
-

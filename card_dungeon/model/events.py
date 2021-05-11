@@ -8,6 +8,7 @@ class Event():
     DEFAULT = "default"
     STATE = "state"
     GAME = "game"
+    BATTLE = "Battle"
     WORLD = "world"
     EFFECT = "effect"
 
@@ -15,6 +16,7 @@ class Event():
     STATE_LOADED = "Game Loaded"
     STATE_READY = "Game Ready"
     STATE_PLAYING = "Game Playing"
+    STATE_ROUND_OVER = "Battle Round Over"
     STATE_PAUSED = "Game Paused"
     STATE_GAME_OVER = "Game Over"
 
@@ -22,6 +24,10 @@ class Event():
     TICK = "Tick"
     EFFECT_START = "Effect Start"
     EFFECT_END = "Effect End"
+    PLAYER_INFO = "Player Info"
+    ENEMY_INFO = "Enemy Info"
+    BATTLE_ROUND_OVER = "Battle Round Over"
+    ACTION_INFO = "Action Info"
     ACTION_FAILED = "action failed"
     ACTION_SUCCEEDED = "action succeeded"
     HELP = "Help"
@@ -54,6 +60,9 @@ class EventQueue():
         if len(self.events) > 0:
             next_event = self.events.pop()
         return next_event
+
+    def clear(self):
+        self.events.clear()
 
     def size(self):
         return len(self.events)

@@ -2,23 +2,24 @@ import logging
 
 from .battle_cards import *
 from .characters import *
+from .events import *
 
 
 class Battle():
-
     ATTACK_BLOCKS = {
-        CardFeature.ATTACK_MAGIC : CardFeature.BLOCK_MAGIC,
-        CardFeature.ATTACK_MELEE : CardFeature.BLOCK_MELEE
+        CardFeature.ATTACK_MAGIC: CardFeature.BLOCK_MAGIC,
+        CardFeature.ATTACK_MELEE: CardFeature.BLOCK_MELEE
     }
-
 
     def __init__(self, player: PlayerCharacter, enemy: EnemyCharacter):
 
         # Properties
-        self.round = 0
+        self.round = 1
+        self.is_round_complete = False
         self.player_max_cards_per_hand = 4
 
         # Components
+        self.events = EventQueue()
         self.player = player
         self.enemy = enemy
 
@@ -27,6 +28,8 @@ class Battle():
 
         self.player_selected_card = None
         self.player_round_card = None
+
+        self.enemy_selected_card = None
         self.enemy_round_card = None
 
         self.player_cards = CardManager(max_hand_size=3)
@@ -53,16 +56,13 @@ class Battle():
         self.player_cards.deck = self.player_deck
         self.enemy_cards.deck = self.enemy_deck
 
-        # Deal cards from the deck to the hand
-        self.player_cards.replenish()
-        self.enemy_cards.replenish()
 
+        self.reset_round()
 
     def start(self):
         pass
 
-
-    def build_deck(self, card_count: int, is_player_deck:bool, deck: list):
+    def build_deck(self, card_count: int, is_player_deck: bool, deck: list):
         """
         Add a specified number of randomly generated cards to a deck
         :param card_count: the number of cards that you want to add to the deck
@@ -98,13 +98,19 @@ class Battle():
             # Attempt all of the element attacks in the attackers card
             for attack, attack_count in attacker_card.attacks.items():
 
+                # Log event
+                # self.events.add_event(Event(type=Event.BATTLE,
+                #                             name=Event.ACTION_INFO,
+                #                             description=f"{attacker.name} attacks {defender.name} with {attack.value}"))
+
                 attempted_attacks += attack_count
 
                 # For this attack, how many blocks does the defender have?
                 # If attack is unblockable then 0 blocks
                 # If defender is sleeping then 0 blocks
                 block = Battle.ATTACK_BLOCKS[attack]
-                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable is False) * (defender.is_sleeping is False)
+                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable is False) * (
+                            defender.is_sleeping is False)
 
                 # Calculate the damage of the attack which must not be negative.
                 damage = max(attack_count - block_count, 0)
@@ -117,6 +123,16 @@ class Battle():
                 if block_count > 0:
                     print(f"{defender.name} blocks {min(block_count, attack_count)} {attack.value}(s)")
 
+                    # Log event
+                    if defender.is_player:
+                        ename = Event.PLAYER_INFO
+                    else:
+                        ename = Event.ENEMY_INFO
+
+                    self.events.add_event(Event(type=Event.BATTLE,
+                                                name=ename,
+                                                description=f"{defender.name} blocks {min(block_count, attack_count)} of {attacker.name}'s {attack.value}(s)"))
+
                 # Print the results of the attacker's attack
                 if damage > 0:
                     # If defender is invincible then damage = 0
@@ -127,9 +143,25 @@ class Battle():
                         defender.health -= damage
 
                     print(f"{attacker.name}'s {attack.value} does {damage} damage")
+                    # Log event
+                    if attacker.is_player:
+                        ename = Event.PLAYER_INFO
+                    else:
+                        ename = Event.ENEMY_INFO
+                    self.events.add_event(Event(type=Event.BATTLE,
+                                                name=ename,
+                                                description=f"{attacker.name}'s {attack.value} does {damage} damage to {defender.name}"))
 
         else:
             print(f"{attacker.name} is asleep ZZZZzzzzz")
+            # Log event
+            if attacker.is_player:
+                ename = Event.PLAYER_INFO
+            else:
+                ename = Event.ENEMY_INFO
+            self.events.add_event(Event(type=Event.BATTLE,
+                                        name=ename,
+                                        description=f"{attacker.name} is asleep ZZZzzzzzz"))
 
         print(f"attack success={succeeded_attacks}/{attempted_attacks} blocks={suceeded_blocks}")
 
@@ -153,7 +185,7 @@ class Battle():
         self.player_round_card = self.player_cards.play_card(self.player_selected_card)
 
         # Get a new card from enemy's hand
-        self.enemy_round_card = self.enemy_cards.play_card()
+        self.enemy_round_card = self.enemy_cards.play_card(self.enemy_selected_card)
 
         assert self.player_round_card is not None, "The Player has not picked a card for this round"
         assert self.enemy_round_card is not None, "The Enemy has not picked a card for this round"
@@ -161,7 +193,9 @@ class Battle():
         # See if the player is going first...
         if self.player_round_card.is_quick is True:
             results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
-            results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
+            if self.enemy.is_dead is False:
+                results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card,
+                                                  self.player)
         # Else the enemy goes first
         else:
             results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card, self.player)
@@ -176,7 +210,7 @@ class Battle():
         self.player.cards_per_hand = min(self.player.cards_per_hand, self.player_max_cards_per_hand)
 
         # Heal the player if applicable
-        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Player"]
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Player",(0,0,0))
         for k, v in self.player_round_card.heals.items():
 
             logging.info(f"Attempting Player heal if {k}={v}...")
@@ -198,13 +232,19 @@ class Battle():
                 heal_amount = v * (succeeded_blocks == attempted_attacks)
             # Looks like nothing happened?
             else:
+                print("How did we end up here?")
                 heal_amount = 0
 
-            logging.info(f"Player healed by {heal_amount}")
-            self.player.health += heal_amount
+            if heal_amount != 0:
+                logging.info(f"Player healed by {heal_amount}")
+                self.player.health += heal_amount
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.player.name} healed by {heal_amount}"))
 
         # Heal the enemy if applicable
-        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Enemy",(0,0,0))
+
         for k, v in self.enemy_round_card.heals.items():
 
             logging.info(f"Attempting Enemy heal if {k}={v}...")
@@ -225,14 +265,19 @@ class Battle():
                 heal_amount = v * (succeeded_blocks == attempted_attacks)
             # Looks like nothing happened?
             else:
+                print("How did we end up here?")
                 heal_amount = 0
 
-            logging.info(f"Enemy healed by {heal_amount}")
-            self.enemy.health += heal_amount
+            if heal_amount != 0:
+                logging.info(f"Enemy healed by {heal_amount}")
+                self.enemy.health += heal_amount
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.ENEMY_INFO,
+                                            description=f"{self.enemy.name} healed by {heal_amount}"))
 
-        # Apply effects to player if Enemy outcomes match...
-        # Get the results of the Enemy action
-        succeeded_attacks, attempted_attacks, succeeded_blocks = results["Enemy"]
+        # Apply effects to player if Player outcomes match...
+        # Get the results of the Player action
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Player",(0,0,0))
 
         # Loop through the effects that are on the Player's Battle Card
         for k, v in self.player_round_card.effects.items():
@@ -261,8 +306,14 @@ class Battle():
             if success is True:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.player.name} is now {v.value}"))
             else:
                 logging.info(f"Failed to add effect {v.name} to Player")
+
+        # Get the results of the Enemy action
+        succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Enemy",(0,0,0))
 
         # Loop through the effects that are on the Enemy's Battle Card
         for k, v in self.enemy_round_card.effects.items():
@@ -291,13 +342,36 @@ class Battle():
             if success is True:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.player.name} is now {v.value}"))
             else:
                 logging.info(f"Failed to add effect {v.name} to Player")
 
+        # Log event if player died
+        if self.player.is_dead:
+            self.events.add_event(Event(type=Event.BATTLE,
+                                        name=Event.PLAYER_INFO,
+                                        description=f"{self.player.name} the {self.player.type.value} is dead!"))
+
+        # Log event if enemy died
+        if self.enemy.is_dead:
+            self.events.add_event(Event(type=Event.BATTLE,
+                                        name=Event.ENEMY_INFO,
+                                        description=f"{self.enemy.name} the {self.enemy.type.value} is dead!"))
 
         # Discard cards from the player's hand based on enemy hits
         for i in range(self.enemy_round_card.new_card_count):
             self.player_cards.play_card()
+
+        # Log end of round event
+        self.events.add_event(Event(type=Event.BATTLE,
+                                    name=Event.BATTLE_ROUND_OVER,
+                                    description=f"End of round {self.round}"))
+
+        self.is_round_complete = True
+
+    def reset_round(self):
 
         # Replenish Player's hand with new cards
         self.player_cards.replenish(self.player.cards_per_hand)
@@ -310,13 +384,22 @@ class Battle():
         self.enemy_round_card = None
         self.player_selected_card = None
 
+        # Select the first card in the enemy's hand
+        self.enemy_selected_card = self.enemy_cards.default_hand_card
+
+        # Clear event log
+        self.events.clear()
+
         # Increment the count of completed rounds
         self.round += 1
         self.player.tick()
         self.player.rounds += 1
 
         self.enemy.tick()
-        self.enemy.rounds +=1
+        self.enemy.rounds += 1
+
+        # Flag that indicated if a round has finished or not
+        self.is_round_complete = False
 
 
 def test():

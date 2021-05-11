@@ -1,5 +1,5 @@
 from . view import *
-from card_dungeon.model import PlayerType, EnemyType, CardFeature, Effect
+from card_dungeon.model import PlayerType, EnemyType, CardFeature, CharacterFeature, Effect
 import os
 import logging
 
@@ -33,6 +33,8 @@ class DoCImageManager(ImageManager):
             EnemyType.RATMAN: "Ratman.png",
             EnemyType.SNAKE: "Snake.png",
             EnemyType.BUNNY: "Angry_Bunny.png",
+
+            CharacterFeature.HEALTH: "heart_small.png",
 
             CardFeature.ATTACK_MAGIC: "attack_magic.png",
             CardFeature.ATTACK_MELEE: "attack_melee.png",

@@ -18,6 +18,7 @@ class BaseCharacter():
         self.health = self.max_health
         self.rounds = 0
         self.wins = 0
+        self.level = 1
 
     @property
     def is_dead(self):
@@ -42,6 +43,10 @@ class BaseCharacter():
 
     def print(self):
         print(f"{self.name} the {self.type.value} (player={self.is_player}, health={self.health}, effects={self.effects}, max hand={self.max_cards_per_hand})")
+
+    def level_up(self):
+        self.level += 1
+        self.max_health += 1
 
     def add_effect(self, effect_name : str, tick_count : int = 3):
         self.effects[effect_name] = tick_count

@@ -25,6 +25,9 @@ class EnemyType(Enum):
     SNAKE = "Snake"
     BUNNY = "Angry Bunny"
 
+class CharacterFeature(Enum):
+    HEALTH = "Health"
+    LEVEL = "Level"
 
 class CardFeature(Enum):
     ATTACK_MELEE = "Melee Attack"

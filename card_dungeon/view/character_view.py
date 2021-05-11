@@ -4,8 +4,8 @@ from .view import *
 
 
 class CharacterView(View):
-    def __init__(self, width: int, height: int):
-        super().__init__(width=width, height=height)
+    def __init__(self, name:str, width: int, height: int):
+        super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
         self.is_highlighted = False
@@ -43,10 +43,13 @@ class CharacterView(View):
         x, y = pane_rect.midtop
         size = 24
         y += int(size / 2) + 4
-        header_rect=pygame.Rect(border.x,border.y,border.width, size)
+        header_rect = pygame.Rect(border.x, border.y, border.width, size)
         pygame.draw.rect(self.surface,
                          fg,
                          header_rect)
+
+        if self.model is None:
+            return
 
         msg = f"{self.model.name} the {self.model.type.value}"
         draw_text(self.surface, msg, x, y,
@@ -75,19 +78,19 @@ class CharacterView(View):
             return
 
         # Draw current health
-        y += 16
+        y += 14
         padding = 4
-        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
+        heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CharacterFeature.HEALTH,width=20, height=20)
         img_rect = heart_img.get_rect()
 
-        x = int(pane_rect.width - ((img_rect.width + padding) * self.model.health)) / 2
-        x=16
+        start_x = x = 12
         for i in range(self.model.health):
-            if i == 5:
-                y+=img_rect.height + padding
-                x = 16
+            # 5 hearts per row.
+            if i>0 and i % 8 == 0:
+                y += img_rect.height + padding
+                x = start_x
             self.surface.blit(heart_img, (x, y))
-            x += heart_img.get_rect().width + 4
+            x += heart_img.get_rect().width + 2
 
         # Draw the current active effects
         y += img_rect.height + padding
@@ -97,7 +100,7 @@ class CharacterView(View):
         for k, v in self.model.effects.items():
             img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
             img_rect = img.get_rect()
-            img_rect.topleft=(x,y)
+            img_rect.topleft = (x, y)
             self.surface.blit(img, img_rect)
             msg = f" {v} "
             draw_text(self.surface,
@@ -109,5 +112,3 @@ class CharacterView(View):
                       bg_colour=self.fg)
 
             x += img_rect.width + padding
-
-

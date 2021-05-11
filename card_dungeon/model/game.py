@@ -11,6 +11,7 @@ class Model():
     STATE_LOADED = Event.STATE_LOADED
     STATE_READY = Event.STATE_READY
     STATE_PLAYING = Event.STATE_PLAYING
+    STATE_ROUND_OVER = Event.STATE_ROUND_OVER
     STATE_PAUSED = Event.STATE_PAUSED
     STATE_GAME_OVER = Event.STATE_GAME_OVER
 
@@ -41,21 +42,8 @@ class Model():
                                         description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
-        self.state = Model.STATE_LOADED
 
-        # If we don't have a living player then create a new one
-        if self.player is None or self.player.is_dead is True:
-            pn = random.choice(["Keith", "Jack", "Rosie"])
-            pt = random.choice(list(PlayerType))
-            self.player = PlayerCharacter(name=pn, type=pt)
-
-        # Generate a random enemy
-        en = random.choice(["Edgar", "Vince","Harold"])
-        et = random.choice(list(EnemyType))
-        e = EnemyCharacter(name=en, type=et)
-
-        self.battle = Battle(self.player, e)
-        self.battle.initialise()
+        self.new_battle()
 
     def tick(self):
         if self.state == Model.STATE_PLAYING:
@@ -107,7 +95,12 @@ class Model():
     def select_card(self, selection : int):
         print(f"Selecting card {selection}")
         if selection >0 and selection <= len(self.battle.player_cards.hand):
-            self.battle.player_selected_card = self.battle.player_cards.hand[selection - 1]
+            selected_card = self.battle.player_cards.hand[selection - 1]
+            if self.battle.player_selected_card != selected_card:
+                self.battle.player_selected_card = selected_card
+            else:
+                self.battle.player_selected_card = None
+
 
     def do_round(self):
 
@@ -117,6 +110,52 @@ class Model():
                                         description="No player card selected"))
         else:
             self.battle.do_round()
+
+            # If game over...
             if self.battle.is_game_over:
-                self.player.wins += self.player.is_dead is False
+                # If player survived
+                if self.player.is_dead is False:
+
+                    self.player.wins += 1
+
+                    # Log event if player levelled up
+                    if self.battle.player.level <= self.battle.enemy.level:
+                        self.player.level_up()
+                        self.events.add_event(Event(type=Event.BATTLE,
+                                                    name=Event.PLAYER_INFO,
+                                                    description=f"{self.player.name} the {self.player.type.value} has gained a level!"))
+
                 self.state = Model.STATE_GAME_OVER
+            else:
+                self.state = Model.STATE_ROUND_OVER
+
+    def new_round(self):
+
+        if self.state == Model.STATE_ROUND_OVER:
+            self.state = Model.STATE_PLAYING
+            self.battle.reset_round()
+        else:
+            print(f"Can't start a new round right now!")
+
+    def new_battle(self):
+
+        self.state = Model.STATE_LOADED
+
+        # If we don't have a living player then create a new one
+        if self.player is None or self.player.is_dead is True:
+            pn = random.choice(["Keith", "Jack", "Rosie"])
+            pt = random.choice(list(PlayerType))
+            self.player = PlayerCharacter(name=pn, type=pt)
+
+        # Reset the player ready for a new battle
+        self.player.reset()
+
+        # Generate a random enemy
+        en = random.choice(["Edgar", "Vince","Harold"])
+        et = random.choice(list(EnemyType))
+        e = EnemyCharacter(name=en, type=et)
+
+        # Create a new battle - player vs. enemy
+        self.battle = Battle(self.player, e)
+        self.battle.initialise()
+
