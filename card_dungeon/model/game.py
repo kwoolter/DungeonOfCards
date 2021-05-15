@@ -153,9 +153,14 @@ class Model():
 
         # If we don't have a living player then create a new one
         if self.player is None or self.player.is_dead is True:
-            pn = random.choice(["Keith", "Jack", "Rosie"])
+
             pt = random.choice(list(PlayerType))
-            self.player = PlayerCharacter(name=pn, type=pt)
+            pg = random.choice(list(Gender))
+            if pg == Gender.MALE:
+                pn = random.choice(["Keith", "Jack", "Monty"])
+            else:
+                pn = random.choice(["Jane", "Honey", "Rosie"])
+            self.player = PlayerCharacter(name=pn, type=pt, gender=pg)
 
         # Reset the player ready for a new battle
         self.player.reset()
@@ -163,7 +168,9 @@ class Model():
         # Generate a random enemy and make the same level as the player
         en = random.choice(["Edgar", "Vince", "Harold", "Fred", "George", "Monty"])
         et = random.choice(list(EnemyType))
-        e = EnemyCharacter(name=en, type=et)
+        eg = random.choice(list(Gender))
+        e = EnemyCharacter(name=en, type=et, gender=eg)
+
         for i in range(self.player.level):
             e.level_up()
 

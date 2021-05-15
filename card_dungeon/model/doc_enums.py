@@ -9,6 +9,10 @@ class Effect(Enum):
     BLESSED = "Blessed"
     SLEEP = "Sleeping"
 
+class Gender(Enum):
+    MALE = "Male"
+    FEMALE = "Female"
+
 class PlayerType(Enum):
     WARRIOR = "Warrior"
     CHUMP = "Chump"

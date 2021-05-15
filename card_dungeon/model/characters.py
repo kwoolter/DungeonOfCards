@@ -2,10 +2,6 @@ import logging
 import random
 from . doc_enums import *
 
-class Gender(Enum):
-    MALE = "Male"
-    FEMALE = "Female"
-
 class BaseCharacter():
 
     def __init__(self, name: str, type: str, gender: str = Gender.MALE, is_player: bool = False):
@@ -15,6 +11,7 @@ class BaseCharacter():
         self.type = type
         self.gender = gender
         self.is_player = is_player
+        self.portrait = random.randint(0,10)
 
         self.effects = {}
 
@@ -91,12 +88,12 @@ class BaseCharacter():
 
 
 class EnemyCharacter(BaseCharacter):
-    def __init__(self, name: str, type: str):
-        super().__init__(name=name, type=type, is_player=False)
+    def __init__(self, name: str, type: str, gender: str):
+        super().__init__(name=name, type=type, gender=gender, is_player=False)
 
 class PlayerCharacter(BaseCharacter):
-    def __init__(self, name: str, type: str):
-        super().__init__(name=name, type=type, is_player=True)
+    def __init__(self, name: str, type: str, gender: str):
+        super().__init__(name=name, type=type, gender=gender, is_player=True)
         self.max_cards_per_hand = 3
         self.cards_per_hand = self.max_cards_per_hand
 
