@@ -1,7 +1,7 @@
 # Dungeon Of Cards
 :copyright: :monkey: kwoolter 2021
 Card game based on Guild of Dungeoneering concept.
-Thanks to GAMBRIBNOUS for inspiration and borrowing graphics.
+Thanks to GAMBRINOUS for inspiration and borrowing graphics.
 
 
 ## Graphics Version
@@ -40,13 +40,43 @@ Battle cards have the following features:-
 The `BattleCard.generate(n)` method will generate a random card with `n` features added.
 
 ## Player Effects
-* Decay - lose 1 health per round
-* Blessed - gain 1 health per round
-* Burning - lose 1 health per round
-* Invincible - enemy attacks do no damage
-* Sleep - player neither attacks nor blocks
-* Confused - you can't see the cards in your own hand
-* Blinded - you can't see the enemy's card
+<table>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/Loot/card_dungeon/view/resources/blessed32x32.png?raw=true" align="center"></td>
+        <td>Blessed</td>
+        <td>Gain 1 health per round</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/0024724b8d9f54ae0d70305ec1e44726ff8c3a2d/card_dungeon/view/resources/blinded32x32.png?raw=true" align="center"></td>
+        <td>Blinded</td>
+        <td>You can't see the enemy's card</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/Loot/card_dungeon/view/resources/burning32x32.png?raw=true" align="center"></td>
+        <td>Burning</td>
+        <td>Lose 1 health per round</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/Loot/card_dungeon/view/resources/confused32x32.png?raw=true" align="center"></td>
+        <td>Confused</td>
+        <td>You can't see the cards in your own hand</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/Loot/card_dungeon/view/resources/decay32x32.png?raw=true" align="center"></td>
+        <td>Decay</td>
+        <td>Lose 1 health per round</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/0024724b8d9f54ae0d70305ec1e44726ff8c3a2d/card_dungeon/view/resources/invincible32x32.png?raw=true" align="center"></td>
+        <td>Invincible</td>
+        <td>Enemy attacks do no damage</td>
+    </tr>
+    <tr>
+        <td><img src="https://github.com/kwoolter/DungeonOfCards/blob/0024724b8d9f54ae0d70305ec1e44726ff8c3a2d/card_dungeon/view/resources/sleeping32x32.png?raw=true" align="center"></td>
+        <td>Sleep</td>
+        <td>player neither attacks nor blocks</td>
+    </tr>
+</table>
 
 ## Decks
 Both the player and an enemy have the following:-
