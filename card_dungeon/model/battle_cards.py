@@ -10,8 +10,12 @@ class BaseCard():
         self.type = type
         self.link_id = 0
 
+    def __str__(self):
+        return f"Card '{self.name}' ({self.type})"
+
     def print(self):
-        print(f"Card '{self.name}' ({self.type.name})")
+        print(str(self))
+
 
 
 class BattleCard(BaseCard):
@@ -36,18 +40,14 @@ class BattleCard(BaseCard):
         self.effects = {}
 
     def __str__(self):
-        text = f"Card '{self.name}': " \
+        text = f"Battle Card '{self.name}': " \
                f"quick={self.is_quick} " \
                f"new_cards={self.new_card_count} " \
                f"unblockable={self.is_attack_unblockable}"
-
         return text
 
     def print(self):
-        print(f"Card '{self.name}' ({self.type.name}) "
-              f"quick={self.is_quick} "
-              f"new_cards={self.new_card_count} "
-              f"unblockable={self.is_attack_unblockable}")
+        print(str(self))
 
         for k, v in self.attacks.items():
             print(f"\tAttack {k.name}={v}")
@@ -197,7 +197,14 @@ class BattleCard(BaseCard):
 class LootCard(BaseCard):
     def __init__(self, name: str):
         super().__init__(name, CardType.LOOT)
+        self.value = 1
 
+    def __str__(self):
+        text = f"Loot Card '{self.name}' value={self.value}"
+        return text
+
+    def print(self):
+        print(str(self))
 
 class CardManager:
     def __init__(self, max_hand_size: int = 1):
@@ -279,7 +286,7 @@ class CardManager:
         self.deck = self.deck + self.discard + self.hand
 
     def shuffle(self):
-        self.deck.shuffle()
+        random.shuffle(self.deck)
 
 
 def test():

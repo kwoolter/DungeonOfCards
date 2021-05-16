@@ -66,11 +66,12 @@ class BattleCardView(View):
 
         padding = 4
         y += 24 + padding
+        margin = 10
 
         # Draw the card attacks
         if len(self.model.attacks) > 0:
             for k, v in self.model.attacks.items():
-                x = 10
+                x = margin
                 img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
                 img_rect = img.get_rect()
                 for i in range(v):
@@ -81,7 +82,7 @@ class BattleCardView(View):
         # Draw the card blocks
         if len(self.model.blocks) > 0:
             for k, v in self.model.blocks.items():
-                x = 16
+                x = margin
                 img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
                 img_rect = img.get_rect()
                 for i in range(v):
@@ -100,7 +101,7 @@ class BattleCardView(View):
 
             # For each type of heal
             for k, v in self.model.heals.items():
-                x = 16
+                x = margin
 
                 # Draw the number of hearts that you will heal by
                 for i in range(v):
@@ -123,7 +124,7 @@ class BattleCardView(View):
         # Draw the card effects
         if len(self.model.effects) > 0:
 
-            x = 16
+            x = margin
             size = 16
 
             # For each type of effect
@@ -151,7 +152,7 @@ class BattleCardView(View):
             y += img_rect.height + padding + size
 
         # Draw any extra properties of the card
-        x = 16
+        x = margin
 
         if self.model.is_attack_unblockable is True:
             property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.UNBLOCKABLE)
@@ -167,3 +168,52 @@ class BattleCardView(View):
             property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.DEAL)
             self.surface.blit(property_img, (x, y))
             x += property_img.get_rect().width + padding
+
+class LootCardView(View):
+    def __init__(self, name:str, width: int, height: int):
+        super().__init__(name=name, width=width, height=height)
+        self.model = None
+        self.surface = None
+        self.fg = Colours.GOLD
+        self.bg = Colours.WHITE
+        self.is_highlighted = False
+
+    def initialise(self, model: model.LootCard):
+        self.model = model
+        self.surface = pygame.Surface((self.width, self.height))
+
+    def draw(self):
+
+        self.surface.fill(self.bg)
+
+        # Draw the border of the card
+        pane_rect = self.surface.get_rect()
+        border = pane_rect
+        border.inflate_ip(-8, -8)
+        if self.is_highlighted is True:
+            fg = Colours.GOLD
+            border_width = 5
+        else:
+            fg = self.fg
+            border_width = 3
+
+        pygame.draw.rect(self.surface,
+                         fg,
+                         border,
+                         border_width)
+
+        if self.model is None:
+            return
+
+        # Draw the name of the card
+        x, y = pane_rect.midtop
+        size = 24
+        header = pygame.Rect(border.x,border.y,border.width, size)
+        pygame.draw.rect(self.surface,
+                         self.fg,
+                         header)
+
+        draw_text(self.surface, self.model.name, x, y + int(size / 2),
+                  size=size,
+                  fg_colour=self.bg,
+                  bg_colour=self.fg)

@@ -11,15 +11,18 @@ class CharacterView(View):
         super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
+        self.portrait_img = None
 
         self.mode = CharacterView.MODE_PORTRAIT
         self.is_highlighted = False
         self.bg = Colours.WHITE
         self.fg = Colours.DARK_GREEN
 
-    def initialise(self, model: model.BaseCharacter):
-        self.model = model
+    def initialise(self, character: model.BaseCharacter):
+        self.model = character
         self.surface = pygame.Surface((self.width, self.height))
+        portrait = self.model.gender == model.Gender.FEMALE
+        self.portrait_img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type, tick=portrait)
 
     def draw(self):
 
@@ -73,7 +76,7 @@ class CharacterView(View):
                       size=size,
                       fg_colour=self.bg,
                       bg_colour=self.fg)
-            return
+            # return
 
         # Draw current health
         y += 14
@@ -94,7 +97,7 @@ class CharacterView(View):
 
         if self.mode == CharacterView.MODE_PORTRAIT:
             # Draw the image of the character
-            img = View.IMAGE_MANAGER.get_skin_image(tile_name=self.model.type)
+            img = self.portrait_img
             img_rect = img.get_rect()
             img_rect.centerx = pane_rect.centerx
             img_rect.bottom = pane_rect.bottom - 16
@@ -105,18 +108,28 @@ class CharacterView(View):
             x = pane_rect.centerx
             y += heart_img.get_rect().height + 20
             size = 16
+
+            msg = f"Gender:{self.model.gender.value.title()}"
+            draw_text(self.surface, msg, x, y,
+                      size=size,
+                      fg_colour=self.fg,
+                      bg_colour=self.bg)
+            y += size
+
             msg = f"Level:{self.model.level}"
             draw_text(self.surface, msg, x, y,
                       size=size,
                       fg_colour=self.fg,
                       bg_colour=self.bg)
             y += size
+
             msg = f"Rounds:{self.model.rounds}"
             draw_text(self.surface, msg, x, y,
                       size=size,
                       fg_colour=self.fg,
                       bg_colour=self.bg)
             y += size
+
             msg = f"Wins:{self.model.wins}"
             draw_text(self.surface, msg, x, y,
                       size=size,

@@ -394,7 +394,7 @@ class Battle():
         self.enemy.tick()
         self.enemy.rounds += 1
 
-        # Flag that indicated if a round has finished or not
+        # Flag that indicates if a round has finished or not
         self.is_round_complete = False
 
 

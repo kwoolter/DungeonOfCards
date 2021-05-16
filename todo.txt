@@ -1,1 +1,3 @@
-1. Need to add checks to only apply attck effects if attack was successful e.g. heal, steal card from player's deck
+1. Confused card hiding logid needs fixing for different game states
+2. Refactor mouse click logic
+3. Add child window structure to views

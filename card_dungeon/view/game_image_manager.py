@@ -20,9 +20,9 @@ class DoCImageManager(ImageManager):
         new_skin_name = ImageManager.DEFAULT_SKIN
         new_skin = (new_skin_name, {
 
-            PlayerType.CHUMP: "test.png",
-            PlayerType.BARBARIAN: "test.png",
-            PlayerType.WARRIOR: "test.png",
+            PlayerType.CHUMP: ("ginger.png","Rosie.png"),
+            PlayerType.BARBARIAN: ("Jack.png","Rosie.png"),
+            PlayerType.WARRIOR: ("Keith.png","Rosie.png"),
 
             EnemyType.RAT: "Rat.png",
             EnemyType.GHOST: "Ghost.png",
@@ -34,24 +34,24 @@ class DoCImageManager(ImageManager):
             EnemyType.SNAKE: "Snake.png",
             EnemyType.BUNNY: "Angry_Bunny.png",
 
-            CharacterFeature.HEALTH: "heart_small.png",
+            CharacterFeature.HEALTH: "heart20x20.png",
 
-            CardFeature.ATTACK_MAGIC: "attack_magic.png",
-            CardFeature.ATTACK_MELEE: "attack_melee.png",
-            CardFeature.BLOCK_MAGIC: "block_magic.png",
-            CardFeature.BLOCK_MELEE: "block_melee.png",
-            CardFeature.UNBLOCKABLE: "unblockable.png",
-            CardFeature.QUICK: "quick.png",
-            CardFeature.DEAL: "extra_card.png",
-            CardFeature.HEAL: "heart.png",
+            CardFeature.ATTACK_MAGIC: "attack_magic32x32.png",
+            CardFeature.ATTACK_MELEE: "attack_melee32x32.png",
+            CardFeature.BLOCK_MAGIC: "block_magic32x32.png",
+            CardFeature.BLOCK_MELEE: "block_melee32x32.png",
+            CardFeature.UNBLOCKABLE: "unblockable32x32.png",
+            CardFeature.QUICK: "quick32x32.png",
+            CardFeature.DEAL: "extra_card32x32.png",
+            CardFeature.HEAL: "heart32x32.png",
 
-            Effect.CONFUSED : "confused.png",
-            Effect.SLEEP : "sleeping.png",
-            Effect.BLIND : "blinded.png",
-            Effect.DECAY : "decay.png",
-            Effect.BURNING : "burning.png",
-            Effect.BLESSED : "blessed.png",
-            Effect.INVINCIBLE : "invincible.png"
+            Effect.CONFUSED : "confused32x32.png",
+            Effect.SLEEP : "sleeping32x32.png",
+            Effect.BLIND : "blinded32x32.png",
+            Effect.DECAY : "decay32x32.png",
+            Effect.BURNING : "burning32x32.png",
+            Effect.BLESSED : "blessed32x32.png",
+            Effect.INVINCIBLE : "invincible32x32.png"
 
         })
 
