@@ -20,7 +20,7 @@ class ImageManager():
         print("Initialising {0}".format(__class__))
         ImageManager.initialised = True
 
-    def get_image(self, image_file_name: str, width: int = 0, height: int = 0):
+    def get_image(self, image_file_name: str, width: int = 0, height: int = 0, crop=False):
 
         transparent = pygame.Color(0, 255, 0)
 
@@ -41,16 +41,19 @@ class ImageManager():
 
             try:
                 # Crop and blank space around the image
-                smallest_size = original_image.get_bounding_rect()
-                print(f'{image_file_name}:{original_image.get_rect()} smallest={smallest_size}')
-                cropped_image = pygame.Surface((smallest_size.width, smallest_size.height))
-                cropped_image.fill(transparent)
-                cropped_image.blit(original_image, dest=(0, 0), area=smallest_size)
-                cropped_image.set_colorkey(transparent)
+                if crop is True:
+                    smallest_size = original_image.get_bounding_rect()
+                    print(f'{image_file_name}:{original_image.get_rect()} smallest={smallest_size}')
+                    cropped_image = pygame.Surface((smallest_size.width, smallest_size.height))
+                    cropped_image.fill(transparent)
+                    cropped_image.blit(original_image, dest=(0, 0), area=smallest_size)
+                    cropped_image.set_colorkey(transparent)
 
-                # Scale the image if requested
-                if width > 0 or height > 0:
-                    cropped_image = pygame.transform.scale(cropped_image, (width, height))
+                    # Scale the image if requested
+                    if width > 0 or height > 0:
+                        cropped_image = pygame.transform.scale(cropped_image, (width, height))
+                else:
+                    cropped_image= original_image
 
                 # Store the image in the cache
                 r = cropped_image.get_rect()
@@ -63,7 +66,7 @@ class ImageManager():
 
         return self.image_cache[image_file_name]
 
-    def get_skin_image(self, tile_name: str, skin_name: str = DEFAULT_SKIN, tick=0, width: int = 0, height: int = 0):
+    def get_skin_image(self, tile_name: str, skin_name: str = DEFAULT_SKIN, tick=0, width: int = 0, height: int = 0, crop=False):
 
         if skin_name not in ImageManager.skins.keys():
             raise Exception("Can't find specified skin {0}".format(skin_name))
@@ -87,10 +90,10 @@ class ImageManager():
             else:
                 tile_file_name = tile_file_names[tick % len(tile_file_names)]
 
-            image = self.get_image(image_file_name=tile_file_name, width=width, height=height)
+            image = self.get_image(image_file_name=tile_file_name, width=width, height=height, crop=crop)
 
         else:
-            image = self.get_image(tile_file_names, width=width, height=height)
+            image = self.get_image(tile_file_names, width=width, height=height, crop=crop)
 
         return image
 
