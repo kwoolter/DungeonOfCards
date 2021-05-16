@@ -115,12 +115,6 @@ class CharacterView(View):
                       fg_colour=self.fg,
                       bg_colour=self.bg)
             y += size
-            msg = f"Rounds:{self.model.rounds}"
-            draw_text(self.surface, msg, x, y,
-                      size=size,
-                      fg_colour=self.fg,
-                      bg_colour=self.bg)
-            y += size
 
             msg = f"Level:{self.model.level}"
             draw_text(self.surface, msg, x, y,
@@ -128,12 +122,14 @@ class CharacterView(View):
                       fg_colour=self.fg,
                       bg_colour=self.bg)
             y += size
+
             msg = f"Rounds:{self.model.rounds}"
             draw_text(self.surface, msg, x, y,
                       size=size,
                       fg_colour=self.fg,
                       bg_colour=self.bg)
             y += size
+
             msg = f"Wins:{self.model.wins}"
             draw_text(self.surface, msg, x, y,
                       size=size,
