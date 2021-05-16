@@ -161,14 +161,20 @@ class Model():
             else:
                 pn = random.choice(["Jane", "Honey", "Rosie"])
             self.player = PlayerCharacter(name=pn, type=pt, gender=pg)
+            self.player.print()
 
         # Reset the player ready for a new battle
         self.player.reset()
 
         # Generate a random enemy and make the same level as the player
-        en = random.choice(["Edgar", "Vince", "Harold", "Fred", "George", "Monty"])
+
         et = random.choice(list(EnemyType))
         eg = random.choice(list(Gender))
+        if eg == Gender.MALE:
+            en = random.choice(["Edgar", "Vince", "Harold", "Fred", "George", "Monty"])
+        else:
+            en = random.choice(["Alice", "Phoebe", "Hannah"])
+
         e = EnemyCharacter(name=en, type=et, gender=eg)
 
         for i in range(self.player.level):

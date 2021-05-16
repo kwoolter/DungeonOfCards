@@ -20,9 +20,9 @@ class DoCImageManager(ImageManager):
         new_skin_name = ImageManager.DEFAULT_SKIN
         new_skin = (new_skin_name, {
 
-            PlayerType.CHUMP: ("Ginger.png","Rosie.png"),
-            PlayerType.BARBARIAN: ("Ginger.png","Rosie.png"),
-            PlayerType.WARRIOR: ("Ginger.png","Rosie.png"),
+            PlayerType.CHUMP: ("ginger.png","Rosie.png"),
+            PlayerType.BARBARIAN: ("Jack.png","Rosie.png"),
+            PlayerType.WARRIOR: ("Keith.png","Rosie.png"),
 
             EnemyType.RAT: "Rat.png",
             EnemyType.GHOST: "Ghost.png",

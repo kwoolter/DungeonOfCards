@@ -116,6 +116,10 @@ class DoCGUIController:
                 elif self.m.state == model.Model.STATE_LOADED:
                     if actions.get("CONTINUE"):
                         self.m.start()
+                    elif actions.get("TEST"):
+                        self.m.player = None
+                        self.m.new_battle()
+                        self.v.initialise()
 
                     # Timer events
                     if event.type == USEREVENT + 2:
