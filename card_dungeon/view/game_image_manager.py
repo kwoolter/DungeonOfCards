@@ -42,16 +42,16 @@ class DoCImageManager(ImageManager):
             CardFeature.BLOCK_MELEE: "block_melee32x32.png",
             CardFeature.UNBLOCKABLE: "unblockable32x32.png",
             CardFeature.QUICK: "quick32x32.png",
-            CardFeature.DEAL: "extra_card.png",
+            CardFeature.DEAL: "extra_card32x32.png",
             CardFeature.HEAL: "heart32x32.png",
 
             Effect.CONFUSED : "confused.png",
             Effect.SLEEP : "sleeping.png",
             Effect.BLIND : "blinded.png",
-            Effect.DECAY : "decay.png",
+            Effect.DECAY : "decay32x32.png",
             Effect.BURNING : "burning.png",
-            Effect.BLESSED : "blessed.png",
-            Effect.INVINCIBLE : "invincible.png"
+            Effect.BLESSED : "blessed32x32.png",
+            Effect.INVINCIBLE : "invincible32x32.png"
 
         })
 

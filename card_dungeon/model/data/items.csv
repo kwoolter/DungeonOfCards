@@ -1,0 +1,8 @@
+Name,Type,Description,Slot,Melee Attack,Magic Attack,Melee Block,Magic Block,Unblockable,Quick,Heal,Heal Condition,Extra Card,Extra Card Condition,Effect,Effect Condition
+Helmet,Loot,Helmet,Head,1,,1,,,,,,,,Blinded,always
+Cape,Loot,Cape,Head,,1,,,,,,,,,Confused,a hit
+Cuirass,Loot,Cuirass,Body,1,1,1,1,1,1,1,always,1,a block,Decaying,all hits
+Wand,Loot,Wand,Hand,,,,1,,,,,,,Burning,a block
+Sword,Loot,Sword,Hand,,,1,,,,,,,,Invincible,all blocks
+Plate,Loot,Plate,Body,,,,,,,,,,,Blessed,
+Chain,Loot,Chain,Body,,,,,,,,,,,Sleeping,

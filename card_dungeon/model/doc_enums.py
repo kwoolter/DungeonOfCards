@@ -33,6 +33,12 @@ class CharacterFeature(Enum):
     HEALTH = "Health"
     LEVEL = "Level"
 
+class CharacterSlot(Enum):
+    HEAD = "Head"
+    BODY = "Body"
+    MAIN_HAND = "Main Hand"
+    OFF_HAND= "Off Hand"
+
 class CardFeature(Enum):
     ATTACK_MELEE = "Melee Attack"
     ATTACK_MAGIC = "Magic Attack"
@@ -46,15 +52,6 @@ class CardFeature(Enum):
 
 class Loot(Enum):
     TOKEN = "Token"
-
-
-# Types of attack and block elements
-class Element(Enum):
-    PHYSICAL = auto()
-    MAGICAL = auto()
-    # FIRE = 1
-    # ICE = 2
-    # WATER = 3
 
 class Outcome(Enum):
     ALL = "always"

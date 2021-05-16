@@ -10,8 +10,12 @@ class BaseCard():
         self.type = type
         self.link_id = 0
 
+    def __str__(self):
+        return f"Card '{self.name}' ({self.type})"
+
     def print(self):
-        print(f"Card '{self.name}' ({self.type.name})")
+        print(str(self))
+
 
 
 class BattleCard(BaseCard):
