@@ -45,11 +45,11 @@ class DoCImageManager(ImageManager):
             CardFeature.DEAL: "extra_card32x32.png",
             CardFeature.HEAL: "heart32x32.png",
 
-            Effect.CONFUSED : "confused.png",
-            Effect.SLEEP : "sleeping.png",
-            Effect.BLIND : "blinded.png",
+            Effect.CONFUSED : "confused32x32.png",
+            Effect.SLEEP : "sleeping32x32.png",
+            Effect.BLIND : "blinded32x32.png",
             Effect.DECAY : "decay32x32.png",
-            Effect.BURNING : "burning.png",
+            Effect.BURNING : "burning32x32.png",
             Effect.BLESSED : "blessed32x32.png",
             Effect.INVINCIBLE : "invincible32x32.png"
 
