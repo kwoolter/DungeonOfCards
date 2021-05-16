@@ -2,7 +2,6 @@ import card_dungeon.model as model
 import card_dungeon.view as view
 
 import os
-import random
 import pygame
 from pygame.locals import *
 
@@ -50,7 +49,7 @@ class DoCGUIController:
         # Sound effects tick timer
         pygame.time.set_timer(USEREVENT + 3, 8000)
 
-        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP, MOUSEBUTTONUP,USEREVENT])
+        pygame.event.set_allowed([QUIT, KEYDOWN, KEYUP, MOUSEBUTTONUP, USEREVENT])
 
         loop = True
 
