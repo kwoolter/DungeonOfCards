@@ -72,8 +72,8 @@ class CardFactory():
             e = BattleCard(name=name, description=row["Description"])
 
             # Add features to thE basic card according to what is in the data frame
-            e.is_attack_unblockable = row["Unblockable"]
-            e.is_quick = row["Quick"]
+            e.is_attack_unblockable = (row["Unblockable"] == True)
+            e.is_quick = (row["Quick"] == True)
             e.new_card_count = row["Extra Card"]
             e.slot = enum_value_to_key(CharacterSlot, row["Slot"], default=CharacterSlot.NONE)
 

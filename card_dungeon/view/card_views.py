@@ -95,20 +95,28 @@ class BattleCardView(View):
                 y += img_rect.height + padding
 
         # Draw the card heals
-        if len(self.model.heals) > 0:
+        if len(self.model.heals) != 0:
 
             size = 16
 
-            # Get the heal image
-            img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
-            img_rect = img.get_rect()
+            # Get the heal/drain image
+            heart_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.HEAL)
+            drain_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.DRAIN)
 
             # For each type of heal
             for k, v in self.model.heals.items():
                 x = margin
 
-                # Draw the number of hearts that you will heal by
-                for i in range(v):
+                # Pick the heart or drain image
+                if v > 0:
+                    img = heart_img
+                else:
+                    img = drain_img
+
+                img_rect = img.get_rect()
+
+                # Draw the number of hearts/drains that you will heal by
+                for i in range(abs(v)):
                     self.surface.blit(img, (x, y))
                     x += img_rect.width + padding
 
@@ -117,7 +125,7 @@ class BattleCardView(View):
                     msg = f"{k.value}"
                     draw_text(self.surface, msg,
                               x,
-                              y + img_rect.centery,
+                              img_rect.bottom+int(size/2) - 2,
                               size=size,
                               fg_colour=self.fg,
                               bg_colour=self.bg,
@@ -146,7 +154,7 @@ class BattleCardView(View):
                     msg = f"{k.value}"
                     draw_text(self.surface, msg,
                               img_rect.centerx,
-                              img_rect.bottom + 10,
+                              img_rect.bottom+int(size/2) - 2,
                               size=size,
                               fg_colour=self.fg,
                               bg_colour=self.bg)
@@ -158,12 +166,12 @@ class BattleCardView(View):
         # Draw any extra properties of the card
         x = margin
 
-        if self.model.is_attack_unblockable is True:
+        if self.model.is_attack_unblockable:
             property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.UNBLOCKABLE)
             self.surface.blit(property_img, (x, y))
             x += property_img.get_rect().width + padding
 
-        if self.model.is_quick is True:
+        if self.model.is_quick:
             property_img = View.IMAGE_MANAGER.get_skin_image(tile_name=model.CardFeature.QUICK)
             self.surface.blit(property_img, (x, y))
             x += property_img.get_rect().width + padding

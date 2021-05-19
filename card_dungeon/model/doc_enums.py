@@ -47,6 +47,7 @@ class CardFeature(Enum):
     BLOCK_MAGIC = "Magic Block"
     QUICK = "Quick"
     HEAL = "Heal"
+    DRAIN = "Drain"
     DEAL = "Extra Card"
     UNBLOCKABLE = "Unblockable"
     EFFECT = "Effect"

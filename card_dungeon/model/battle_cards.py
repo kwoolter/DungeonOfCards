@@ -86,15 +86,16 @@ class BattleCard(BaseCard):
 
         # Random weightings for features...
         weights = [
-            10,  # ATTACK MAGIC
-            10,  # ATTACK MELEE
-            10,  # DEFEND MAGIC
-            10,  # DEFEND MELEE
+            10, # ATTACK MAGIC
+            10, # ATTACK MELEE
+            10, # DEFEND MAGIC
+            10, # DEFEND MELEE
             4,  # QUICK
             3,  # HEAL
+            3,  # DRAIN
             3,  # DEAL
             3,  # UNBLOCKABLE
-            3  # EFFECT
+            3   # EFFECT
         ]
 
         # Keep adding features to the Battle Card until we reach the required level...

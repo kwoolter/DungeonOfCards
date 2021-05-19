@@ -237,12 +237,19 @@ class Battle():
                 print("How did we end up here?")
                 heal_amount = 0
 
-            if heal_amount != 0:
+            self.player.health += heal_amount
+
+            if heal_amount > 0:
                 logging.info(f"Player healed by {heal_amount}")
-                self.player.health += heal_amount
                 self.events.add_event(Event(type=Event.BATTLE,
                                             name=Event.PLAYER_INFO,
                                             description=f"{self.player.name} healed by {heal_amount}"))
+            elif heal_amount < 0:
+                logging.info(f"Player is drained by {abs(heal_amount)}")
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.player.name} drained by {abs(heal_amount)}"))
+
 
         # Heal the enemy if applicable
         succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Enemy",(0,0,0))
@@ -270,12 +277,18 @@ class Battle():
                 print("How did we end up here?")
                 heal_amount = 0
 
-            if heal_amount != 0:
+            self.enemy.health += heal_amount
+
+            if heal_amount > 0:
                 logging.info(f"Enemy healed by {heal_amount}")
-                self.enemy.health += heal_amount
                 self.events.add_event(Event(type=Event.BATTLE,
                                             name=Event.ENEMY_INFO,
                                             description=f"{self.enemy.name} healed by {heal_amount}"))
+            elif heal_amount < 0:
+                logging.info(f"Enemy is drained by {abs(heal_amount)}")
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.enemy.name} drained by {abs(heal_amount)}"))
 
         # Apply effects to player if Player outcomes match...
         # Get the results of the Player action

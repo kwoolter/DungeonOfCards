@@ -44,6 +44,7 @@ class DoCImageManager(ImageManager):
             CardFeature.QUICK: "quick32x32.png",
             CardFeature.DEAL: "extra_card32x32.png",
             CardFeature.HEAL: "heart32x32.png",
+            CardFeature.DRAIN: "drain32x32.png",
 
             Effect.CONFUSED : "confused32x32.png",
             Effect.SLEEP : "sleeping32x32.png",
