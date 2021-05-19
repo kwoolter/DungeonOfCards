@@ -71,6 +71,8 @@ class BattleCardView(View):
         # Draw the card attacks
         if len(self.model.attacks) > 0:
             for k, v in self.model.attacks.items():
+                if v == 0:
+                    continue
                 x = margin
                 img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
                 img_rect = img.get_rect()
@@ -82,6 +84,8 @@ class BattleCardView(View):
         # Draw the card blocks
         if len(self.model.blocks) > 0:
             for k, v in self.model.blocks.items():
+                if v == 0:
+                    continue
                 x = margin
                 img = View.IMAGE_MANAGER.get_skin_image(tile_name=k)
                 img_rect = img.get_rect()

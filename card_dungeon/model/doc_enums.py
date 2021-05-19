@@ -38,6 +38,7 @@ class CharacterSlot(Enum):
     BODY = "Body"
     MAIN_HAND = "Main Hand"
     OFF_HAND= "Off Hand"
+    NONE = "None"
 
 class CardFeature(Enum):
     ATTACK_MELEE = "Melee Attack"
@@ -59,8 +60,17 @@ class Outcome(Enum):
     HIT_ALL = "all hits"
     BLOCK = "a block"
     BLOCK_ALL = "all blocks"
+    NEVER = "never"
 
 class CardType(Enum):
     BATTLE = 1
     LOOT = 2
     MAP = 3
+
+def enum_value_to_key(enum_class:Enum, value:str, default = None):
+    result = default
+    try:
+        result = enum_class._value2member_map_[value]
+    except:
+        pass
+    return result

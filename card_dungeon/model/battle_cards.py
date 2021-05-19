@@ -4,9 +4,10 @@ from .doc_enums import *
 
 
 class BaseCard():
-    def __init__(self, name: str, type: str):
+    def __init__(self, name: str, description:str, type: str):
         # Properties
         self.name = name
+        self.description = description
         self.type = type
         self.link_id = 0
 
@@ -17,7 +18,6 @@ class BaseCard():
         print(str(self))
 
 
-
 class BattleCard(BaseCard):
     MAX_ATTACKS = 3
     MAX_BLOCKS = 3
@@ -26,13 +26,14 @@ class BattleCard(BaseCard):
     PLAYER_CARD_EFFECTS = [Effect.INVINCIBLE, Effect.BLESSED]
     ENEMY_CARD_EFFECTS = [Effect.BLIND, Effect.CONFUSED, Effect.DECAY, Effect.BURNING, Effect.SLEEP]
 
-    def __init__(self, name: str):
-        super().__init__(name, CardType.BATTLE)
+    def __init__(self, name: str, description: str):
+        super().__init__(name, description, CardType.BATTLE)
 
         # Properties
         self.is_attack_unblockable = False
         self.is_quick = False
         self.new_card_count = 0
+        self.slot = CharacterSlot.NONE
 
         self.attacks = {}
         self.blocks = {}
@@ -40,7 +41,8 @@ class BattleCard(BaseCard):
         self.effects = {}
 
     def __str__(self):
-        text = f"Battle Card '{self.name}': " \
+        text = f"Battle Card '{self.name} - {self.description}': " \
+               f"slot={self.slot.value} " \
                f"quick={self.is_quick} " \
                f"new_cards={self.new_card_count} " \
                f"unblockable={self.is_attack_unblockable}"
@@ -50,12 +52,18 @@ class BattleCard(BaseCard):
         print(str(self))
 
         for k, v in self.attacks.items():
+            if v == 0:
+                continue
             print(f"\tAttack {k.name}={v}")
 
         for k, v in self.blocks.items():
+            if v == 0:
+                continue
             print(f"\tBlock {k.name}={v}")
 
         for k, v in self.heals.items():
+            if v == 0:
+                continue
             print(f"\tHeal {k}={v}")
 
         for k, v in self.effects.items():
@@ -96,11 +104,13 @@ class BattleCard(BaseCard):
             feature = random.choices(list(CardFeature), weights=weights, k=1)[0]
 
             # If it is an attack and we haven't hit the max number of attacks..
-            if feature in (CardFeature.ATTACK_MAGIC, CardFeature.ATTACK_MELEE) and len(self.attacks) < BattleCard.MAX_ATTACKS:
+            if feature in (CardFeature.ATTACK_MAGIC, CardFeature.ATTACK_MELEE) and len(
+                    self.attacks) < BattleCard.MAX_ATTACKS:
                 self.attacks[feature] = self.attacks.get(feature, 0) + 1
 
             # If it is a block and we haven't hit the max number of block..
-            elif feature in (CardFeature.BLOCK_MAGIC, CardFeature.BLOCK_MELEE) and len(self.blocks) < BattleCard.MAX_BLOCKS:
+            elif feature in (CardFeature.BLOCK_MAGIC, CardFeature.BLOCK_MELEE) and len(
+                    self.blocks) < BattleCard.MAX_BLOCKS:
                 self.blocks[feature] = self.blocks.get(feature, 0) + 1
 
             # If it is an unblockable attack feature
@@ -195,16 +205,17 @@ class BattleCard(BaseCard):
 
 
 class LootCard(BaseCard):
-    def __init__(self, name: str):
-        super().__init__(name, CardType.LOOT)
+    def __init__(self, name: str, description: str):
+        super().__init__(name, description, CardType.LOOT)
         self.value = 1
 
     def __str__(self):
-        text = f"Loot Card '{self.name}' value={self.value}"
+        text = f"Loot Card '{self.name} - {self.description}' (value={self.value})"
         return text
 
     def print(self):
         print(str(self))
+
 
 class CardManager:
     def __init__(self, max_hand_size: int = 1):
@@ -235,7 +246,6 @@ class CardManager:
             card = self.hand[0]
 
         return card
-
 
     def play_card(self, selected_card: BaseCard = None):
 
@@ -280,7 +290,6 @@ class CardManager:
 
         for card in cards_to_delete:
             self.deck.remove(card)
-
 
     def reset(self):
         self.deck = self.deck + self.discard + self.hand

@@ -3,6 +3,7 @@ import logging
 from .battle_cards import *
 from .characters import *
 from .events import *
+from .card_factory import CardFactory
 
 
 class Battle():
@@ -65,8 +66,13 @@ class Battle():
         :param deck: the deck that you want to add the cards to
         """
         for i in range(card_count):
-            new_card = BattleCard(f"Card {i}")
+            new_card = BattleCard(name=f"Card {i}", description="Bog Standard")
             new_card.generate(random.randint(1, 3), is_player_deck)
+            #deck.append(new_card)
+
+        factory_cards = CardFactory.get_list_of_entities(is_player_deck)
+        for i in range(card_count):
+            new_card = CardFactory.get_entity_by_name(random.choice(factory_cards))
             deck.append(new_card)
 
     def do_attack(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
@@ -299,7 +305,7 @@ class Battle():
                 success = False
 
             # If the Player outcome succeeded then add the effect to the player
-            if success is True:
+            if success:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
                 self.events.add_event(Event(type=Event.BATTLE,
@@ -335,7 +341,7 @@ class Battle():
                 success = False
 
             # If the Enemy outcome succeeded then add the effect to the player
-            if success is True:
+            if success:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
                 self.events.add_event(Event(type=Event.BATTLE,

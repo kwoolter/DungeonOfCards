@@ -1,6 +1,7 @@
 import os
 
 from .battle import *
+from .card_factory import CardFactory
 
 
 class Model():
@@ -41,6 +42,8 @@ class Model():
                                         description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
+
+        CardFactory.load("items.csv")
 
         self.new_battle()
         self.new_loot()
@@ -142,7 +145,7 @@ class Model():
         """
         for i in range(10):
             loot_name = random.choice(["Gold", "Silver", "Diamond", "Ruby", "Sapphire", "Emerald"])
-            new_card = LootCard(loot_name)
+            new_card = LootCard(loot_name, description=f"{loot_name} loot")
             self.loot_deck.deck.append(new_card)
         self.loot_deck.shuffle()
         self.loot_deck.replenish()

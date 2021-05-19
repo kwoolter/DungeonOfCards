@@ -9,5 +9,5 @@ setup(
     author='kwoolter',
     author_email='',
     description='Dungeon of Cards',
-    install_requires=['pygame'],
+    install_requires=['pygame','pandas','numpy']
 )
