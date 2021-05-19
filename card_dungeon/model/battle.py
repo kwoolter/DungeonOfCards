@@ -3,6 +3,7 @@ import logging
 from .battle_cards import *
 from .characters import *
 from .events import *
+from .card_factory import CardFactory
 
 
 class Battle():
@@ -65,8 +66,13 @@ class Battle():
         :param deck: the deck that you want to add the cards to
         """
         for i in range(card_count):
-            new_card = BattleCard(f"Card {i}")
+            new_card = BattleCard(name=f"Card {i}", description="Bog Standard")
             new_card.generate(random.randint(1, 3), is_player_deck)
+            #deck.append(new_card)
+
+        factory_cards = CardFactory.get_list_of_entities(is_player_deck)
+        for i in range(card_count):
+            new_card = CardFactory.get_entity_by_name(random.choice(factory_cards))
             deck.append(new_card)
 
     def do_attack(self, attacker_card: BattleCard, attacker: BaseCharacter, defender_card: BattleCard,
@@ -89,10 +95,14 @@ class Battle():
         suceeded_blocks = 0
 
         # If the attacker is awake...
-        if attacker.is_sleeping is False:
+        if attacker.is_sleeping == False:
 
             # Attempt all of the element attacks in the attackers card
             for attack, attack_count in attacker_card.attacks.items():
+
+                # If numebr of attacks is 0 then loop
+                if attack_count < 1:
+                    continue
 
                 # Log event
                 # self.events.add_event(Event(type=Event.BATTLE,
@@ -105,8 +115,8 @@ class Battle():
                 # If attack is unblockable then 0 blocks
                 # If defender is sleeping then 0 blocks
                 block = Battle.ATTACK_BLOCKS[attack]
-                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable is False) * (
-                            defender.is_sleeping is False)
+                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable == False) * (
+                            defender.is_sleeping == False)
 
                 # Calculate the damage of the attack which must not be negative.
                 damage = max(attack_count - block_count, 0)
@@ -132,7 +142,7 @@ class Battle():
                 # Print the results of the attacker's attack
                 if damage > 0:
                     # If defender is invincible then damage = 0
-                    if defender.is_invincible is True:
+                    if defender.is_invincible:
                         damage = 0
                         print(f"{defender.name} is Invincible!")
                     else:
@@ -168,7 +178,7 @@ class Battle():
         Do a round in the battle
         :return:
         """
-        if self.is_game_over is True:
+        if self.is_game_over:
             print("Battle is over!")
             for c in [self.player, self.enemy]:
                 if c.is_dead:
@@ -187,9 +197,9 @@ class Battle():
         assert self.enemy_round_card is not None, "The Enemy has not picked a card for this round"
 
         # See if the player is going first...
-        if self.player_round_card.is_quick is True:
+        if self.player_round_card.is_quick:
             results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
-            if self.enemy.is_dead is False:
+            if self.enemy.is_dead == False:
                 results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card,
                                                   self.player)
         # Else the enemy goes first
@@ -231,12 +241,19 @@ class Battle():
                 print("How did we end up here?")
                 heal_amount = 0
 
-            if heal_amount != 0:
+            self.player.health += heal_amount
+
+            if heal_amount > 0:
                 logging.info(f"Player healed by {heal_amount}")
-                self.player.health += heal_amount
                 self.events.add_event(Event(type=Event.BATTLE,
                                             name=Event.PLAYER_INFO,
                                             description=f"{self.player.name} healed by {heal_amount}"))
+            elif heal_amount < 0:
+                logging.info(f"Player is drained by {abs(heal_amount)}")
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.player.name} drained by {abs(heal_amount)}"))
+
 
         # Heal the enemy if applicable
         succeeded_attacks, attempted_attacks, succeeded_blocks = results.get("Enemy",(0,0,0))
@@ -264,12 +281,18 @@ class Battle():
                 print("How did we end up here?")
                 heal_amount = 0
 
-            if heal_amount != 0:
+            self.enemy.health += heal_amount
+
+            if heal_amount > 0:
                 logging.info(f"Enemy healed by {heal_amount}")
-                self.enemy.health += heal_amount
                 self.events.add_event(Event(type=Event.BATTLE,
                                             name=Event.ENEMY_INFO,
                                             description=f"{self.enemy.name} healed by {heal_amount}"))
+            elif heal_amount < 0:
+                logging.info(f"Enemy is drained by {abs(heal_amount)}")
+                self.events.add_event(Event(type=Event.BATTLE,
+                                            name=Event.PLAYER_INFO,
+                                            description=f"{self.enemy.name} drained by {abs(heal_amount)}"))
 
         # Apply effects to player if Player outcomes match...
         # Get the results of the Player action
@@ -299,7 +322,7 @@ class Battle():
                 success = False
 
             # If the Player outcome succeeded then add the effect to the player
-            if success is True:
+            if success:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
                 self.events.add_event(Event(type=Event.BATTLE,
@@ -335,7 +358,7 @@ class Battle():
                 success = False
 
             # If the Enemy outcome succeeded then add the effect to the player
-            if success is True:
+            if success:
                 logging.info(f"Effect {v.name} added to Player")
                 self.player.add_effect(v)
                 self.events.add_event(Event(type=Event.BATTLE,

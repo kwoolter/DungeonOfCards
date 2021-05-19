@@ -1,8 +1,43 @@
-Name,Type,Description,Slot,Melee Attack,Magic Attack,Melee Block,Magic Block,Unblockable,Quick,Heal,Heal Condition,Extra Card,Extra Card Condition,Effect,Effect Condition
-Helmet,Loot,Helmet,Head,1,,1,,,,,,,,Blinded,always
-Cape,Loot,Cape,Head,,1,,,,,,,,,Confused,a hit
-Cuirass,Loot,Cuirass,Body,1,1,1,1,1,1,1,always,1,a block,Decaying,all hits
-Wand,Loot,Wand,Hand,,,,1,,,,,,,Burning,a block
-Sword,Loot,Sword,Hand,,,1,,,,,,,,Invincible,all blocks
-Plate,Loot,Plate,Body,,,,,,,,,,,Blessed,
-Chain,Loot,Chain,Body,,,,,,,,,,,Sleeping,
+Name,Type,Description,Slot,Is Player,Is Enemy,Melee Attack,Magic Attack,Melee Block,Magic Block,Unblockable,Quick,Heal,Heal Condition,Extra Card,Extra Card Condition,Effect,Effect Condition
+Helmet,Loot,Helmet,Head,,1,1,,1,,,,,,,,Blinded,always
+Cape,Loot,Cape,Head,,1,,1,,,,,,,,,Confused,a hit
+Cuirass,Loot,Cuirass,Body,,1,,,2,,,,,,1,a block,,
+Flaming Wand,Loot,Flaming Wand,Main Hand,,1,,1,,1,,,,,,,Burning,a block
+Divine Sword,Loot,Divine Sword,Main Hand,1,,1,1,,,,,,,,,Invincible,all hits
+Shield,Loot,Shield,Off Hand,1,,,,2,,,,,,,,,
+Parry,Loot,Parry,Off Hand,1,1,,,1,,,,,,,,,
+Dodge,Loot,Dodge,Off Hand,1,1,,,,1,,,,,,,,
+Plate,Loot,Plate,Body,1,,1,,1,,,,,,,,Blessed,always
+Chain,Loot,Chain,Body,,1,,,2,,,,,,,,Sleeping,12314
+Fire,Loot,Fire,None,1,1,,1,,,,,,,,,,
+Fire 2,Loot,Fire 2,None,1,1,,2,,,,,,,,,,
+Bash,Loot,Bash,None,1,1,1,,,,,,,,,,XYZ,always
+Bash 2,Loot,Bash 2,None,1,1,2,,,,,1,,,,,,
+Combo 1,Loot,Combo 1,None,1,1,1,1,,,,,,,,,,
+Counter,Loot,Counter,None,1,1,1,,1,,,,1,XXX,,,,
+All in,Loot,All in,None,1,,3,,,,1,,-1,always,,,,
+Trade Blows,Loot,Trade Blows,None,1,1,1,,,,,,,,1,always,,
+Sleep Spell,Loot,Sleep Spell,None,,1,,2,,,,,,,,,Sleeping,a hit
+Fire Spell,Loot,Fire Spell,None,,1,,2,,,,,,,,,Burning,a hit
+Knockout Punch,Loot,Knockout Punch,None,,1,2,,,,1,,,,,,Confused,all hits
+Fog Spell,Loot,Fog Spell,None,,1,,1,,,1,,,,,,Blinded,a hit
+Faith Strike,Loot,Faith Strike,None,1,,2,,,,,1,,,,,Blessed,all hits
+Protection,Loot,Protection,None,1,1,,,1,1,,,,,,,,
+Magic Absorption,Loot,Magic Absorption,None,1,1,,,,1,,,1,all blocks,,,,
+Deflect Blow,Loot,Deflect Blow,None,1,1,,,1,,,,1,all blocks,,,,
+Steal Powers,Loot,Steal Powers,None,,1,1,,,,,,,,1,,,
+Raining Blows,Loot,Raining Blows,None,1,1,3,,,,,,,,,,,
+Magic Wave,Loot,Magic Wave,None,1,1,,3,,,,,,,,,,
+Arcane Shroud,Loot,Arcane Shroud,None,1,1,,,,2,,,,,,,,
+Blinding Flash,Loot,Blinding Flash,None,,1,,1,,,,,,,,,Blinded,all hits
+Aura of Poison,Loot,Aura of Poison,None,,1,,,1,,,,,,,,Decaying,a block
+Blow of Stealth,Loot,Blow of Stealth,None,1,1,1,,,,1,1,,,,,,
+Gain Insight,Loot,Gain Insight,None,1,,,,,1,,,,,1,,,
+Reflex Blow,Loot,Reflex Blow,None,1,1,1,1,,,,1,,,,,,
+Burning Hands,Loot,Burning Hands,None,,1,,2,,,,,,,,,Burning,all hits
+Sleep of the Dead,Loot,Sleep of the Dead,None,,1,,2,,,,,,,,,Sleeping,all hits
+Life Steal,Loot,Life Steal,None,1,1,,2,,,,,2,all hits,,,,
+Stupidity,Loot,Stupidity,None,1,1,,,,,,,,,,,,
+Acid Rain,Loot,Acid Rain,None,,1,,2,,,,,,,,,Decaying,a hit
+Wrath of God,Loot,Wrath of God,None,1,1,2,1,,,,,,,,,,
+Psychic Blast,Loot,Psychic Blast,None,1,1,1,2,,,,,,,,,,

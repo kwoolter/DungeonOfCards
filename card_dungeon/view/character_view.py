@@ -65,18 +65,6 @@ class CharacterView(View):
                   fg_colour=self.bg,
                   bg_colour=self.fg)
 
-        # Is the character dead?
-        if self.model.is_dead is True:
-            x, y = pane_rect.center
-            size = 40
-            msg = "*** DEAD ***"
-            draw_text(self.surface,
-                      msg,
-                      x, y,
-                      size=size,
-                      fg_colour=self.bg,
-                      bg_colour=self.fg)
-            # return
 
         # Draw current health
         y += 14
@@ -135,6 +123,18 @@ class CharacterView(View):
                       size=size,
                       fg_colour=self.fg,
                       bg_colour=self.bg)
+
+        # Is the character dead?
+        if self.model.is_dead:
+            x, y = pane_rect.center
+            size = 40
+            msg = "*** DEAD ***"
+            draw_text(self.surface,
+                      msg,
+                      x, y,
+                      size=size,
+                      fg_colour=self.bg,
+                      bg_colour=self.fg)
 
         # Draw the current active effects
         y = temp_y

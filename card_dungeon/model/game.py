@@ -1,6 +1,7 @@
 import os
 
 from .battle import *
+from .card_factory import CardFactory
 
 
 class Model():
@@ -41,6 +42,8 @@ class Model():
                                         description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
+
+        CardFactory.load("items.csv")
 
         self.new_battle()
         self.new_loot()
@@ -109,30 +112,33 @@ class Model():
                                         description="No player card selected"))
         else:
             self.battle.do_round()
+            self.state = Model.STATE_ROUND_OVER
+            self.is_game_over()
 
-            # If game over...
-            if self.battle.is_game_over:
-                # If player survived
-                if self.player.is_dead is False:
+    def is_game_over(self):
+        # If game over...
+        if self.battle.is_game_over:
+            # If player survived
+            if self.player.is_dead == False:
 
-                    self.player.wins += 1
+                self.player.wins += 1
 
-                    # Log event if player levelled up
-                    if self.battle.player.level <= self.battle.enemy.level:
-                        self.player.level_up()
-                        self.events.add_event(Event(type=Event.BATTLE,
-                                                    name=Event.PLAYER_INFO,
-                                                    description=f"{self.player.name} the {self.player.type.value} has gained a level!"))
+                # Log event if player levelled up
+                if self.battle.player.level <= self.battle.enemy.level:
+                    self.player.level_up()
+                    self.events.add_event(Event(type=Event.BATTLE,
+                                                name=Event.PLAYER_INFO,
+                                                description=f"{self.player.name} the {self.player.type.value} has gained a level!"))
 
-                self.state = Model.STATE_GAME_OVER
-            else:
-                self.state = Model.STATE_ROUND_OVER
+            self.state = Model.STATE_GAME_OVER
+
 
     def new_round(self):
 
         if self.state == Model.STATE_ROUND_OVER:
             self.state = Model.STATE_PLAYING
             self.battle.reset_round()
+            self.is_game_over()
         else:
             print(f"Can't start a new round right now!")
 
@@ -142,7 +148,7 @@ class Model():
         """
         for i in range(10):
             loot_name = random.choice(["Gold", "Silver", "Diamond", "Ruby", "Sapphire", "Emerald"])
-            new_card = LootCard(loot_name)
+            new_card = LootCard(loot_name, description=f"{loot_name} loot")
             self.loot_deck.deck.append(new_card)
         self.loot_deck.shuffle()
         self.loot_deck.replenish()
