@@ -4,7 +4,7 @@ from .doc_enums import *
 
 
 class BaseCard():
-    def __init__(self, name: str, description:str, type: str):
+    def __init__(self, name: str, description: str, type: str):
         # Properties
         self.name = name
         self.description = description
@@ -41,12 +41,33 @@ class BattleCard(BaseCard):
         self.effects = {}
 
     def __str__(self):
-        text = f"Battle Card '{self.name} - {self.description}': " \
+        text = f"Battle Card '{self.name} - {self.description} ({self.level})': " \
                f"slot={self.slot.value} " \
                f"quick={self.is_quick} " \
                f"new_cards={self.new_card_count} " \
                f"unblockable={self.is_attack_unblockable}"
         return text
+
+    @property
+    def level(self):
+        l = 0
+
+        for k, v in self.attacks.items():
+            l += v
+
+        for k, v in self.blocks.items():
+            l += v
+
+        for k, v in self.heals.items():
+            l += v
+
+        l += len(self.effects)
+
+        l += self.is_quick == True
+        l += self.is_attack_unblockable == True
+        l += self.new_card_count
+
+        return l
 
     def print(self):
         print(str(self))
@@ -86,16 +107,16 @@ class BattleCard(BaseCard):
 
         # Random weightings for features...
         weights = [
-            10, # ATTACK MAGIC
-            10, # ATTACK MELEE
-            10, # DEFEND MAGIC
-            10, # DEFEND MELEE
+            10,  # ATTACK MAGIC
+            10,  # ATTACK MELEE
+            10,  # DEFEND MAGIC
+            10,  # DEFEND MELEE
             4,  # QUICK
             3,  # HEAL
             3,  # DRAIN
             3,  # DEAL
             3,  # UNBLOCKABLE
-            3   # EFFECT
+            3  # EFFECT
         ]
 
         # Keep adding features to the Battle Card until we reach the required level...

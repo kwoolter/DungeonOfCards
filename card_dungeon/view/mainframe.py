@@ -29,6 +29,9 @@ class MainFrame(View):
         self.card_width = 150
         self.card_height = 180
 
+        self.msg_box_width = 350
+        self.msg_box_height = 80
+
         self._debug = False
 
         # Components
@@ -185,9 +188,7 @@ class MainFrame(View):
         if self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 
-            msg_box_width = 350
-            msg_box_height = 100
-            msg_rect = pygame.Rect(0, 0, msg_box_width, msg_box_height)
+            msg_rect = pygame.Rect(0, 0, self.msg_box_width, self.msg_box_height)
             self.msg_box_rect = msg_rect
             bg = grid_colour
 

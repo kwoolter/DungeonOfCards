@@ -1,17 +1,17 @@
-from .view import *
-from .graphics import *
 import card_dungeon.model as model
 from .card_views import BattleCardView
-import time
+from .graphics import *
+from .view import *
 
 
 class BattleRoundView(View):
 
-    def __init__(self, name:str, width: int, height: int):
+    def __init__(self, name: str, width: int, height: int):
         super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
         self.fg = Colours.DARK_GREEN
+        self.bg = (190, 244, 255)
         self.bg = Colours.WHITE
 
         self.text_size = 20
@@ -19,7 +19,6 @@ class BattleRoundView(View):
 
         self.button_text_size = 48
         self.button_font = pygame.font.SysFont(pygame.font.get_default_font(), self.button_text_size)
-        self.play_button_rect = None
 
         self.player_card_view = None
         self.enemy_card_view = None
@@ -31,12 +30,14 @@ class BattleRoundView(View):
         self.model = model
         self.surface = pygame.Surface((self.width, self.height))
 
-        self.player_card_view = BattleCardView(name="Player Battle Card View", width=self.card_width, height=self.card_height)
+        self.player_card_view = BattleCardView(name="Player Battle Card View", width=self.card_width,
+                                               height=self.card_height)
         self.player_card_view.initialise(self.model.player_selected_card)
         self.player_card_view.fg = Colours.BLUE
 
-        self.enemy_card_view = BattleCardView(name="Enemy Battle Card View", width=self.card_width, height=self.card_height)
-        self.enemy_card_view.initialise(self.model.enemy_cards.default_hand_card )
+        self.enemy_card_view = BattleCardView(name="Enemy Battle Card View", width=self.card_width,
+                                              height=self.card_height)
+        self.enemy_card_view.initialise(self.model.enemy_cards.default_hand_card)
         self.enemy_card_view.fg = Colours.RED
 
     def draw(self):
@@ -79,7 +80,7 @@ class BattleRoundView(View):
 
         # if the round is still in progress...
         if self.model.is_round_complete is False:
-            # Chnage card visibility flags based on effects on the player
+            # Chagne card visibility flags based on effects on the player
             self.player_card_view.is_concealed = self.model.player.is_confused
             self.enemy_card_view.is_concealed = self.model.player.is_blind
 
@@ -102,7 +103,7 @@ class BattleRoundView(View):
         padding = 4
 
         # Create a rect that will contain each event line of text
-        msg_rect = pygame.Rect(0,0,280,size)
+        msg_rect = pygame.Rect(0, 0, 280, size)
         msg_rect.centerx = border.centerx
         msg_rect.y += size + padding
 
@@ -111,14 +112,14 @@ class BattleRoundView(View):
 
             # Pick the colour scheme for the event
             if event.name == model.Event.PLAYER_INFO:
-                fg=Colours.BLUE
-                bg=Colours.WHITE
+                fg = Colours.BLUE
+                bg = Colours.WHITE
             elif event.name == model.Event.ENEMY_INFO:
-                fg=Colours.RED
-                bg=Colours.WHITE
+                fg = Colours.RED
+                bg = Colours.WHITE
             else:
-                fg=Colours.DARK_GREEN
-                bg=self.bg
+                fg = Colours.DARK_GREEN
+                bg = self.bg
 
             msg_rect.y += padding
 
@@ -131,22 +132,20 @@ class BattleRoundView(View):
                                  msg_rect)
 
                 msg = drawText(self.surface,
-                         msg,
-                         color = fg,
-                         rect = msg_rect,
-                         font = self.font,
-                         bkg = bg)
+                               msg,
+                               color=fg,
+                               rect=msg_rect,
+                               font=self.font,
+                               bkg=bg)
                 msg_rect.y += size - 2
 
         # Draw the 'Play' button
         if self.model.player_selected_card is not None and self.model.is_round_complete is False:
-
             fg = Colours.WHITE
-            bg=Colours.GREEN
+            bg = Colours.GREEN
             border_fg = Colours.DARK_GREEN
-            button_rect = pygame.Rect(0,0, 150,100)
+            button_rect = pygame.Rect(0, 0, 150, 100)
             button_rect.center = pane_rect.center
-            self.play_button_rect = button_rect
             self.add_click_zone("Play Button", button_rect)
 
             pygame.draw.rect(self.surface,
@@ -159,7 +158,7 @@ class BattleRoundView(View):
                              4)
 
             text_size = self.button_text_size
-            text_rect = pygame.Rect(0,0, 150,text_size)
+            text_rect = pygame.Rect(0, 0, 150, text_size)
             text_rect.center = button_rect.center
 
             msg = f"Play"
@@ -171,11 +170,3 @@ class BattleRoundView(View):
                            font=self.button_font,
                            bkg=bg,
                            )
-        else:
-
-            self.play_button_rect = None
-
-
-
-
-

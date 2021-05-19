@@ -4,7 +4,7 @@ from .view import *
 
 
 class BattleCardView(View):
-    def __init__(self, name:str, width: int, height: int):
+    def __init__(self, name: str, width: int, height: int):
         super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
@@ -43,12 +43,19 @@ class BattleCardView(View):
         # Draw the name of the card
         x, y = pane_rect.midtop
         size = 24
-        header = pygame.Rect(border.x,border.y,border.width, size)
+        header = pygame.Rect(border.x, border.y, border.width, size)
         pygame.draw.rect(self.surface,
                          self.fg,
                          header)
 
-        draw_text(self.surface, self.model.name, x, y + int(size / 2),
+        if self.is_concealed is True:
+            header_text = "????"
+        else:
+            header_text = self.model.name
+
+        draw_text(self.surface,
+                  header_text,
+                  x, y + int(size / 2),
                   size=size,
                   fg_colour=self.bg,
                   bg_colour=self.fg)
@@ -66,7 +73,7 @@ class BattleCardView(View):
 
         padding = 4
         y += 24 + padding
-        margin = 10
+        margin = 16
 
         # Draw the card attacks
         if len(self.model.attacks) > 0:
@@ -114,22 +121,23 @@ class BattleCardView(View):
                     img = drain_img
 
                 img_rect = img.get_rect()
+                img_rect.topleft = (x,y)
 
                 # Draw the number of hearts/drains that you will heal by
                 for i in range(abs(v)):
-                    self.surface.blit(img, (x, y))
+                    self.surface.blit(img, img_rect)
                     x += img_rect.width + padding
 
                 # If there is a condition on the effect other than ALL...
                 if k != model.Outcome.ALL:
                     msg = f"{k.value}"
                     draw_text(self.surface, msg,
-                              x,
-                              img_rect.bottom+int(size/2) - 2,
+                              img_rect.centerx,
+                              img_rect.bottom + int(size / 2) - 2,
                               size=size,
                               fg_colour=self.fg,
                               bg_colour=self.bg,
-                              centre=False)
+                              centre=True)
 
                 y += img_rect.height + padding
 
@@ -149,12 +157,11 @@ class BattleCardView(View):
 
                 # If there is a condition on the effect other than ALL...
                 if k != model.Outcome.ALL:
-
                     # Draw what outcome is required for effect to apply
                     msg = f"{k.value}"
                     draw_text(self.surface, msg,
                               img_rect.centerx,
-                              img_rect.bottom+int(size/2) - 2,
+                              img_rect.bottom + int(size / 2) - 2,
                               size=size,
                               fg_colour=self.fg,
                               bg_colour=self.bg)
@@ -181,8 +188,9 @@ class BattleCardView(View):
             self.surface.blit(property_img, (x, y))
             x += property_img.get_rect().width + padding
 
+
 class LootCardView(View):
-    def __init__(self, name:str, width: int, height: int):
+    def __init__(self, name: str, width: int, height: int):
         super().__init__(name=name, width=width, height=height)
         self.model = None
         self.surface = None
@@ -220,7 +228,7 @@ class LootCardView(View):
         # Draw the name of the card
         x, y = pane_rect.midtop
         size = 24
-        header = pygame.Rect(border.x,border.y,border.width, size)
+        header = pygame.Rect(border.x, border.y, border.width, size)
         pygame.draw.rect(self.surface,
                          self.fg,
                          header)

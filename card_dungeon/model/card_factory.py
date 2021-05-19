@@ -8,6 +8,7 @@ class CardFactory():
     CARDS = None
     PLAYER_CARDS = None
     ENEMY_CARDS = None
+    CARDS_BY_LEVEL = {}
 
     def __init__(self):
         pass
