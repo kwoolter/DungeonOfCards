@@ -95,10 +95,14 @@ class Battle():
         suceeded_blocks = 0
 
         # If the attacker is awake...
-        if attacker.is_sleeping is False:
+        if attacker.is_sleeping == False:
 
             # Attempt all of the element attacks in the attackers card
             for attack, attack_count in attacker_card.attacks.items():
+
+                # If numebr of attacks is 0 then loop
+                if attack_count < 1:
+                    continue
 
                 # Log event
                 # self.events.add_event(Event(type=Event.BATTLE,
@@ -111,8 +115,8 @@ class Battle():
                 # If attack is unblockable then 0 blocks
                 # If defender is sleeping then 0 blocks
                 block = Battle.ATTACK_BLOCKS[attack]
-                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable is False) * (
-                            defender.is_sleeping is False)
+                block_count = defender_card.blocks.get(block, 0) * (attacker_card.is_attack_unblockable == False) * (
+                            defender.is_sleeping == False)
 
                 # Calculate the damage of the attack which must not be negative.
                 damage = max(attack_count - block_count, 0)
@@ -138,7 +142,7 @@ class Battle():
                 # Print the results of the attacker's attack
                 if damage > 0:
                     # If defender is invincible then damage = 0
-                    if defender.is_invincible is True:
+                    if defender.is_invincible:
                         damage = 0
                         print(f"{defender.name} is Invincible!")
                     else:
@@ -174,7 +178,7 @@ class Battle():
         Do a round in the battle
         :return:
         """
-        if self.is_game_over is True:
+        if self.is_game_over:
             print("Battle is over!")
             for c in [self.player, self.enemy]:
                 if c.is_dead:
@@ -193,9 +197,9 @@ class Battle():
         assert self.enemy_round_card is not None, "The Enemy has not picked a card for this round"
 
         # See if the player is going first...
-        if self.player_round_card.is_quick is True:
+        if self.player_round_card.is_quick:
             results["Player"] = self.do_attack(self.player_round_card, self.player, self.enemy_round_card, self.enemy)
-            if self.enemy.is_dead is False:
+            if self.enemy.is_dead == False:
                 results["Enemy"] = self.do_attack(self.enemy_round_card, self.enemy, self.player_round_card,
                                                   self.player)
         # Else the enemy goes first
