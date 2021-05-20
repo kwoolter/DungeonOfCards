@@ -246,6 +246,8 @@ class CardManager:
         self.discard = []
         self.max_hand_size = max_hand_size
 
+        self.selected_card = None
+
     def deal_card(self, from_deck: list, to_deck: list):
 
         new_card = None
@@ -268,6 +270,18 @@ class CardManager:
             card = self.hand[0]
 
         return card
+
+    def select_card(self, n:int):
+        selected_card = None
+        if n>=1 and n <= len(self.hand):
+            selected_card = self.hand[n-1]
+
+        if selected_card == self.selected_card:
+            self.selected_card = None
+        else:
+            self.selected_card = selected_card
+
+        return self.selected_card
 
     def play_card(self, selected_card: BaseCard = None):
 

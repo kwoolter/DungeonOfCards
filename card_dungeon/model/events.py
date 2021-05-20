@@ -1,7 +1,8 @@
 import collections
+from enum import Enum
 
 
-class Event():
+class Event:
     # Event Types
     DEBUG = "debug"
     QUIT = "quit"
@@ -17,6 +18,7 @@ class Event():
     STATE_READY = "Game Ready"
     STATE_PLAYING = "Game Playing"
     STATE_ROUND_OVER = "Battle Round Over"
+    STATE_BATTLE_OVER = "Battle Over"
     STATE_PAUSED = "Game Paused"
     STATE_GAME_OVER = "Game Over"
 
@@ -27,6 +29,7 @@ class Event():
     PLAYER_INFO = "Player Info"
     ENEMY_INFO = "Enemy Info"
     BATTLE_ROUND_OVER = "Battle Round Over"
+    BATTLE_OVER = "Battle Over"
     ACTION_INFO = "Action Info"
     ACTION_FAILED = "action failed"
     ACTION_SUCCEEDED = "action succeeded"

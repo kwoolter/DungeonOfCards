@@ -82,7 +82,7 @@ class MainFrame(View):
         self.enemy_view.initialise(self.model.battle.enemy)
         self.enemy_view.fg = Colours.RED
 
-        self.loot_view = LootView(name="Loot View", width=self.card_width*5+30,height=self.card_height+20)
+        self.loot_view = LootView(name="Loot View", width=self.card_width*5+30,height=self.card_height+100)
         self.loot_view.initialise(self.model.loot_deck)
 
 
@@ -131,47 +131,50 @@ class MainFrame(View):
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.enemy_view, pos = view_rect.topleft)
 
-        y = view_rect.bottom + 10
-        x = padding
+        # Draw the player's hand if w4 are currently playing
+        if self.model.state == model.Model.STATE_PLAYING:
 
-        # Draw all of the cards in the player's hand
-        for i, card in enumerate(self.model.battle.player_cards.hand):
+            y = view_rect.bottom + 10
+            x = padding
 
-            cv = BattleCardView(name=f"Battle Card View {i}",width=self.card_width, height=self.card_height)
-            view_rect = cv.rect
-            view_rect.topleft = (x,y)
+            # Draw all of the cards in the player's hand
+            for i, card in enumerate(self.model.battle.player_cards.hand):
 
-            cv.initialise(card)
-            cv.is_highlighted = card == self.model.battle.player_selected_card
-            cv.is_concealed = self.model.player.is_confused and self.model.state in (model.Model.STATE_PLAYING,model.Model.STATE_ROUND_OVER)
-            cv.fg = Colours.BLUE
+                cv = BattleCardView(name=f"Battle Card View {i}",width=self.card_width, height=self.card_height)
+                view_rect = cv.rect
+                view_rect.topleft = (x,y)
 
-            cv.draw()
-            self.surface.blit(cv.surface, view_rect)
+                cv.initialise(card)
+                cv.is_highlighted = card == self.model.battle.player_selected_card
+                cv.is_concealed = self.model.player.is_confused and self.model.state in (model.Model.STATE_PLAYING,model.Model.STATE_ROUND_OVER)
+                cv.fg = Colours.BLUE
 
-            # Register card view as a child and add a click zone
-            self.add_child_view(cv, pos=view_rect.topleft)
-            self.add_click_zone(f"Player Card:{i+1}",view_rect )
+                cv.draw()
+                self.surface.blit(cv.surface, view_rect)
 
-            # Draw the number below the card
-            fg = Colours.WHITE
-            bg = Colours.BLUE
+                # Register card view as a child and add a click zone
+                self.add_child_view(cv, pos=view_rect.topleft)
+                self.add_click_zone(f"Player Card:{i+1}",view_rect )
 
-            # Change colours if this is THE selected card
-            if card == self.model.battle.player_selected_card:
-                bg = Colours.GOLD
-            else:
-                bg = Colours.GREY
+                # Draw the number below the card
+                fg = Colours.WHITE
+                bg = Colours.BLUE
 
-            draw_text(self.surface,
-                      f" {i + 1} ",
-                      x + int(cv.width / 2),
-                      y + cv.height,
-                      64,
-                      fg_colour=fg,
-                      bg_colour=bg)
+                # Change colours if this is THE selected card
+                if card == self.model.battle.player_selected_card:
+                    bg = Colours.GOLD
+                else:
+                    bg = Colours.GREY
 
-            x += cv.width + padding
+                draw_text(self.surface,
+                          f" {i + 1} ",
+                          x + int(cv.width / 2),
+                          y + cv.height,
+                          64,
+                          fg_colour=fg,
+                          bg_colour=bg)
+
+                x += cv.width + padding
 
         # Draw the battle view
         pane_rect = self.surface.get_rect()
@@ -214,7 +217,10 @@ class MainFrame(View):
                       bg_colour=bg)
 
 
-        if self.loot_view.is_visible is True:
+        # Draw the Loot selection view if the battle is over
+        if self.model.state == model.Model.STATE_BATTLE_OVER:
+            self.loot_view.is_visible = True
+
             # Draw the loot card deck
             self.loot_view.draw()
             view_rect = self.loot_view.rect

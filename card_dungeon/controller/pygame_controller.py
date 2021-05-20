@@ -111,6 +111,19 @@ class DoCGUIController:
                     if actions.get("CONTINUE"):
                         self.m.new_round()
 
+                # Process events for when the game is in state PLAYING
+                elif self.m.state == model.Model.STATE_BATTLE_OVER:
+                    if actions.get("GO"):
+                        card = self.m.loot_deck.selected_card
+                        if card is not None:
+                            print(f"You chose card {card}")
+                            self.m.new_battle()
+                            self.v.initialise()
+
+                    n = actions.get("SELECT", 0)
+                    if n > 0:
+                        self.m.loot_deck.select_card(n)
+
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
                     if actions.get("CONTINUE"):
@@ -183,12 +196,48 @@ class DoCGUIController:
             actions.update(self.handle_state_events_PLAYING(event))
         elif self.m.state == model.Model.STATE_LOADED:
             actions.update(self.handle_state_events_LOADED(event))
-        elif self.m.state == model.Model.STATE_GAME_OVER:
-            actions.update(self.handle_state_events_GAME_OVER(event))
         elif self.m.state == model.Model.STATE_ROUND_OVER:
             actions.update(self.handle_state_events_ROUND_OVER(event))
+        elif self.m.state == model.Model.STATE_BATTLE_OVER:
+            actions = {}
+            actions.update(self.handle_state_events_BATTLE_OVER(event))
+        elif self.m.state == model.Model.STATE_GAME_OVER:
+            actions.update(self.handle_state_events_GAME_OVER(event))
         elif self.m.state == model.Model.STATE_PAUSED:
             actions.update(self.handle_state_events_PAUSED(event))
+
+        return actions
+
+
+    def handle_state_events_BATTLE_OVER(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Pick a card to play
+            if event.key >= K_1 and event.key <= K_9:
+                n = event.key - K_1 + 1
+                actions["SELECT"] = n
+            # Go and play!
+            elif event.key == K_RETURN:
+                actions["GO"] = True
+
+        # handle MOUSEBUTTONUP
+        elif event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
+
+            # Get the name of the zone that the user clicked on
+            zone = self.v.on_click(pos)
+
+            # If it was a recognizable zone...
+            if zone is not None:
+                if zone == "Choose Button":
+                    actions["GO"] = True
+                elif zone.startswith("Loot Card"):
+                    n = int(zone.split(":")[1])
+                    actions["SELECT"] = n
+                else:
+                    print(f"Nothing happened when you clicked on zone '{zone}' in state {self.m.state}")
 
         return actions
 

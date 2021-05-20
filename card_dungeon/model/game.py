@@ -12,6 +12,7 @@ class Model():
     STATE_READY = Event.STATE_READY
     STATE_PLAYING = Event.STATE_PLAYING
     STATE_ROUND_OVER = Event.STATE_ROUND_OVER
+    STATE_BATTLE_OVER = Event.STATE_BATTLE_OVER
     STATE_PAUSED = Event.STATE_PAUSED
     STATE_GAME_OVER = Event.STATE_GAME_OVER
 
@@ -104,6 +105,15 @@ class Model():
             else:
                 self.battle.player_selected_card = None
 
+    def select_loot_card(self, selection: int):
+        print(f"Selecting loot card {selection}")
+        if selection > 0 and selection <= len(self.loot_deck.hand):
+            selected_card = self.loot_deck.hand[selection - 1]
+            if self.loot_deck.selected_card != selected_card:
+                self.loot_deck.selected_card = selected_card
+            else:
+                self.loot_deck.selected_card = None
+
     def do_round(self):
 
         if self.battle.player_selected_card is None:
@@ -116,8 +126,10 @@ class Model():
             self.is_game_over()
 
     def is_game_over(self):
-        # If game over...
+
+        # If battle is over...
         if self.battle.is_game_over:
+
             # If player survived
             if self.player.is_dead == False:
 
@@ -130,7 +142,12 @@ class Model():
                                                 name=Event.PLAYER_INFO,
                                                 description=f"{self.player.name} the {self.player.type.value} has gained a level!"))
 
-            self.state = Model.STATE_GAME_OVER
+                # Set state to end of the battle
+                self.state = Model.STATE_BATTLE_OVER
+
+            # Else Player died and Game Over
+            else:
+                self.state = Model.STATE_GAME_OVER
 
 
     def new_round(self):
@@ -152,13 +169,14 @@ class Model():
             self.loot_deck.deck.append(new_card)
         self.loot_deck.shuffle()
         self.loot_deck.replenish()
+        self.loot_deck.selected_card = self.loot_deck.default_hand_card
 
     def new_battle(self):
 
         self.state = Model.STATE_LOADED
 
         # If we don't have a living player then create a new one
-        if self.player is None or self.player.is_dead is True:
+        if self.player is None or self.player.is_dead:
 
             pt = random.choice(list(PlayerType))
             pg = random.choice(list(Gender))
@@ -173,18 +191,20 @@ class Model():
         self.player.reset()
 
         # Generate a random enemy and make the same level as the player
-
         et = random.choice(list(EnemyType))
         eg = random.choice(list(Gender))
         if eg == Gender.MALE:
             en = random.choice(["Edgar", "Vince", "Harold", "Fred", "George", "Monty"])
         else:
-            en = random.choice(["Alice", "Phoebe", "Hannah"])
+            en = random.choice(["Alice", "Phoebe", "Hannah", "Elvira", "Lillith","Zora"])
 
         e = EnemyCharacter(name=en, type=et, gender=eg)
 
-        for i in range(self.player.level):
+        # Level up the enemy and reset
+        for i in range(1,self.player.level):
             e.level_up()
+        e.reset()
+        #e.health = 1
 
         # Create a new battle - player vs. enemy
         self.battle = Battle(self.player, e)

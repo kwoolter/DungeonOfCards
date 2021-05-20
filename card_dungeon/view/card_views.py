@@ -206,24 +206,15 @@ class LootCardView(View):
 
         self.surface.fill(self.bg)
 
+        if self.model is None:
+            return
+
+        padding = 6
+
         # Draw the border of the card
         pane_rect = self.surface.get_rect()
         border = pane_rect
-        border.inflate_ip(-8, -8)
-        if self.is_highlighted is True:
-            fg = Colours.GOLD
-            border_width = 5
-        else:
-            fg = self.fg
-            border_width = 3
-
-        pygame.draw.rect(self.surface,
-                         fg,
-                         border,
-                         border_width)
-
-        if self.model is None:
-            return
+        border.inflate_ip(-padding, -padding)
 
         # Draw the name of the card
         x, y = pane_rect.midtop
@@ -233,7 +224,23 @@ class LootCardView(View):
                          self.fg,
                          header)
 
-        draw_text(self.surface, self.model.name, x, y + int(size / 2),
+        draw_text(self.surface, self.model.name,
+                  header.centerx,
+                  header.centery,
                   size=size,
                   fg_colour=self.bg,
                   bg_colour=self.fg)
+
+
+        # Draw the border in the appropriate colour
+        if self.is_highlighted is True:
+            fg = Colours.RED
+            border_width = 5
+        else:
+            fg = self.fg
+            border_width = 3
+
+        pygame.draw.rect(self.surface,
+                         fg,
+                         border,
+                         border_width)
