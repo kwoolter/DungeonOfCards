@@ -1,5 +1,6 @@
 import logging
 from card_dungeon.model.doc_enums import *
+import numpy as np
 
 
 class Room:
@@ -34,6 +35,7 @@ class Map():
         self.name = name
         self.current_room_id = 1
         self.rooms = {}
+        self.tiles = None
         self.visible = set()
 
     def initialise(self):
@@ -99,6 +101,17 @@ class Map():
             new_room = None
 
         return new_room
+
+    def build_tile_map(self, room_id):
+        self.tiles=np.array()
+        used_tiles = []
+        x=0
+        y=0
+
+    def navigate(self, room_id:int):
+        pass
+
+
 
     def generate(self):
 

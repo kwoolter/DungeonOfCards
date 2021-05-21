@@ -127,3 +127,5 @@ Both the player and an enemy have the following:-
 * Hand - The hand of cards that have been dealt from the deck to play with in a round
 * Discard pile - cards that have been used in a round and discarded
 
+# Screen Shots
+<img src="https://github.com/kwoolter/DungeonOfCards/blob/0024724b8d9f54ae0d70305ec1e44726ff8c3a2d/card_dungeon/view/resources/sleeping32x32.png?raw=true" align="center"></td>
