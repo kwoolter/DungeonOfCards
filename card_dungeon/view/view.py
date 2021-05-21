@@ -48,12 +48,12 @@ class ImageManager():
                     cropped_image.fill(transparent)
                     cropped_image.blit(original_image, dest=(0, 0), area=smallest_size)
                     cropped_image.set_colorkey(transparent)
-
-                    # Scale the image if requested
-                    if width > 0 or height > 0:
-                        cropped_image = pygame.transform.scale(cropped_image, (width, height))
                 else:
                     cropped_image= original_image
+
+                # Scale the image if requested
+                if width > 0 or height > 0:
+                    cropped_image = pygame.transform.scale(cropped_image, (width, height))
 
                 # Store the image in the cache
                 r = cropped_image.get_rect()

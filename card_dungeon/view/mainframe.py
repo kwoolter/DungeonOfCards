@@ -1,13 +1,9 @@
-import pygame
-import os
-import card_dungeon.model as model
-from .view import *
-from .graphics import *
+from .battle_views import BattleRoundView
 from .card_views import BattleCardView
 from .character_view import CharacterView
-from . battle_views import BattleRoundView
-from .loot_view import LootView
 from .game_image_manager import *
+from .loot_view import LootView
+from .map_views import *
 
 
 class MainFrame(View):
@@ -46,6 +42,7 @@ class MainFrame(View):
         self.enemy_view = None
         self.batte_round_view = None
         self.loot_view = None
+        self.map_view = None
 
         self.msg_box_rect = None
 
@@ -84,6 +81,11 @@ class MainFrame(View):
 
         self.loot_view = LootView(name="Loot View", width=self.card_width*5+30,height=self.card_height+100)
         self.loot_view.initialise(self.model.loot_deck)
+
+        self.map_view = MapView(name="Map View", width=self.width-20,height=self.height - 20)
+        self.map_view.initialise(self.model.dungeon_map)
+
+
 
 
     def print(self):
@@ -131,8 +133,8 @@ class MainFrame(View):
         # Register this view as a child view and a clickable zone
         self.add_child_view(self.enemy_view, pos = view_rect.topleft)
 
-        # Draw the player's hand if w4 are currently playing
-        if self.model.state == model.Model.STATE_PLAYING:
+        # Draw the player's hand if we are currently playing
+        if self.model.state in (model.Model.STATE_PLAYING, model.Model.STATE_ROUND_OVER):
 
             y = view_rect.bottom + 10
             x = padding
@@ -176,19 +178,26 @@ class MainFrame(View):
 
                 x += cv.width + padding
 
-        # Draw the battle view
-        pane_rect = self.surface.get_rect()
-        self.batte_round_view.draw()
-        view_rect = self.batte_round_view.surface.get_rect()
-        view_rect.centerx = pane_rect.centerx
-        view_rect.y = padding
-        self.surface.blit(self.batte_round_view.surface, view_rect)
+            # Draw the battle view
+            pane_rect = self.surface.get_rect()
+            self.batte_round_view.draw()
+            view_rect = self.batte_round_view.surface.get_rect()
+            view_rect.centerx = pane_rect.centerx
+            view_rect.y = padding
+            self.surface.blit(self.batte_round_view.surface, view_rect)
 
-        # Register battle view as a child view
-        self.add_child_view(self.batte_round_view, pos=view_rect.topleft)
+            # Register battle view as a child view
+            self.add_child_view(self.batte_round_view, pos=view_rect.topleft)
+
+        elif self.model.state == model.Model.STATE_MAP:
+            # Draw the Map view
+            self.map_view.draw()
+            view_rect = self.map_view.rect
+            view_rect.center = pane_rect.center
+            self.surface.blit(self.map_view.surface, view_rect)
 
         # Draw game state msg box if not playing
-        if self.model.state != model.Model.STATE_PLAYING:
+        elif self.model.state != model.Model.STATE_PLAYING:
             pane_rect = self.surface.get_rect()
 
             msg_rect = pygame.Rect(0, 0, self.msg_box_width, self.msg_box_height)
@@ -230,6 +239,8 @@ class MainFrame(View):
 
             # Register battle view as a child view
             self.add_child_view(self.loot_view, pos=view_rect.topleft)
+
+
 
     def update(self):
         pygame.display.update()

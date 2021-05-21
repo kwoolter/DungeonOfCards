@@ -21,6 +21,7 @@ class Event:
     STATE_BATTLE_OVER = "Battle Over"
     STATE_PAUSED = "Game Paused"
     STATE_GAME_OVER = "Game Over"
+    STATE_MAP_MODE = "Map Mode"
 
     # Event Names
     TICK = "Tick"

@@ -1,7 +1,6 @@
-from . view import *
 from card_dungeon.model import PlayerType, EnemyType, CardFeature, CharacterFeature, Effect
-import os
-import logging
+from .view import *
+
 
 class DoCImageManager(ImageManager):
 
@@ -20,9 +19,9 @@ class DoCImageManager(ImageManager):
         new_skin_name = ImageManager.DEFAULT_SKIN
         new_skin = (new_skin_name, {
 
-            PlayerType.CHUMP: ("ginger.png","Rosie.png"),
-            PlayerType.BARBARIAN: ("Jack.png","Rosie.png"),
-            PlayerType.WARRIOR: ("Keith.png","Rosie.png"),
+            PlayerType.CHUMP: ("ginger.png", "Rosie.png"),
+            PlayerType.BARBARIAN: ("Jack.png", "Rosie.png"),
+            PlayerType.WARRIOR: ("Keith.png", "Rosie.png"),
 
             EnemyType.RAT: "Rat.png",
             EnemyType.GHOST: "Ghost.png",
@@ -46,13 +45,25 @@ class DoCImageManager(ImageManager):
             CardFeature.HEAL: "heart32x32.png",
             CardFeature.DRAIN: "drain32x32.png",
 
-            Effect.CONFUSED : "confused32x32.png",
-            Effect.SLEEP : "sleeping32x32.png",
-            Effect.BLIND : "blinded32x32.png",
-            Effect.DECAY : "decay32x32.png",
-            Effect.BURNING : "burning32x32.png",
-            Effect.BLESSED : "blessed32x32.png",
-            Effect.INVINCIBLE : "invincible32x32.png"
+            Effect.CONFUSED: "confused32x32.png",
+            Effect.SLEEP: "sleeping32x32.png",
+            Effect.BLIND: "blinded32x32.png",
+            Effect.DECAY: "decay32x32.png",
+            Effect.BURNING: "burning32x32.png",
+            Effect.BLESSED: "blessed32x32.png",
+            Effect.INVINCIBLE: "invincible32x32.png",
+
+            "NSEW": "roomC-NSEW.png",
+            "NSE_": "room-NSE_.png",
+            "_SE_": "roomC-_SE_.png",
+            "N_E_": "room-N_E_.png",
+            "N___": "roomC-N___.png",
+            "_S__": "roomC-_S__.png",
+            "___W": "roomC-___W.png",
+            "__E_": "roomC-__E_.png",
+            "__EW": "roomB-__EW.png",
+            "NS__": "roomB-NS__.png",
+            "_S_W": "roomC-_S_W.png",
 
         })
 

@@ -8,3 +8,4 @@ from .battle_cards import LootCard
 from .battle_cards import CardManager
 from .characters import *
 from .doc_enums import *
+from .maps import Map, Room

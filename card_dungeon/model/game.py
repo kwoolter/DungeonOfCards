@@ -2,6 +2,7 @@ import os
 
 from .battle import *
 from .card_factory import CardFactory
+from .maps import Map, Room
 
 
 class Model():
@@ -13,10 +14,12 @@ class Model():
     STATE_PLAYING = Event.STATE_PLAYING
     STATE_ROUND_OVER = Event.STATE_ROUND_OVER
     STATE_BATTLE_OVER = Event.STATE_BATTLE_OVER
+    STATE_MAP = Event.STATE_MAP_MODE
     STATE_PAUSED = Event.STATE_PAUSED
     STATE_GAME_OVER = Event.STATE_GAME_OVER
 
     def __init__(self, name: str):
+
         # Properties
         self.name = name
         self.tick_count = 0
@@ -28,6 +31,7 @@ class Model():
         self.battle = None
         self.events = EventQueue()
         self.loot_deck = CardManager(max_hand_size=5)
+        self.dungeon_map = None
 
     @property
     def state(self):
@@ -43,6 +47,10 @@ class Model():
                                         description="Game state changed to {0}".format(self.state)))
 
     def initialise(self):
+
+        self.dungeon_map = Map(self.name)
+        self.dungeon_map.generate()
+        self.dungeon_map.initialise()
 
         CardFactory.load("items.csv")
 
@@ -95,6 +103,9 @@ class Model():
 
     def end(self):
         print("Ending {0}".format(__class__))
+
+    def move(self, direction:Direction):
+        self.dungeon_map.move(direction)
 
     def select_card(self, selection: int):
         print(f"Selecting card {selection}")

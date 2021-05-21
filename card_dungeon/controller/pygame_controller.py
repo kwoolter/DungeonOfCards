@@ -124,10 +124,20 @@ class DoCGUIController:
                     if n > 0:
                         self.m.loot_deck.select_card(n)
 
+                # Process events for when the game is in MAP mode
+                elif self.m.state == model.Model.STATE_MAP:
+                    if actions.get("GO"):
+                        self.m.state = model.Model.STATE_PLAYING
+                    else:
+                        direction = actions.get("MOVE", None)
+                        if direction is not None:
+                            self.m.move(direction)
+
                 # Process events for when the game is in state LOADED
                 elif self.m.state == model.Model.STATE_LOADED:
                     if actions.get("CONTINUE"):
                         self.m.start()
+                        self.m.state = model.Model.STATE_MAP
                     elif actions.get("TEST"):
                         self.m.player = None
                         self.m.new_battle()
@@ -203,6 +213,8 @@ class DoCGUIController:
             actions.update(self.handle_state_events_BATTLE_OVER(event))
         elif self.m.state == model.Model.STATE_GAME_OVER:
             actions.update(self.handle_state_events_GAME_OVER(event))
+        if self.m.state == model.Model.STATE_MAP:
+            actions.update(self.handle_state_events_MAP_MODE(event))
         elif self.m.state == model.Model.STATE_PAUSED:
             actions.update(self.handle_state_events_PAUSED(event))
 
@@ -328,5 +340,26 @@ class DoCGUIController:
                     actions["SELECT"] = n
                 else:
                     print(f"Nothing happened when you clicked on zone '{zone}' in state {self.m.state}")
+
+        return actions
+
+
+    def handle_state_events_MAP_MODE(self, event):
+        actions = {}
+
+        # Key events
+        if event.type == KEYUP:
+            # Move selected Room
+            if event.key == K_UP:
+                actions["MOVE"] = model.Direction.NORTH
+            elif event.key == K_DOWN:
+                actions["MOVE"] = model.Direction.SOUTH
+            elif event.key == K_LEFT:
+                actions["MOVE"] = model.Direction.WEST
+            elif event.key == K_RIGHT:
+                actions["MOVE"] = model.Direction.EAST
+            # Go and play!
+            elif event.key == K_RETURN:
+                actions["GO"] = True
 
         return actions
