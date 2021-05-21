@@ -113,9 +113,23 @@ class Map():
         self.add_link(1, 4, Direction.SOUTH)
         self.add_link(1, 5, Direction.WEST)
         self.add_link(2, 6, Direction.EAST)
+        self.add_link(6, 10, Direction.EAST)
         self.add_link(3, 7, Direction.EAST)
         self.add_link(4, 8, Direction.SOUTH)
         self.add_link(7, 9, Direction.SOUTH)
+        self.add_link(10,7, Direction.SOUTH)
+        self.add_link(9,11, Direction.SOUTH)
+        self.add_link(11,12, Direction.WEST)
+        self.add_link(12, 8, Direction.WEST)
+        self.add_link(3, 13, Direction.SOUTH)
+        self.add_link(4, 13, Direction.EAST)
+        self.add_link(9, 13, Direction.WEST)
+        self.add_link(12, 13, Direction.NORTH)
+        self.add_link(7,14, Direction.EAST)
+        self.add_link(14,16, Direction.EAST)
+        self.add_link(14,17, Direction.SOUTH)
+        self.add_link(10,15, Direction.NORTH)
+
 
         # Set starting location
         self.current_room_id = 1

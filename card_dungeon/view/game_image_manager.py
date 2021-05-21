@@ -54,16 +54,24 @@ class DoCImageManager(ImageManager):
             Effect.INVINCIBLE: "invincible32x32.png",
 
             "NSEW": "roomC-NSEW.png",
-            "NSE_": "room-NSE_.png",
+            "NSE_": "roomC-NSE_.png",
+            "_SEW": "roomC-_SEW.png",
+            "NS_W": "roomC-NS_W.png",
+            "N_EW": "roomC-N_EW.png",
+            "NS__": "roomB-NS__.png",
             "_SE_": "roomC-_SE_.png",
-            "N_E_": "room-N_E_.png",
+            "_S_W": "roomC-_S_W.png",
+            "N_E_": "roomC-N_E_.png",
+            "__EW": "roomB-__EW.png",
             "N___": "roomC-N___.png",
             "_S__": "roomC-_S__.png",
             "___W": "roomC-___W.png",
             "__E_": "roomC-__E_.png",
-            "__EW": "roomB-__EW.png",
-            "NS__": "roomB-NS__.png",
+
+
             "_S_W": "roomC-_S_W.png",
+
+            "N__W": "roomC-N__W.png",
 
         })
 
