@@ -10,6 +10,8 @@ class MapView(View):
                          Direction.WEST:(-1,0),
                          Direction.EAST:(1,0)}
 
+    ZOOM_SIZES = [32, 48, 64, 96, 128 ]
+
     def __init__(self, name:str, width:int, height:int):
         super().__init__(name=name, width=width,height=height)
 
@@ -17,8 +19,9 @@ class MapView(View):
         self.fg = Colours.GREY
         self.bg = Colours.WHITE
         self.bg_highlight = Colours.YELLOW
-        self.room_width = 48
-        self.room_height = 48
+        self.zoom_factor = 1
+        self.room_width = MapView.ZOOM_SIZES[self.zoom_factor]
+        self.room_height = MapView.ZOOM_SIZES[self.zoom_factor]
 
         self.drawn = []
 
@@ -26,6 +29,9 @@ class MapView(View):
         self.model = model
         self.surface = pygame.Surface((self.width, self.height))
         self.drawn=[]
+
+    def zoom(self, dz: int = 1):
+        self.zoom_factor = max(min(self.zoom_factor + dz, len(MapView.ZOOM_SIZES)-1),0)
 
     def draw(self):
 
@@ -36,7 +42,7 @@ class MapView(View):
 
         # Fill the view with graph paper-like grid of squares
         self.surface.fill(Colours.WHITE)
-        grid_size = 34
+        grid_size = MapView.ZOOM_SIZES[self.zoom_factor]
         grid_colour = (190, 244, 255)
 
         for x in range(pane_rect.x, pane_rect.width, grid_size):
@@ -70,16 +76,20 @@ class MapView(View):
         if room_id in self.drawn:
             return
 
-
         # Get the room object using the room ID
         room = self.model.get_room(room_id)
 
         # Get what the room should look like
-        img = View.IMAGE_MANAGER.get_skin_image(tile_name=room.link_key,width=self.room_width, height=self.room_height)
+        img = View.IMAGE_MANAGER.get_skin_image(tile_name=room.link_key)
+
+        # Scale image based on ZOOM factor
+        room_width = MapView.ZOOM_SIZES[self.zoom_factor]
+        room_height = MapView.ZOOM_SIZES[self.zoom_factor]
+        img = pygame.transform.scale(img, (room_width, room_height))
 
         # Draw the room at the specified coordinates
         img_rect = img.get_rect()
-        img_rect.topleft = (x,y)
+        img_rect.center = (x,y)
 
         fg = self.fg
         bg = self.bg
@@ -112,6 +122,6 @@ class MapView(View):
             dx,dy = MapView.DIRECTION_VECTORS[direction]
 
             # Draw the linked room
-            self.draw_room(room_id, x + dx*self.room_width, y+dy*self.room_height)
+            self.draw_room(room_id, x + dx*room_width, y+dy*room_height)
 
 

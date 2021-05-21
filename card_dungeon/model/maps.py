@@ -128,7 +128,8 @@ class Map():
         self.add_link(7,14, Direction.EAST)
         self.add_link(14,16, Direction.EAST)
         self.add_link(14,17, Direction.SOUTH)
-        self.add_link(10,15, Direction.NORTH)
+        self.add_link(17,18, Direction.SOUTH)
+        self.add_link(14,15, Direction.NORTH)
 
 
         # Set starting location

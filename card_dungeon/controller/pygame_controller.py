@@ -128,6 +128,8 @@ class DoCGUIController:
                 elif self.m.state == model.Model.STATE_MAP:
                     if actions.get("GO"):
                         self.m.state = model.Model.STATE_PLAYING
+                    elif actions.get("ZOOM"):
+                        self.v.map_view.zoom(actions.get("ZOOM"))
                     else:
                         direction = actions.get("MOVE", None)
                         if direction is not None:
@@ -358,6 +360,10 @@ class DoCGUIController:
                 actions["MOVE"] = model.Direction.WEST
             elif event.key == K_RIGHT:
                 actions["MOVE"] = model.Direction.EAST
+            elif event.key == K_PAGEUP:
+                actions["ZOOM"] = 1
+            elif event.key == K_PAGEDOWN:
+                actions["ZOOM"] = -1
             # Go and play!
             elif event.key == K_RETURN:
                 actions["GO"] = True
