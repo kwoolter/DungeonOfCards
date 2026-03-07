@@ -5,10 +5,6 @@ from card_dungeon.model.doc_enums import *
 
 class MapView(View):
 
-    DIRECTION_VECTORS = {Direction.NORTH:(0,-1),
-                         Direction.SOUTH:(0,1),
-                         Direction.WEST:(-1,0),
-                         Direction.EAST:(1,0)}
 
     ZOOM_SIZES = [32, 48, 64, 96, 128 ]
 
@@ -28,7 +24,6 @@ class MapView(View):
     def initialise(self, model: model.Map):
         self.model = model
         self.surface = pygame.Surface((self.width, self.height))
-        self.drawn=[]
 
     def zoom(self, dz: int = 1):
         self.zoom_factor = max(min(self.zoom_factor + dz, len(MapView.ZOOM_SIZES)-1),0)
@@ -119,7 +114,7 @@ class MapView(View):
                 continue
 
             # get the vector to change the x,y coordinated by based on direction
-            dx,dy = MapView.DIRECTION_VECTORS[direction]
+            dx,dy = model.Map.DIRECTION_VECTORS[direction]
 
             # Draw the linked room
             self.draw_room(room_id, x + dx*room_width, y+dy*room_height)

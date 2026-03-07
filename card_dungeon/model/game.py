@@ -49,7 +49,8 @@ class Model():
     def initialise(self):
 
         self.dungeon_map = Map(self.name)
-        self.dungeon_map.generate()
+        #self.dungeon_map.generate()
+        self.dungeon_map.generate_random2()
         self.dungeon_map.initialise()
 
         CardFactory.load("items.csv")

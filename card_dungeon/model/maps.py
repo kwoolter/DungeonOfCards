@@ -1,6 +1,9 @@
 import logging
-from card_dungeon.model.doc_enums import *
+import random
+
 import numpy as np
+
+from card_dungeon.model.doc_enums import *
 
 
 class Room:
@@ -31,14 +34,29 @@ class Room:
 
 
 class Map():
+
+    DIRECTION_VECTORS = {Direction.NORTH: (0, -1),
+                         Direction.SOUTH: (0, 1),
+                         Direction.WEST: (-1, 0),
+                         Direction.EAST: (1, 0)}
+
     def __init__(self, name:str):
         self.name = name
-        self.current_room_id = 1
+        self.current_room_id = 56
+        self.max_width = 10
+        self.max_height = 10
+        self.max_rooms = 10
         self.rooms = {}
         self.tiles = None
+        self.filled_tiles = None
         self.visible = set()
 
     def initialise(self):
+        self.filled_tiles = {}
+        self.visible = set()
+        self.max_width = 10
+        self.max_height = 10
+        self.max_rooms = 10
         self.visible.add(self.current_room_id)
 
     def print(self):
@@ -112,6 +130,106 @@ class Map():
         pass
 
 
+    def generate_random(self):
+        new_room_id = 1
+        self.filled_tiles = {}
+        x = y = 0
+
+        self.add_random_room(x,y,new_room_id)
+
+    def add_random_room(self, x: int, y:int, new_room_id):
+
+        logging.info(f"Attempting to add new room {new_room_id} at {x},{y}")
+
+        if (x,y) in self.filled_tiles.keys():
+            logging.info(f"Adding new room {new_room_id}: Tile {x},{y} is already occupied")
+            return False
+
+        if new_room_id > self.max_rooms:
+            logging.info(f"Adding new room {new_room_id}: Reached maximum number of rooms {self.max_rooms}")
+            return False
+
+        if x<0 or x > self.max_width or y<0 or y > self.max_height:
+            logging.info(f"Attempting to add new room {new_room_id} at {x},{y}: Hit the edge of the max")
+            return False
+
+        new_room = Room(new_room_id, f"Room {new_room_id}")
+        self.add_room(new_room)
+        self.filled_tiles[(x,y)] = new_room_id
+        next_room_id = new_room_id + 1
+
+
+        for d in Direction:
+            if random.random() > 0.5:
+                dx,dy = Map.DIRECTION_VECTORS[d]
+                if self.add_random_room(x+dx,y+dy, next_room_id):
+                    self.add_link(new_room_id,next_room_id, d)
+                    next_room_id += 1
+
+            if new_room_id > self.max_rooms:
+                break
+
+        return True
+
+    def generate_random2(self):
+
+        self.filled_tiles = {}
+        links_added = 0
+        rooms_linked = 0
+
+        new_room_id = 1
+        for x in range(self.max_width):
+            for y in range(self.max_height):
+                new_room = Room(new_room_id, f"{new_room_id}")
+                self.add_room(new_room, is_visible=True)
+                self.filled_tiles[(x,y)] = new_room
+                new_room_id+=1
+
+        start_x, start_y = (5,5)
+        self.add_links(start_x, start_y)
+        new_room =self.filled_tiles[(start_x,start_y)]
+
+
+        while rooms_linked < 80:
+            directions = list(new_room.links.keys())
+            random.shuffle(directions)
+            for d in directions:
+                dx, dy = Map.DIRECTION_VECTORS[d]
+                if self.add_links(start_x + dx, start_y + dy):
+                    rooms_linked += 1
+                start_x += dx
+                start_y += dy
+
+
+
+    def add_links(self, x: int, y:int):
+
+        links_added = 0
+
+        if x < 0 or x >= self.max_width or y < 0 or y >= self.max_height:
+            return links_added == 0
+
+        room = self.filled_tiles[(x, y)]
+        room_id = room.id
+
+        logging.info(f"Attempting to link up room {room_id} at {x},{y}")
+
+        directions = list(
+            set(Direction) -
+            set(room.links.keys())
+        )
+        random.shuffle(directions)
+
+        for d in directions:
+            if random.random() > 0.7 or len(room.links) == 0:
+                dx,dy = Map.DIRECTION_VECTORS[d]
+                if x+dx < 0 or x+dx >= self.max_width or y+dy < 0 or y+dy >= self.max_height:
+                    continue
+                next_room_id = self.filled_tiles[(x+dx,y+dy)]
+                self.add_link(room_id, next_room_id.id, d)
+                links_added += 1
+
+        return links_added > 0
 
     def generate(self):
 
@@ -154,16 +272,13 @@ def test():
     logging.basicConfig(level=logging.INFO)
 
     my_map = Map("Test Map")
-    my_map.generate()
+    my_map.initialise()
+    my_map.generate_random2()
+    my_map.print()
 
     current_room = my_map.get_room()
     current_room.print()
 
-    current_room = my_map.move(Direction.NORTH)
-    current_room.print()
-
-    current_room = my_map.move(Direction.EAST)
-    current_room.print()
 
 
 

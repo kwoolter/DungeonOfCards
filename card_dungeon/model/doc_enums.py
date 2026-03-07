@@ -84,6 +84,7 @@ class Direction(Enum):
     EAST = "East"
     WEST = "West"
 
+
 DIRECTION_REVERSE = {Direction.NORTH: Direction.SOUTH,
                      Direction.SOUTH: Direction.NORTH,
                      Direction.EAST: Direction.WEST,

@@ -130,6 +130,10 @@ class DoCGUIController:
                         self.m.state = model.Model.STATE_PLAYING
                     elif actions.get("ZOOM"):
                         self.v.map_view.zoom(actions.get("ZOOM"))
+                    elif actions.get("TEST"):
+                        self.m.dungeon_map.initialise()
+                        self.m.dungeon_map.generate_random()
+                        self.v.map_view.initialise(self.m.dungeon_map)
                     else:
                         direction = actions.get("MOVE", None)
                         if direction is not None:
@@ -367,5 +371,7 @@ class DoCGUIController:
             # Go and play!
             elif event.key == K_RETURN:
                 actions["GO"] = True
+            elif event.key == K_F5:
+                actions["TEST"] = True
 
         return actions
